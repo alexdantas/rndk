@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class MENTRY < CDK::CDKOBJS
@@ -18,7 +18,7 @@ module CDK
       # If the field_width is a negative value, the field_width will be
       # COLS-field_width, otherwise the field_width will be the given width.
       field_width = CDK.setWidgetDimension(parent_width, field_width, 0)
- 
+
       # If the field_rows is a negative value, the field_rows will be
       # ROWS-field_rows, otherwise the field_rows will be the given rows.
       field_rows = CDK.setWidgetDimension(parent_width, field_rows, 0)
@@ -28,7 +28,7 @@ module CDK
       @label = ''
       @label_len = 0
       @label_win = nil
-      
+
       # We need to translate the string label to a chtype array
       if label.size > 0
         label_len = []
@@ -36,7 +36,7 @@ module CDK
         @label_len = label_len[0]
       end
       box_width = @label_len + field_width + 2
-      
+
       old_width = box_width
       box_width = self.setTitle(title, box_width)
       horizontal_adjust = (box_width - old_width) / 2
@@ -433,12 +433,12 @@ module CDK
     # This function redraws the multiple line entry field.
     def drawField
       currchar = @field_width * @top_row
-  
+
       self.drawTitle(@win)
       @win.wrefresh
-  
+
       lastpos = @info.size
-  
+
       # Start redrawing the fields.
       (0...@rows).each do |x|
         (0...@field_width).each do |y|
@@ -454,12 +454,12 @@ module CDK
           end
         end
       end
-  
+
       # Refresh the screen.
       @field_win.wmove(@current_row, @current_col)
       @field_win.wrefresh
     end
-  
+
     # This function draws the multiple line entry field.
     def draw(box)
       # Box the widget if asked.
@@ -467,23 +467,23 @@ module CDK
         Draw.drawObjBox(@win, self)
         @win.wrefresh
       end
-  
+
       # Do we need to draw in the shadow?
       unless @shadow_win.nil?
         Draw.drawShadow(@shadow_win)
       end
-  
+
       # Draw in the label to the widget.
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,
             0, @label_len)
         @label_win.wrefresh
       end
-  
+
       # Draw the mentry field
       self.drawField
     end
-  
+
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
       @win.wbkgd(attrib)
@@ -492,7 +492,7 @@ module CDK
         @label_win.wbkgd(attrib)
       end
     end
-  
+
     # This function erases the multiple line entry field from the screen.
     def erase
       if self.validCDKObject
@@ -502,38 +502,38 @@ module CDK
         CDK.eraseCursesWindow(@shadow_win)
       end
     end
-  
+
     # This function destroys a multiple line entry field widget.
     def destroy
       self.cleanTitle
-  
+
       # Clean up the windows.
       CDK.deleteCursesWindow(@field_win)
       CDK.deleteCursesWindow(@label_win)
       CDK.deleteCursesWindow(@shadow_win)
       CDK.deleteCursesWindow(@win)
-  
+
       # Clean the key bindings.
       self.cleanBindings(:MENTRY)
-  
+
       # Unregister this object.
       CDK::SCREEN.unregister(:MENTRY, self)
     end
-  
+
     # This sets multiple attributes of the widget.
     def set(value, min, box)
       self.setValue(value)
       self.setMin(min)
       self.setBox(box)
     end
-  
+
     # This removes the old information in the entry field and keeps the
     # new information given.
     def setValue(new_value)
       field_characters = @rows * @field_width
-  
+
       @info = new_value
-  
+
       # Set the cursor/row info
       if new_value.size < field_characters
         @top_row = 0
@@ -545,42 +545,42 @@ module CDK
         @current_row = @rows - 1
         @current_col = new_value.size % @field_width
       end
-  
+
       # Redraw the widget.
       self.drawField
     end
-  
+
     def getValue
       return @info
     end
-  
+
     # This sets the filler character to use when drawing the widget.
     def setFillerChar(filler)
       @filler = filler.ord
     end
-  
+
     def getFillerChar
       return @filler
     end
-  
+
     # This sets the character to use when a hidden character type is used
     def setHiddenChar(character)
       @hidden = character
     end
-  
+
     def getHiddenChar
       return @hidden
     end
-  
+
     # This sets a minimum length of the widget.
     def setMin(min)
       @min = min
     end
-  
+
     def getMin
       return @min
     end
-  
+
     # This erases the information in the multiple line entry widget
     def clean
       @info = ''
@@ -588,17 +588,17 @@ module CDK
       @current_col = 0
       @top_row = 0
     end
-  
+
     # This sets the callback function.
     def setCB(callback)
       @callbackfn = callback
     end
-  
+
     def focus
       @field_win.wmove(0, @current_col)
       @field_win.wrefresh
     end
-  
+
     def unfocus
       @field_win.wrefresh
     end

@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class SCALE < CDK::CDKOBJS
@@ -438,7 +438,7 @@ module CDK
     def destroy
       self.cleanTitle
       @label = []
-      
+
       # Clean up the windows.
       CDK.deleteCursesWindow(@field_win)
       CDK.deleteCursesWindow(@label_win)

@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   class RADIO < CDK::SCROLLER
@@ -20,7 +20,7 @@ module CDK
         '<'           => Ncurses::KEY_HOME,
         '>'           => Ncurses::KEY_END,
       }
-      
+
       self.setBox(box)
 
       # If the height is a negative value, height will be ROWS-height,

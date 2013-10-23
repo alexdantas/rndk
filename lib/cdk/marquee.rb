@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class MARQUEE < CDK::CDKOBJS
@@ -38,7 +38,7 @@ module CDK
 
       # Keep the box info, setting BorderOf()
       self.setBox(box)
-      
+
       padding = if mesg[-1] == ' ' then 0 else 1 end
 
       # Translate the string to a chtype array

@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class ALPHALIST < CDK::CDKOBJS
@@ -116,7 +116,7 @@ module CDK
           CDK.Beep
           return true
         end
-        
+
         # Look for a unique word match.
         index = CDK.searchList(alphalist.list, alphalist.list.size, entry.info)
 

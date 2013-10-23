@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class VIEWER < CDK::CDKOBJS
@@ -596,7 +596,7 @@ module CDK
       end
       return found
     end
-    
+
     # This allows us to 'jump' to a given line in the file.
     def jumpToLine
       newline = CDK::SCALE.new(@screen, CDK::CENTER, CDK::CENTER,

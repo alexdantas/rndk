@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class TEMPLATE < CDK::CDKOBJS
@@ -407,7 +407,7 @@ module CDK
     # Draw the template field
     def drawField
       field_color = 0
-      
+
       # Draw in the label and the template object.
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,

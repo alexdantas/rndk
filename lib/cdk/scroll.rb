@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   class SCROLL < CDK::SCROLLER
@@ -33,7 +33,7 @@ module CDK
       # If the width is a negative value, the width will be COLS-width,
       # otherwise the width will be the given width
       box_width = CDK.setWidgetDimension(parent_width, width, 0)
-    
+
       box_width = self.setTitle(title, box_width)
 
       # Set the box height.
@@ -50,9 +50,9 @@ module CDK
       end
 
       # Make sure we didn't extend beyond the dimensions of the window.
-      @box_width = if box_width > parent_width 
-                   then parent_width - scroll_adjust 
-                   else box_width 
+      @box_width = if box_width > parent_width
+                   then parent_width - scroll_adjust
+                   else box_width
                    end
       @box_height = if box_height > parent_height
                     then parent_height
@@ -63,7 +63,7 @@ module CDK
 
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
-      ytmp = [ypos] 
+      ytmp = [ypos]
       CDK.alignxy(cdkscreen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -129,7 +129,7 @@ module CDK
       end
 
       cdkscreen.register(:SCROLL, self);
-      
+
       return self
     end
 
@@ -342,7 +342,7 @@ module CDK
           @toggle_pos = (@current_item * @step).floor
 
           # Make sure the toggle button doesn't go out of bounds.
-          
+
           if @toggle_pos >= @scrollbar_win.getmaxy
             @toggle_pos = @scrollbar_win.getmaxy - 1
           end
@@ -598,7 +598,7 @@ module CDK
         self.setPosition(@current_item)
       end
     end
-    
+
     def focus
       self.drawCurrent
       @list_win.wrefresh

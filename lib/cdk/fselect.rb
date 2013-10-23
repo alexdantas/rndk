@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class FSELECT < CDK::CDKOBJS
@@ -167,7 +167,7 @@ module CDK
         filename = entry.info.clone
         mydirname = CDK.dirName(filename)
         current_index = 0
-        
+
         # Make sure the filename is not nil/empty.
         if filename.nil? || filename.size == 0
           CDK.Beep

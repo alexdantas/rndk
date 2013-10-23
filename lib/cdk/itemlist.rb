@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class ITEMLIST < CDK::CDKOBJS
@@ -116,7 +116,7 @@ module CDK
 
       if actions.nil? || actions.size == 0
         input = 0
-        
+
         while true
           input = self.getch([])
 
@@ -375,7 +375,7 @@ module CDK
         @default_item = default_item
       end
     end
-    
+
     def getDefaultItem
       return @default_item
     end

@@ -1,4 +1,4 @@
-require_relative 'scale'
+require 'cdk/scale'
 
 module CDK
   class FSCALE < CDK::SCALE
@@ -16,7 +16,7 @@ module CDK
       digits = [@digits, 30].min
       format = '%%.%if' % [digits]
       temp = format % [@current]
-      
+
       Draw.writeCharAttrib(@field_win,
           @field_width - temp.size - 1, 0, temp, @field_attr,
           CDK::HORIZONTAL, 0, temp.size)

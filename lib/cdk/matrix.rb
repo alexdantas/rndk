@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class MATRIX < CDK::CDKOBJS
@@ -623,7 +623,7 @@ module CDK
       disptype = @colvalues[@col]
       highlight = @highlight
       infolen = @info[@row][@col].size
-      
+
       # Given the dominance of the color/attributes, we need to set the
       # current cell attribute.
       if @dominant == CDK::ROW

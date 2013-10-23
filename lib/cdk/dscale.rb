@@ -1,4 +1,4 @@
-require_relative 'fscale'
+require 'cdk/fscale'
 
 module CDK
   class DSCALE < CDK::FSCALE

@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class ENTRY < CDK::CDKOBJS
@@ -15,7 +15,7 @@ module CDK
       box_width = 0
       xpos = xplace
       ypos = yplace
-      
+
       self.setBox(box)
       box_height = @border_size * 2 + 1
 
@@ -202,7 +202,7 @@ module CDK
 
       # Set the exit type
       self.setExitType(0)
-      
+
       # Refresh the widget field.
       self.drawField
 
@@ -279,7 +279,7 @@ module CDK
                   success = true
                 end
               end
-              
+
               if success
                 if input == Ncurses::KEY_BACKSPACE
                   if @screen_col > 0
@@ -360,7 +360,7 @@ module CDK
       self.move_specific(xplace, yplace, relative, refresh_flag,
           windows, [])
     end
-    
+
     # This erases the information in the entry field and redraws
     # a clean and empty entry field.
     def clean

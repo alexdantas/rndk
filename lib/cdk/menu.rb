@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class MENU < CDK::CDKOBJS
@@ -19,7 +19,7 @@ module CDK
       xpos = cdkscreen.window.getbegx
       ypos = cdkscreen.window.getbegy
       ymax = cdkscreen.window.getmaxy
-      
+
       # Start making a copy of the information.
       @screen = cdkscreen
       @box = false
@@ -48,7 +48,7 @@ module CDK
       (0...menu_items).each do |x|
         x1 = if menu_location[x] == CDK::LEFT
              then x
-             else 
+             else
                rightcount -= 1
                rightcount + 1
              end
@@ -440,7 +440,7 @@ module CDK
       end
       return within
     end
-          
+
     def object_type
       :MENU
     end

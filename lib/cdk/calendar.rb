@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class CALENDAR < CDK::CDKOBJS
@@ -406,7 +406,7 @@ module CDK
       month << @month
       year << @year
     end
-    
+
     # This sets the attribute of the days in the calendar.
     def setDayAttribute(attribute)
       @day_attrib = attribute

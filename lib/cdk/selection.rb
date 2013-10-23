@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   class SELECTION < CDK::SCROLLER
@@ -251,18 +251,18 @@ module CDK
             @screen.refresh
           end
         end
-  
+
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
           @post_process_func.call(:SELECTION, self, @post_process_data, input)
         end
       end
-  
+
       unless complete
         self.drawList(@box)
         self.setExitType(0)
       end
-  
+
       @result_data = ret
       self.fixCursorPosition
       return ret

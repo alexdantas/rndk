@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class SWINDOW < CDK::CDKOBJS
@@ -184,7 +184,7 @@ module CDK
         @list_pos += [0]
         @list_len += [0]
         self.setupLine(list, @list_size)
-        
+
         @max_left_char = @widest_line - (@box_width - 2)
 
         # Increment the item count and zero out the next row.
