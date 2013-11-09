@@ -86,7 +86,7 @@ module CDK
       @field_win = Ncurses.subwin(@win, 1, field_width,
             ypos + @title_lines + @border_size,
             xpos + @label_len + horizontal_adjust + @border_size)
-      @field_win.keypad(true)
+      Ncurses.keypad(@field_win, true)
 
       # Set up the info field.
       @plate_len = plate.size
@@ -412,7 +412,7 @@ module CDK
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,
             0, @label_len)
-        @label_win.wrefresh
+        Ncurses.wrefresh @label_win
       end
 
       # Draw in the template
@@ -427,15 +427,15 @@ module CDK
         (0...[@field_width, @plate.size].min).each do |x|
           if CDK::TEMPLATE.isPlateChar(@plate[x]) && pos < @info.size
             field_color = @overlay[x] & Ncurses::A_ATTRIBUTES
-            @field_win.mvwaddch(0, x, @info[pos].ord | field_color)
+            Ncurses.mvwaddch(@field_win, 0, x, @info[pos].ord | field_color)
             pos += 1
           end
         end
-        @field_win.wmove(0, @screen_pos)
+        Ncurses.wmove(@field_win, 0, @screen_pos)
       else
         self.adjustCursor(1)
       end
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     # Adjust the cursor for the template
@@ -445,17 +445,15 @@ module CDK
         @plate_pos += direction
         @screen_pos += direction
       end
-      @field_win.wmove(0, @screen_pos)
-      @field_win.wrefresh
+      Ncurses.wmove(@field_win, 0, @screen_pos)
+      Ncurses.wrefresh @field_win
     end
 
     # Set the background attribute of the widget.
     def setBKattr(attrib)
       Ncurses.wbkgd(@win, attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # Destroy this widget.

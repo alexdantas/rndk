@@ -37,15 +37,14 @@ class SubwindowExample < CLIExample
     Ncurses.curs_set(0)
 
     # Create a basic window.
-    sub_window = Ncurses::WINDOW.new(
-        Ncurses.LINES - 5, Ncurses.LINES - 10, 2, 5)
+    sub_window = Ncurses.newwin(Ncurses.LINES - 5, Ncurses.LINES - 10, 2, 5)
 
     # Start Cdk.
     cdkscreen = CDK::SCREEN.new(sub_window)
 
     # Box our window.
     Ncurses.box(sub_window, Ncurses::ACS_VLINE, Ncurses::ACS_HLINE)
-    sub_window.wrefresh
+    Ncurses.wrefresh sub_window
 
     # Create a basic scrolling list inside the window.
     dow_list = CDK::SCROLL.new(cdkscreen,
@@ -64,7 +63,7 @@ class SubwindowExample < CLIExample
 
     # Refresh the screen.
     cdkscreen.refresh
-    
+
     # Let the user play.
     pick = dow_list.activate('')
 

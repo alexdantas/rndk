@@ -389,16 +389,16 @@ class TraverseExample < Example
       screen = object.screen
       window = screen.window
 
-      window.mvwprintw(window.getmaxy - 1, 0, 'selection %d/%d', mp, sp)
+      Ncurses.mvwaddstr(window, (Ncurses.getmaxy(window) - 1), 0, ('selection %d/%d' % [mp, sp]))
       Ncurses.clrtoeol
       Ncurses.refresh
       if sp >= 0 && sp < TraverseExample::MENU_TABLE.size
         self.make_any(screen, mp, TraverseExample::MENU_TABLE[sp][1])
       end
-    end 
+    end
     return 1
   end
-  
+
   # This demonstrates the Cdk widget-traversal
   def TraverseExample.main
     menulist = [['Left'], ['Center'], ['Right']]

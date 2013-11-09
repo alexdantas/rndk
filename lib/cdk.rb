@@ -763,14 +763,17 @@ module CDK
   end
 
   def CDK.digit?(character)
+    false if character.nil?
     !(character.match(/^[[:digit:]]$/).nil?)
   end
 
   def CDK.alpha?(character)
+    false if character.nil?
     !(character.match(/^[[:alpha:]]$/).nil?)
   end
 
   def CDK.isChar(c)
+    false if c.nil?
     c >= 0 && c < Ncurses::KEY_MIN
   end
 

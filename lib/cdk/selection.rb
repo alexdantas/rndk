@@ -1,6 +1,7 @@
 require_relative 'scroller'
 
 module CDK
+  # TODO This Widget's very buggy! Somehow improve it later!
   class SELECTION < CDK::SCROLLER
     attr_reader :selections
 
@@ -146,8 +147,8 @@ module CDK
       ypos = self.SCREEN_YPOS(@current_item - @current_top)
       xpos = self.SCREEN_XPOS(0) + scrollbar_adj
 
-      @input_window.wmove(ypos, xpos)
-      @input_window.wrefresh
+      Ncurses.wmove(@input_window, ypos, xpos)
+      Ncurses.wrefresh @input_window
     end
 
     # This actually manages the selection widget
@@ -309,7 +310,7 @@ module CDK
           xpos = self.SCREEN_XPOS(0)
 
           # Draw the empty line.
-          Draw.writeBlanks(@win, xpos, ypos, CDK::HORIZONTAL, 0, @win.getmaxx)
+          Draw.writeBlanks(@win, xpos, ypos, CDK::HORIZONTAL, 0, Ncurses.getmaxx(@win))
 
           # Draw the selection item.
           Draw.writeChtypeAttrib(@win,
@@ -333,10 +334,16 @@ module CDK
         @toggle_pos = (@current_item * @step).floor
         @toggle_pos = [@toggle_pos, Ncurses.getmaxy(@scrollbar_win) - 1].min
 
-        @scrollbar_win.mvwvline(0, 0, Ncurses::ACS_CKBOARD,
-            Ncurses.getmaxy(@scrollbar_win))
-        @scrollbar_win.mvwvline(@toggle_pos, 0,
-            ' '.ord | Ncurses::A_REVERSE, @toggle_size)
+        Ncurses.mvwvline(@scrollbar_win,
+                         0,
+                         0,
+                         Ncurses::ACS_CKBOARD,
+                         Ncurses.getmaxy(@scrollbar_win))
+
+        Ncurses.mvwvline(@scrollbar_win,
+                         @toggle_pos,
+                         0,
+                         ' '.ord | Ncurses::A_REVERSE, @toggle_size)
       end
 
       # Box it if needed
@@ -351,7 +358,7 @@ module CDK
     def setBKattr(attrib)
       Ncurses.wbkgd(@win, attrib)
       unless @scrollbar_win.nil?
-        @scrollbar_win.wbkgd(attrib)
+        Ncurses.wbkgd(@scrollbar_win, attrib)
       end
     end
 
@@ -400,8 +407,12 @@ module CDK
 
       # Clean up the display
       (0...@view_size).each do |j|
-        Draw.writeBlanks(@win, self.SCREEN_XPOS(0), self.SCREEN_YPOS(j),
-            CDK::HORIZONTAL, 0, @win.getmaxx)
+        Draw.writeBlanks(@win,
+                         self.SCREEN_XPOS(0),
+                         self.SCREEN_YPOS(j),
+                         CDK::HORIZONTAL,
+                         0,
+                         Ncurses.getmaxx(@win))
       end
 
       self.setViewSize(list_size)

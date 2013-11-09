@@ -1,6 +1,7 @@
 require_relative 'cdk_objs'
 
 module CDK
+  # TODO This Widget's very buggy! Somehow improve it later!
   class SWINDOW < CDK::CDKOBJS
     def initialize(cdkscreen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
@@ -58,9 +59,12 @@ module CDK
       Ncurses.keypad(@win, true)
 
       # Make the field window
-      @field_win = Ncurses.subwin(@win, box_height - @title_lines - 2, box_width - 2,
-          ypos + @title_lines + 1, xpos + 1)
-      @field_win.keypad(true)
+      @field_win = Ncurses.subwin(@win,
+                                  box_height - @title_lines - 2,
+                                  box_width - 2,
+                                  ypos + @title_lines + 1,
+                                  xpos + 1)
+      Ncurses.keypad(@field_win, true)
 
       # Set the rest of the variables
       @screen = cdkscreen
@@ -472,7 +476,7 @@ module CDK
       end
 
       # Erase the scrolling window.
-      @field_win.werase
+      Ncurses.werase @field_win
 
       # Start drawing in each line.
       (0...last_line).each do |x|
@@ -490,13 +494,13 @@ module CDK
         end
       end
 
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
       Ncurses.wbkgd(@win, attrib)
-      @field_win.wbkgd(attrib)
+      Ncurses.wbkgd(@field_win, attrib)
     end
 
     # Free any storage associated with the info-list.
