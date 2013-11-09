@@ -2,12 +2,17 @@ module CDK
   module Draw
     # This sets up a basic set of color pairs. These can be redefined if wanted
     def Draw.initCDKColor
-      color = [Ncurses::COLOR_WHITE, Ncurses::COLOR_RED, Ncurses::COLOR_GREEN,
-          Ncurses::COLOR_YELLOW, Ncurses::COLOR_BLUE, Ncurses::COLOR_MAGENTA,
-          Ncurses::COLOR_CYAN, Ncurses::COLOR_BLACK]
+      color = [Ncurses::COLOR_WHITE,
+               Ncurses::COLOR_RED,
+               Ncurses::COLOR_GREEN,
+               Ncurses::COLOR_YELLOW,
+               Ncurses::COLOR_BLUE,
+               Ncurses::COLOR_MAGENTA,
+               Ncurses::COLOR_CYAN,
+               Ncurses::COLOR_BLACK]
       pair = 1
 
-      if Ncurses.has_colors?
+      if Ncurses.has_colors
         # XXX: Only checks if terminal has colours not if colours are started
         Ncurses.start_color
         limit = if Ncurses.COLORS < 8 then Ncurses.COLORS else 8 end
@@ -155,7 +160,7 @@ module CDK
 
         # Draw the line on the bottom.
         shadow_win.mvwhline(y_hi, 1, Ncurses::ACS_HLINE | Ncurses::A_DIM, x_hi)
-        
+
         # Draw the line on teh right.
         shadow_win.mvwvline(0, x_hi, Ncurses::ACS_VLINE | Ncurses::A_DIM, y_hi)
 

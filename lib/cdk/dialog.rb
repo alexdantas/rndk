@@ -345,8 +345,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, height, width,
         title, xtitle, ytitle)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx cdkscreen.window
+      parent_height = Ncurses.getmaxy cdkscreen.window
 
       self.setBox(false)
 
@@ -367,7 +367,7 @@ module CDK
       # Create the widget pointer
       @screen = cdkscreen
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @box_height = box_height
       @box_width = box_width
       @minx = 0
@@ -381,7 +381,7 @@ module CDK
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Translate the X axis title string to a chtype array
       if !(xtitle.nil?) && xtitle.size > 0

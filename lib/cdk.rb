@@ -2,7 +2,7 @@
 
 # Copyright (c) 2013, Chris Sauro
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -13,7 +13,7 @@
 #     * Neither the name of Chris Sauro nor the
 #       names of its contributors may be used to endorse or promote products
 #       derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -25,7 +25,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'ncurses'
+require 'ffi-ncurses'
 require 'scanf'
 require_relative 'cdk/draw'
 require_relative 'cdk/display'
@@ -60,6 +60,8 @@ require_relative 'cdk/uscale'
 require_relative 'cdk/uslider'
 require_relative 'cdk/viewer'
 
+Ncurses = FFI::NCurses
+
 module CDK
   # some useful global values
 
@@ -70,9 +72,9 @@ module CDK
   VERSION_MAJOR = 0
   VERSION_MINOR = 8
   VERSION_PATCH = 0
-  
+
   CDK_PATHMAX = 256
-  
+
   L_MARKER = '<'
   R_MARKER = '>'
 
@@ -112,7 +114,7 @@ module CDK
 
   ALL_SCREENS = []
   ALL_OBJECTS = []
-  
+
   # This beeps then flushes the stdout stream
   def CDK.Beep
     Ncurses.beep
@@ -135,8 +137,8 @@ module CDK
   # xpos, ypos is an array with exactly one value, an integer
   # box_width, box_height is an integer
   def CDK.alignxy (window, xpos, ypos, box_width, box_height)
-    first = window.getbegx
-    last = window.getmaxx
+    first = Ncurses.getbegx window
+    last = Ncurses.getmaxx window
     if (gap = (last - box_width)) < 0
       gap = 0
     end
@@ -157,8 +159,8 @@ module CDK
       end
     end
 
-    first = window.getbegy
-    last = window.getmaxy
+    first = Ncurses.getbegy window
+    last = Ncurses.getmaxy window
     if (gap = (last - box_height)) < 0
       gap = 0
     end
@@ -397,7 +399,7 @@ module CDK
           start = x + 4
         end
       end
-      
+
       while adjust > 0
         adjust -= 1
         result << ' '
@@ -580,7 +582,7 @@ module CDK
   # Formatting codes are omitted.
   def CDK.chtype2Char(string)
     newstring = ''
-    
+
     unless string.nil?
       string.each do |char|
         newstring << CDK.CharOf(char)
