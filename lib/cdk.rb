@@ -42,6 +42,7 @@ require_relative 'cdk/entry'
 require_relative 'cdk/fscale'
 require_relative 'cdk/fslider'
 require_relative 'cdk/fselect'
+require_relative 'cdk/graph'
 require_relative 'cdk/histogram'
 require_relative 'cdk/itemlist'
 require_relative 'cdk/label'
@@ -246,7 +247,7 @@ module CDK
     if mask[0] != 0
       from += 1
     elsif CDK.digit?(string[from+1]) and CDK.digit?(string[from + 2])
-      if Ncurses.has_colors?
+      if Ncurses.has_colors
         # XXX: Only checks if terminal has colours not if colours are started
         pair = string[from + 1..from + 2].to_i
         mask[0] = Ncurses.COLOR_PAIR(pair)
@@ -256,7 +257,7 @@ module CDK
 
       from += 2
     elsif CDK.digit?(string[from + 1])
-      if Ncurses.has_colors?
+      if Ncurses.has_colors
         # XXX: Only checks if terminal has colours not if colours are started
         pair = string[from + 1].to_i
         mask[0] = Ncurses.COLOR_PAIR(pair)
@@ -309,7 +310,7 @@ module CDK
           end
         end
         # XXX: Only checks if terminal has colours not if colours are started
-        if Ncurses.has_colors?
+        if Ncurses.has_colors
           if (tmpattr & Ncurses::A_COLOR) != (newattr & Ncurses::A_COLOR)
             oldpair = Ncurses.PAIR_NUMBER(tmpattr)
             newpair = Ncurses.PAIR_NUMBER(newattr)

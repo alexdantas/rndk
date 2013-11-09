@@ -6,11 +6,22 @@ module CDK
     attr_reader :win, :box_height, :box_width, :max, :field_width
     attr_reader :min, :max
 
-    def initialize(cdkscreen, xplace, yplace, title, label, field_attr, filler,
-        disp_type, f_width, min, max, box, shadow)
+    def initialize(cdkscreen,
+                   xplace,
+                   yplace,
+                   title,
+                   label,
+                   field_attr,
+                   filler,
+                   disp_type,
+                   f_width,
+                   min,
+                   max,
+                   box,
+                   shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx cdkscreen.window
+      parent_height = Ncurses.getmaxy cdkscreen.window
       field_width = f_width
       box_width = 0
       xpos = xplace
@@ -65,15 +76,17 @@ module CDK
       Ncurses.keypad(@win, true)
 
       # Make the field window.
-      @field_win = Ncurses.subwin(@win, 1, field_width,
-          ypos + @title_lines + @border_size,
-          xpos + @label_len + horizontal_adjust + @border_size)
+      @field_win = Ncurses.subwin(@win,
+                                  1,
+                                  field_width,
+                                  ypos + @title_lines + @border_size,
+                                  xpos + @label_len + horizontal_adjust + @border_size)
 
       if @field_win.nil?
         self.destroy
         return nil
       end
-      @field_win.keypad(true)
+      Ncurses.keypad(@field_win, true)
 
       # make the label win, if we need to
       if !(label.nil?) && label.size > 0
@@ -247,7 +260,7 @@ module CDK
               self.drawField
             else
               @screen_col -= 1
-              @field_win.wmove(0, @screen_col)
+              Ncurses.wmove(@field_win, 0, @screen_col)
             end
           when Ncurses::KEY_RIGHT
             if curr_pos >= @info.size
@@ -259,7 +272,7 @@ module CDK
             else
               # Move right.
               @screen_col += 1
-              @field_win.wmove(0, @screen_col)
+              Ncurses.wmove(@field_win, 0, @screen_col)
             end
           when Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC
             if @disp_type == :VIEWONLY
@@ -369,21 +382,21 @@ module CDK
       @info = ''
 
       # Clean the entry screen field.
-      @field_win.mvwhline(0, 0, @filler.ord, width)
+      Ncurses.mvwhline(@field_win, 0, 0, @filler.ord, width)
 
       # Reset some variables
       @screen_col = 0
       @left_char = 0
 
       # Refresh the entry field.
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     # This draws the entry field.
     def draw(box)
       # Did we ask for a shadow?
       unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
+        Draw.drawShadow @shadow_win
       end
 
       # Box the widget if asked.
@@ -391,15 +404,20 @@ module CDK
         Draw.drawObjBox(@win, self)
       end
 
-      self.drawTitle(@win)
+      self.drawTitle @win
 
       Ncurses.wrefresh @win
 
       # Draw in the label to the widget.
       unless @label_win.nil?
-        Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL, 0,
-            @label_len)
-        @label_win.wrefresh
+        Draw.writeChtype(@label_win,
+                         0,
+                         0,
+                         @label,
+                         CDK::HORIZONTAL,
+                         0,
+                         @label_len)
+        Ncurses.wrefresh @label_win
       end
 
       self.drawField
@@ -407,24 +425,24 @@ module CDK
 
     def drawField
       # Draw in the filler characters.
-      @field_win.mvwhline(0, 0, @filler.ord, @field_width)
+      Ncurses.mvwhline(@field_win, 0, 0, @filler.ord, @field_width)
 
       # If there is information in the field then draw it in.
       if !(@info.nil?) && @info.size > 0
         # Redraw the field.
         if Display.isHiddenDisplayType(@disp_type)
           (@left_char...@info.size).each do |x|
-            @field_win.mvwaddch(0, x - @left_char, @hidden)
+            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @hidden)
           end
         else
           (@left_char...@info.size).each do |x|
-            @field_win.mvwaddch(0, x - @left_char, @info[x].ord | @field_attr)
+            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @info[x].ord | @field_attr)
           end
         end
-        @field_win.wmove(0, @screen_col)
+        Ncurses.wmove(@field_win, 0, @screen_col)
       end
 
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     # This erases an entry widget from the screen.
@@ -516,7 +534,7 @@ module CDK
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
       @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
+      Ncurses.wbkgd(@field_win, attrib)
       unless @label_win.nil?
         @label_win.wbkgd(attrib)
       end
@@ -524,7 +542,7 @@ module CDK
 
     # This sets the attribute of the entry field.
     def setHighlight(highlight, cursor)
-      @field_win.wbkgd(highlight)
+      Ncurses.wbkgd(@field_win, highlight)
       @field_attr = highlight
       Ncurses.curs_set(cursor)
       # FIXME(original) - if (cursor) { move the cursor to this widget }
@@ -536,13 +554,13 @@ module CDK
     end
 
     def focus
-      @field_win.wmove(0, @screen_col)
-      @field_win.wrefresh
+      Ncurses.wmove(@field_win, 0, @screen_col)
+      Ncurses.wrefresh @field_win
     end
 
     def unfocus
       self.draw(box)
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     def position

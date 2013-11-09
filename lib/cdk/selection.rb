@@ -331,10 +331,10 @@ module CDK
       # Determine where the toggle is supposed to be.
       if @scrollbar
         @toggle_pos = (@current_item * @step).floor
-        @toggle_pos = [@toggle_pos, @scrollbar_win.getmaxy - 1].min
+        @toggle_pos = [@toggle_pos, Ncurses.getmaxy(@scrollbar_win) - 1].min
 
         @scrollbar_win.mvwvline(0, 0, Ncurses::ACS_CKBOARD,
-            @scrollbar_win.getmaxy)
+            Ncurses.getmaxy(@scrollbar_win))
         @scrollbar_win.mvwvline(@toggle_pos, 0,
             ' '.ord | Ncurses::A_REVERSE, @toggle_size)
       end

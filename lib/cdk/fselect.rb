@@ -83,7 +83,7 @@ module CDK
                    then CDK::FULL
                    else box_width - 2 - label_len
                    end
-      @entry_field = CDK::ENTRY.new(cdkscreen, @win.getbegx, @win.getbegy,
+      @entry_field = CDK::ENTRY.new(cdkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, field_attribute, filler_char, :MIXED, temp_width,
           0, 512, box, false)
 
@@ -362,13 +362,13 @@ module CDK
       @entry_field.setValue(@pwd)
 
       # Create the scrolling list in the selector.
-      temp_height = @entry_field.win.getmaxy - @border_size
+      temp_height = Ncurses.getmaxy(@entry_field.win) - @border_size
       temp_width = if CDK::FSELECT.isFullWidth(width)
                    then CDK::FULL
                    else box_width - 1
                    end
       @scroll_field = CDK::SCROLL.new(cdkscreen,
-          @win.getbegx, @win.getbegy + temp_height, CDK::RIGHT,
+          Ncurses.getbegx(@win), Ncurses.getbegy(@win) + temp_height, CDK::RIGHT,
           box_height - temp_height, temp_width, '', @dir_contents,
           @file_counter, false, @highlight, box, false)
 

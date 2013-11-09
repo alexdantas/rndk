@@ -76,7 +76,7 @@ module CDK
                     then CDK::FULL
                     else box_width - 2 - label_len
                     end
-      @entry_field = CDK::ENTRY.new(cdkscreen, @win.getbegx, @win.getbegy,
+      @entry_field = CDK::ENTRY.new(cdkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, Ncurses::A_NORMAL, filler_char, :MIXED, temp_width,
           0, 512, box, false)
       if @entry_field.nil?
@@ -258,15 +258,25 @@ module CDK
 
       # Create the scrolling list.  It overlaps the entry field by one line if
       # we are using box-borders.
-      temp_height = @entry_field.win.getmaxy - @border_size
+      temp_height = Ncurses.getmaxy(@entry_field.win) - @border_size
       temp_width = if CDK::ALPHALIST.isFullWidth(width)
                    then CDK::FULL
                    else box_width - 1
                    end
-      @scroll_field = CDK::SCROLL.new(cdkscreen, @win.getbegx,
-          @entry_field.win.getbegy + temp_height, CDK::RIGHT,
-          box_height - temp_height, temp_width, '', list, list_size,
-          false, Ncurses::A_REVERSE, box, false)
+
+      @scroll_field = CDK::SCROLL.new(cdkscreen,
+                                      Ncurses.getbegx(@win),
+                                      Ncurses.getbegy(@entry_field.win) + temp_height,
+                                      CDK::RIGHT,
+                                      box_height - temp_height,
+                                      temp_width,
+                                      '',
+                                      list,
+                                      list_size,
+                                      false,
+                                      Ncurses::A_REVERSE,
+                                      box,
+                                      false)
       @scroll_field.setULchar(Ncurses::ACS_LTEE)
       @scroll_field.setURchar(Ncurses::ACS_RTEE)
 

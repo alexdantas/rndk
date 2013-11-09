@@ -178,8 +178,8 @@ module CDK
 
     # This sets the widgets box attribute.
     def setBox(box)
-      xpos = if @win.nil? then 0 else @win.getbegx end
-      ypos = if @win.nil? then 0 else @win.getbegy end
+      xpos = if @win.nil? then 0 else Ncurses.getbegx(@win) end
+      ypos = if @win.nil? then 0 else Ncurses.getbegy(@win) end
 
       super
 

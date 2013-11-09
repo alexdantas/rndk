@@ -62,16 +62,16 @@ module CDK
 
     def move_specific(xplace, yplace, relative, refresh_flag,
         windows, subwidgets)
-      current_x = @win.getbegx
-      current_y = @win.getbegy
+      current_x = Ncurses.getbegx(@win)
+      current_y = Ncurses.getbegy(@win)
       xpos = xplace
       ypos = yplace
 
       # If this is a relative move, then we will adjust where we want
       # to move to.
       if relative
-        xpos = @win.getbegx + xplace
-        ypos = @win.getbegy + yplace
+        xpos = Ncurses.getbegx(@win) + xplace
+        ypos = Ncurses.getbegy(@win) + yplace
       end
 
       # Adjust the window if we need to
@@ -393,7 +393,7 @@ module CDK
             CDK.Beep
           end
         when Ncurses::KEY_DOWN, '2'.ord
-          if (win.getbegy + win.getmaxy) < end_y
+          if (win.getbegy + Ncurses.getmaxy(win)) < end_y
             self.move(0, 1, true, true)
           else
             CDK.Beep
@@ -423,14 +423,14 @@ module CDK
             CDK.Beep
           end
         when '1'.ord
-          if win.getbegx > beg_x && (win.getbegy + win.getmaxy) < end_y
+          if win.getbegx > beg_x && (win.getbegy + Ncurses.getmaxy(win)) < end_y
             self.move(-1, 1, true, true)
           else
             CDK.Beep
           end
         when '3'.ord
           if (win.getbegx + win.getmaxx) < end_x &&
-              (win.getbegy + win.getmaxy) < end_y
+              (win.getbegy + Ncurses.getmaxy(win)) < end_y
             self.move(1, 1, true, true)
           else
             CDK.Beep

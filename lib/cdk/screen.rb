@@ -122,11 +122,11 @@ module CDK
       popup = CDK::LABEL.new(self, CENTER, CENTER, mesg, count, true, false)
 
       old_state = Ncurses.curs_set(0)
-      #Draw it on the screen
+      # Draw it on the screen
       popup.draw(true)
 
       # Wait for some input.
-      popup.win.keypad(true)
+      Ncurses.keypad(popup.win, true)
       popup.getch([])
 
       # Kill it.
@@ -149,7 +149,7 @@ module CDK
       popup.draw(true)
 
       # Wait for some input
-      popup.win.keypad(true)
+      Ncurses.keypad(popup.win, true)
       popup.getch([])
 
       # Kill it.
