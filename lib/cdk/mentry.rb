@@ -67,16 +67,22 @@ module CDK
 
       # Create the label window.
       if @label.size > 0
-        @label_win = Ncurses.subwin(@win, field_rows, @label_len + 2,
-            ypos + @title_lines + 1, xpos + horizontal_adjust + 1)
+        @label_win = Ncurses.subwin(@win,
+                                    field_rows,
+                                    @label_len + 2,
+                                    ypos + @title_lines + 1,
+                                    xpos + horizontal_adjust + 1)
       end
 
       # make the field window.
-      @field_win = Ncurses.subwin(@win, field_rows, field_width,
-          ypos + @title_lines + 1, xpos + @label_len + horizontal_adjust + 1)
+      @field_win = Ncurses.subwin(@win,
+                                  field_rows,
+                                  field_width,
+                                  ypos + @title_lines + 1,
+                                  xpos + @label_len + horizontal_adjust + 1)
 
       # Turn on the keypad.
-      @field_win.keypad(true)
+      Ncurses.keypad(@field_win, true)
       Ncurses.keypad(@win, true)
 
       # Set up the rest of the structure.
@@ -136,8 +142,8 @@ module CDK
               mentry.top_row += 1
               mentry.drawField
             end
-            mentry.field_win.wmove(mentry.current_row, mentry.current_col)
-            mentry.field_win.wrefresh
+            Ncurses.wmove(mentry.field_win, mentry.current_row, mentry.current_col)
+            Ncurses.wrefresh(mentry.field_win)
           end
         end
       end
@@ -145,8 +151,10 @@ module CDK
 
       # Do we need to create a shadow.
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos + 1, xpos + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width,
+                                     ypos + 1,
+                                     xpos + 1)
       end
 
       # Register
@@ -404,8 +412,8 @@ module CDK
           if redraw
             self.drawField
           elsif moved
-            @field_win.wmove(@current_row, @current_col)
-            @field_win.wrefresh
+            Ncurses.wmove(@field_win, @current_row, @current_col)
+            Ncurses.wrefresh(@field_win)
           end
         end
 
@@ -426,8 +434,8 @@ module CDK
     # This moves the mentry field to the given location.
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-          windows, [])
+
+      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
     # This function redraws the multiple line entry field.
@@ -444,20 +452,20 @@ module CDK
         (0...@field_width).each do |y|
           if currchar < lastpos
             if Display.isHiddenDisplayType(@disp_type)
-              @field_win.mvwaddch(x, y, @filler)
+              Ncurses.mvwaddch(@field_win, x, y, @filler)
             else
-              @field_win.mvwaddch(x, y, @info[currchar].ord | @field_attr)
+              Ncurses.mvwaddch(@field_win, x, y, @info[currchar].ord | @field_attr)
               currchar += 1
             end
           else
-            @field_win.mvwaddch(x, y, @filler)
+            Ncurses.mvwaddch(@field_win, x, y, @filler)
           end
         end
       end
 
       # Refresh the screen.
-      @field_win.wmove(@current_row, @current_col)
-      @field_win.wrefresh
+      Ncurses.wmove(@field_win, @current_row, @current_col)
+      Ncurses.wrefresh(@field_win)
     end
 
     # This function draws the multiple line entry field.
@@ -475,9 +483,8 @@ module CDK
 
       # Draw in the label to the widget.
       unless @label_win.nil?
-        Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,
-            0, @label_len)
-        @label_win.wrefresh
+        Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL, 0, @label_len)
+        Ncurses.wrefresh @label_win
       end
 
       # Draw the mentry field
@@ -486,11 +493,9 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # This function erases the multiple line entry field from the screen.
@@ -595,12 +600,12 @@ module CDK
     end
 
     def focus
-      @field_win.wmove(0, @current_col)
-      @field_win.wrefresh
+      Ncurses.wmove(@field_win, 0, @current_col)
+      Ncurses.wrefresh @field_win
     end
 
     def unfocus
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
     end
 
     def position

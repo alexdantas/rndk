@@ -64,7 +64,7 @@ module CDK
         y = first_char
         (start_pos...(start_pos + view_size)).each do |x|
           ch = if y < mesg_length[0] then message[y].ord else ' '.ord end
-          @win.mvwaddch(@border_size, x, ch)
+          Ncurses.mvwaddch(@win, @border_size, x, ch)
           y += 1
         end
         Ncurses.wrefresh @win
@@ -111,7 +111,7 @@ module CDK
           end
 
           # Time to start over.
-          @win.mvwaddch(@border_size, @border_size, ' '.ord)
+          Ncurses.mvwaddch(@win, @border_size, @border_size, ' '.ord)
           Ncurses.wrefresh @win
           first_time = true
         end
@@ -224,17 +224,20 @@ module CDK
 
         # Do we want a shadow?
         if @shadow
-          @shadow_win = @screen.window.subwin(box_height, box_width,
-              ytmp[0] + 1, xtmp[0] + 1)
+          @shadow_win = Ncurses.subwin(@screen.window,
+                                       box_height,
+                                       box_width,
+                                       ytmp[0] + 1,
+                                       xtmp[0] + 1)
         end
       end
     end
 
     def self.discardWin(winp)
       unless winp.nil?
-        winp.werase
-        winp.wrefresh
-        winp.delwin
+        Ncurses.werase(winp)
+        Ncurses.wrefresh(winp)
+        Ncurses.delwin(winp)
       end
     end
   end

@@ -92,8 +92,10 @@ module CDK
 
       # Do we need to create a shadow?
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width + 1,
-            ypos + 1, xpos + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width + 1,
+                                     ypos + 1,
+                                     xpos + 1)
         if @shadow_win.nil?
           self.destroy
           return nil
@@ -311,7 +313,7 @@ module CDK
       @max_top_line = 0
 
       # Redraw the window.
-      self.draw(@box)
+      self.draw @box
     end
 
     def PatternNotFound(pattern)
@@ -631,7 +633,7 @@ module CDK
     def draw(box)
       # Do we need to draw in the shadow?
       unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
+        Draw.drawShadow @shadow_win
       end
 
       # Box it if it was asked for.
@@ -653,8 +655,13 @@ module CDK
 
       # Redraw the buttons.
       (0...@button_count).each do |x|
-        Draw.writeChtype(@win, @button_pos[x], @box_height - 2,
-            @button[x], CDK::HORIZONTAL, 0, @button_len[x])
+        Draw.writeChtype(@win,
+                         @button_pos[x],
+                         @box_height - 2,
+                         @button[x],
+                         CDK::HORIZONTAL,
+                         0,
+                         @button_len[x])
       end
 
       # Highlight the current button.
@@ -663,8 +670,10 @@ module CDK
         character = CDK.CharOf(@button[@current_button][x])
 
         # Add the character into the window.
-        @win.mvwaddch(@box_height - 2, @button_pos[@current_button] + x,
-            character.ord | @button_highlight)
+        Ncurses.mvwaddch(@win,
+                         @box_height - 2,
+                         @button_pos[@current_button] + x,
+                         character.ord | @button_highlight)
       end
 
       # Refresh the window.
@@ -673,7 +682,7 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
     end
 
     def destroyInfo
@@ -713,7 +722,7 @@ module CDK
       line_adjust = false
 
       # Clear the window.
-      @win.werase
+      Ncurses.werase(@win)
 
       self.drawTitle(@win)
 
@@ -736,9 +745,13 @@ module CDK
         if @title_lines == '' || @title_pos[0] < temp.size + 2
           list_adjust = true
         end
-        Draw.writeChar(@win, 1,
-            if list_adjust then @title_lines else 0 end + 1,
-            temp, CDK::HORIZONTAL, 0, temp.size)
+        Draw.writeChar(@win,
+                       1,
+                       if list_adjust then @title_lines else 0 end + 1,
+                       temp,
+                       CDK::HORIZONTAL,
+                       0,
+                       temp.size)
       end
 
       # Determine the last line to draw.
@@ -751,14 +764,15 @@ module CDK
           screen_pos = @list_pos[@current_top + x] + 1 - @left_char
 
           Draw.writeChtype(@win,
-              if screen_pos >= 0 then screen_pos else 1 end,
-              x + @title_lines + if list_adjust then 1 else 0 end + 1,
-              @list[x + @current_top], CDK::HORIZONTAL,
-              if screen_pos >= 0
-              then 0
-              else @left_char - @list_pos[@current_top + x]
-              end,
-              @list_len[x + @current_top])
+                           if screen_pos >= 0 then screen_pos else 1 end,
+                           x + @title_lines + if list_adjust then 1 else 0 end + 1,
+                           @list[x + @current_top],
+                           CDK::HORIZONTAL,
+                           if screen_pos >= 0
+                           then 0
+                           else @left_char - @list_pos[@current_top + x]
+                           end,
+                           @list_len[x + @current_top])
         end
       end
 
@@ -773,12 +787,11 @@ module CDK
         boxattr = @BXAttr
 
         (1..@box_width).each do |x|
-          @win.mvwaddch(@box_height - 3, x, @HZChar | boxattr)
+          Ncurses.mvwaddch(@win, @box_height - 3, x, @HZChar | boxattr)
         end
 
-        @win.mvwaddch(@box_height - 3, 0, Ncurses::ACS_LTEE | boxattr)
-        @win.mvwaddch(@box_height - 3, @win.getmaxx - 1,
-            Ncurses::ACS_RTEE | boxattr)
+        Ncurses.mvwaddch(@win, @box_height - 3, 0, Ncurses::ACS_LTEE | boxattr)
+        Ncurses.mvwaddch(@win, @box_height - 3, Ncurses.getmaxx(@win) - 1, Ncurses::ACS_RTEE | boxattr)
       end
 
       # Draw the buttons. This will call refresh on the viewer win.

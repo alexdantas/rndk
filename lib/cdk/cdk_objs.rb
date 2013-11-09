@@ -375,83 +375,91 @@ module CDK
     # postion of the widget.
     def position(win)
       parent = @screen.window
-      orig_x = win.getbegx
-      orig_y = win.getbegy
-      beg_x = parent.getbegx
-      beg_y = parent.getbegy
+      orig_x = Ncurses.getbegx win
+      orig_y = Ncurses.getbegy win
+      beg_x = Ncurses.getbegx parent
+      beg_y = Ncurses.getbegy parent
       end_x = beg_x + Ncurses.getmaxx(@screen.window)
       end_y = beg_y + Ncurses.getmaxy(@screen.window)
 
       # Let them move the widget around until they hit return.
-      while !([CDK::KEY_RETURN, Ncurses::KEY_ENTER].include?(
-          key = self.getch([])))
+      while not [CDK::KEY_RETURN, Ncurses::KEY_ENTER].include?(
+        (key = self.getch([])))
         case key
         when Ncurses::KEY_UP, '8'.ord
-          if win.getbegy > beg_y
+          if Ncurses.getbegy(win) > beg_y
             self.move(0, -1, true, true)
           else
             CDK.Beep
           end
         when Ncurses::KEY_DOWN, '2'.ord
-          if (win.getbegy + Ncurses.getmaxy(win)) < end_y
+          if (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(0, 1, true, true)
           else
             CDK.Beep
           end
         when Ncurses::KEY_LEFT, '4'.ord
-          if win.getbegx > beg_x
+          if Ncurses.getbegx(win) > beg_x
             self.move(-1, 0, true, true)
           else
             CDK.Beep
           end
         when Ncurses::KEY_RIGHT, '6'.ord
-          if (win.getbegx + win.getmaxx) < end_x
+          if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x
             self.move(1, 0, true, true)
           else
             CDK.Beep
           end
         when '7'.ord
-          if win.getbegy > beg_y && win.getbegx > beg_x
+          if Ncurses.getbegy(win) > beg_y && Ncurses.getbegx(win) > beg_x
             self.move(-1, -1, true, true)
           else
             CDK.Beep
           end
         when '9'.ord
-          if (win.getbegx + win.getmaxx) < end_x && win.getbegy > beg_y
+          if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x && Ncurses.getbegy(win) > beg_y
             self.move(1, -1, true, true)
           else
             CDK.Beep
           end
         when '1'.ord
-          if win.getbegx > beg_x && (win.getbegy + Ncurses.getmaxy(win)) < end_y
+          if Ncurses.getbegx(win) > beg_x && (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(-1, 1, true, true)
           else
             CDK.Beep
           end
         when '3'.ord
-          if (win.getbegx + win.getmaxx) < end_x &&
-              (win.getbegy + Ncurses.getmaxy(win)) < end_y
+          if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x &&
+              (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(1, 1, true, true)
           else
             CDK.Beep
           end
         when '5'.ord
           self.move(CDK::CENTER, CDK::CENTER, false, true)
+
         when 't'.ord
-          self.move(win.getbegx, CDK::TOP, false, true)
+          self.move(Ncurses.getbegx(win), CDK::TOP, false, true)
+
         when 'b'.ord
-          self.move(win.getbegx, CDK::BOTTOM, false, true)
+          self.move(Ncurses.getbegx(win), CDK::BOTTOM, false, true)
+
         when 'l'.ord
-          self.move(CDK::LEFT, win.getbegy, false, true)
+          self.move(CDK::LEFT, Ncurses.getbegy(win), false, true)
+
         when 'r'.ord
-          self.move(CDK::RIGHT, win.getbegy, false, true)
+          self.move(CDK::RIGHT, Ncurses.getbegy(win), false, true)
+
         when 'c'.ord
-          self.move(CDK::CENTER, win.getbegy, false, true)
+          self.move(CDK::CENTER, Ncurses.getbegy(win), false, true)
+
         when 'C'.ord
-          self.move(win.getbegx, CDK::CENTER, false, true)
+          self.move(Ncurses.getbegx(win), CDK::CENTER, false, true)
+
         when CDK::REFRESH
           @screen.erase
           @screen.refresh
+
         when CDK::KEY_ESC
           self.move(orig_x, orig_y, false, true)
         else

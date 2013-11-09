@@ -34,6 +34,7 @@ require_relative 'cdk/traverse'
 require_relative 'cdk/screen'
 
 require_relative 'cdk/alphalist'
+require_relative 'cdk/button'
 require_relative 'cdk/buttonbox'
 require_relative 'cdk/calendar'
 require_relative 'cdk/dialog'

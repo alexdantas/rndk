@@ -2,11 +2,24 @@ require_relative 'slider'
 
 module CDK
   class FSLIDER < CDK::SLIDER
-    def initialize(cdkscreen, xplace, yplace, title, label, filler,
-        field_width, start, low, high, inc, fast_inc, digits, box, shadow)
+    def initialize(cdkscreen,
+                   xplace,
+                   yplace,
+                   title,
+                   label,
+                   filler,
+                   field_width,
+                   start,
+                   low,
+                   high,
+                   inc,
+                   fast_inc,
+                   digits,
+                   box,
+                   shadow)
+
       @digits = digits
-      super(cdkscreen, xplace, yplace, title, label, filler, field_width,
-          start, low, high, inc, fast_inc, box, shadow)
+      super(cdkscreen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
     end
 
     # This draws the widget.
@@ -16,11 +29,11 @@ module CDK
       # Determine how many filler characters need to be drawn.
       filler_characters = (@current - @low) * step
 
-      @field_win.werase
+      Ncurses.werase(@field_win)
 
       # Add the character to the window.
       (0...filler_characters).each do |x|
-        @field_win.mvwaddch(0, x, @filler)
+        Ncurses.mvwaddch(@field_win, 0, x, @filler)
       end
 
       # Draw the value in the field.
@@ -28,11 +41,17 @@ module CDK
       format = '%%.%if' % [digits]
       temp = format % [@current]
 
-      Draw.writeCharAttrib(@field_win, @field_width, 0, temp,
-          Ncurses::A_NORMAL, CDK::HORIZONTAL, 0, temp.size)
+      Draw.writeCharAttrib(@field_win,
+                           @field_width,
+                           0,
+                           temp,
+                           Ncurses::A_NORMAL,
+                           CDK::HORIZONTAL,
+                           0,
+                           temp.size)
 
       self.moveToEditPosition(@field_edit)
-      @field_win.wrefresh
+      Ncurses.wrefresh(@field_win)
     end
 
     def formattedSize(value)

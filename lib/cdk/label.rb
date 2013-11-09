@@ -140,7 +140,7 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
     end
 
     # This draws the label widget.

@@ -129,8 +129,8 @@ module CDK
       ypos = self.SCREEN_YPOS(@current_item - @current_top)
       xpos = self.SCREEN_XPOS(0) + scrollbar_adj
 
-      @input_window.wmove(ypos, xpos)
-      @input_window.wrefresh
+      Ncurses.wmove(@input_window, ypos, xpos)
+      Ncurses.wrefresh @input_window
     end
 
     # This actually manages the radio widget.
@@ -291,10 +291,10 @@ module CDK
 
           # Draw the selected choice
           xpos += scrollbar_adj
-          @win.mvwaddch(ypos, xpos, @left_box_char)
-          @win.mvwaddch(ypos, xpos + 1,
+          Ncurses.mvwaddch(@win, ypos, xpos, @left_box_char)
+          Ncurses.mvwaddch(@win, ypos, xpos + 1,
               if k == @selected_item then @choice_char else ' '.ord end)
-          @win.mvwaddch(ypos, xpos + 2, @right_box_char)
+          Ncurses.mvwaddch(@win, ypos, xpos + 2, @right_box_char)
         end
       end
 
@@ -317,10 +317,17 @@ module CDK
         @toggle_pos = (@current_item * @step).floor
         @toggle_pos = [@toggle_pos, Ncurses.getmaxy(@scrollbar_win) - 1].min
 
-        @scrollbar_win.mvwvline(0, 0, Ncurses::ACS_CKBOARD,
-            Ncurses.getmaxy(@scrollbar_win))
-        @scrollbar_win.mvwvline(@toggle_pos, 0, ' '.ord | Ncurses::A_REVERSE,
-            @toggle_size)
+        Ncurses.mvwvline(@scrollbar_win,
+                         0,
+                         0,
+                         Ncurses::ACS_CKBOARD,
+                         Ncurses.getmaxy(@scrollbar_win))
+
+        Ncurses.mvwvline(@scrollbar_win,
+                         @toggle_pos,
+                         0,
+                         ' '.ord | Ncurses::A_REVERSE,
+                         @toggle_size)
       end
 
       # Box it if needed.
@@ -333,10 +340,8 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      unless @scrollbar_win.nil?
-        @scrollbar_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@scrollbar_win, attrib) unless @scrollbar_win.nil?
     end
 
     def destroyInfo

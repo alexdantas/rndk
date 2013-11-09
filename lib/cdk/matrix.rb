@@ -193,7 +193,7 @@ module CDK
             return nil
           end
           begx += cell_width + col_space - 1
-          @cell[x][y].keypad(true)
+          Ncurses.keypad(@cell[x][y], true)
         end
         begy += row_space + 2
       end
@@ -227,7 +227,7 @@ module CDK
       @highlight = Ncurses::A_REVERSE
       @shadow_win = nil
       @callbackfn = lambda do |matrix, input|
-        disptype = matrix.colvalues[matrix.col]
+        disptype = matrix.colvanlues[matrix.col]
         plainchar = Display.filterByDisplayType(disptype, input)
         charcount = matrix.info[matrix.row][matrix.col].size
 
@@ -237,14 +237,15 @@ module CDK
           CDK.Beep
         else
           # Update the screen.
-          matrix.CurMatrixCell.wmove(1,
-              matrix.info[matrix.row][matrix.col].size + 1)
-          matrix.CurMatrixCell.waddch(
-              if Display.isHiddenDisplayType(disptype)
-              then matrix.filler
-              else plainchar
-              end)
-          matrix.CurMatrixCell.wrefresh
+          Ncurses.wmove(matrix.CurMatrixCell,
+                        1,
+                        matrix.info[matrix.row][matrix.col].size + 1)
+          Ncurses.waddch(matrix.CurMatrixCell,
+                         if Display.isHiddenDisplayType(disptype)
+                         then matrix.filler
+                         else plainchar
+                         end)
+          Ncurses.wrefresh matrix.CurMatrixCell
 
           # Update the info string
           matrix.info[matrix.row][matrix.col] =
@@ -286,7 +287,7 @@ module CDK
       if actions.nil? || actions.size == 0
         while true
           @input_window = self.CurMatrixCell
-          @input_window.keypad(true)
+          Ncurses.keypad(@input_window, true)
           input = self.getch([])
 
           # Inject the character into the widget.
@@ -324,9 +325,9 @@ module CDK
 
       # Move the cursor to the correct position within the cell.
       if @colwidths[@ccol] == 1
-        self.CurMatrixCell.wmove(1, 1)
+        Ncurses.wmove(self.CurMatrixCell, 1, 1)
       else
-        self.CurMatrixCell.wmove(1, @info[@row][@col].size + 1)
+        Ncurses.wmove(self.CurMatrixCell, 1, @info[@row][@col].size + 1)
       end
 
       # Put the focus on the current cell.
@@ -354,10 +355,10 @@ module CDK
               CDK.Beep
             else
               charcount -= 1
-              self.CurMatrixCell.mvwdelch(1, charcount + 1)
-              self.CurMatrixCell.mvwinsch(1, charcount + 1, @filler)
+              Ncurses.mvwdelch(self.CurMatrixCell, 1, charcount + 1)
+              Ncurses.mvwinsch(self.CurMatrixCell, 1, charcount + 1, @filler)
 
-              self.CurMatrixCell.wrefresh
+              Ncurses.wrefresh self.CurMatrixCell
               @info[@row][@col] = @info[@row][@col][0...charcount]
             end
           when Ncurses::KEY_RIGHT, CDK::KEY_TAB
@@ -540,7 +541,7 @@ module CDK
             else
               self.drawOldCell
             end
-            self.CurMatrixCell.wrefresh
+            Ncurses.wrefresh self.CurMatrixCell
             self.setExitType(input)
             ret = 1
             complete = true
@@ -554,7 +555,7 @@ module CDK
             else
               self.drawOldCell
             end
-            self.CurMatrixCell.wrefresh
+            Ncurses.wrefresh self.CurMatrixCell
             self.setExitType(input)
             complete = true
           when CDK::REFRESH
@@ -575,7 +576,7 @@ module CDK
             else
               self.drawOldCell
             end
-            @cell[@oldcrow][@oldccol].wrefresh
+            Ncurses.wrefresh(@cell[@oldcrow][@oldccol])
 
             self.focusCurrent
           end
@@ -589,11 +590,11 @@ module CDK
           # Move to the correct position in the cell.
           if refresh_cells || moved_cell
             if @colwidths[@ccol] == 1
-              self.CurMatrixCell.wmove(1, 1)
+              Ncurses.wmove(self.CurMatrixCell, 1, 1)
             else
-              self.CurMatrixCell.wmove(1, self.CurMatrixInfo.size + 1)
+              Ncurses.wmove(self.CurMatrixCell, 1, self.CurMatrixInfo.size + 1)
             end
-            self.CurMatrixCell.wrefresh
+            Ncurses.wrefresh self.CurMatrixCell
           end
 
           # Should we call a post-process?
@@ -638,10 +639,10 @@ module CDK
              then CDK.CharOf(@info[@row][@col][x - 1])
              else @filler
              end
-        self.CurMatrixCell.mvwaddch(1, x, ch.ord | highlight)
+        Ncurses.mvwaddch(self.CurMatrixCell, 1, x, ch.ord | highlight)
       end
-      self.CurMatrixCell.wmove(1, infolen + 1)
-      self.CurMatrixCell.wrefresh
+      Ncurses.wmove(self.CurMatrixCell, 1, infolen + 1)
+      Ncurses.wrefresh self.CurMatrixCell
     end
 
     # This moves the matrix field to the given location.
@@ -655,8 +656,7 @@ module CDK
       end
 
       windows << @shadow_win
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-         windows, [])
+      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
     # This draws a cell within a matrix.
@@ -681,11 +681,11 @@ module CDK
              then CDK.CharOf(@info[vrow][vcol][x-1]).ord | highlight
              else @filler
              end
-        @cell[row][col].mvwaddch(1, x, ch.ord | highlight)
+        Ncurses.mvwaddch(@cell[row][col], 1, x, ch.ord | highlight)
       end
 
-      @cell[row][col].wmove(1, infolen + 1)
-      @cell[row][col].wrefresh
+      Ncurses.wmove(@cell[row][col], 1, infolen + 1)
+      Ncurses.wrefresh(@cell[row][col])
 
       # Only draw the box iff the user asked for a box.
       if !box
@@ -799,12 +799,15 @@ module CDK
     def drawEachColTitle
       (1..@vcols).each do |x|
         unless @cell[0][x].nil?
-          @cell[0][x].werase
+          Ncurses.werase @cell[0][x]
+
           Draw.writeChtype(@cell[0][x],
-              @coltitle_pos[@lcol + x - 1], 0,
-              @coltitle[@lcol + x - 1], CDK::HORIZONTAL, 0,
-              @coltitle_len[@lcol + x - 1])
-          @cell[0][x].wrefresh
+                           @coltitle_pos[@lcol + x - 1], 0,
+                           @coltitle[@lcol + x - 1],
+                           CDK::HORIZONTAL, 0,
+                           @coltitle_len[@lcol + x - 1])
+
+          Ncurses.wrefresh @cell[0][x]
         end
       end
     end
@@ -812,12 +815,16 @@ module CDK
     def drawEachRowTitle
       (1..@vrows).each do |x|
         unless @cell[x][0].nil?
-          @cell[x][0].werase
+          Ncurses.werase @cell[x][0]
+
           Draw.writeChtype(@cell[x][0],
-              @rowtitle_pos[@trow + x - 1], 1,
-              @rowtitle[@trow + x - 1], CDK::HORIZONTAL, 0,
-              @rowtitle_len[@trow + x - 1])
-          @cell[x][0].wrefresh
+                           @rowtitle_pos[@trow + x - 1], 1,
+                           @rowtitle[@trow + x - 1],
+                           CDK::HORIZONTAL,
+                           0,
+                           @rowtitle_len[@trow + x - 1])
+
+          Ncurses.wrefresh @cell[x][0]
         end
       end
     end
@@ -826,8 +833,12 @@ module CDK
       # Fill in the cells.
       (1..@vrows).each do |x|
         (1..@vcols).each do |y|
-          self.drawCell(x, y, @trow + x - 1, @lcol + y - 1,
-              Ncurses::A_NORMAL, @box_cell)
+          self.drawCell(x,
+                        y,
+                        @trow + x - 1,
+                        @lcol + y - 1,
+                        Ncurses::A_NORMAL,
+                        @box_cell)
         end
       end
     end
@@ -837,8 +848,7 @@ module CDK
     end
 
     def drawOldCell
-      self.drawCell(@oldcrow, @oldccol, @oldvrow, @oldvcol,
-          Ncurses::A_NORMAL, @box_cell)
+      self.drawCell(@oldcrow, @oldccol, @oldvrow, @oldvcol, Ncurses::A_NORMAL, @box_cell)
     end
 
     # This function draws the matrix widget.
@@ -869,20 +879,17 @@ module CDK
 
       # Clear the matrix windows.
       CDK.deleteCursesWindow(@cell[0][0])
-      (1..@vrows).each do |x|
-        CDK.deleteCursesWindow(@cell[x][0])
-      end
-      (1..@vcols).each do |x|
-        CDK.deleteCursesWindow(@cell[0][x])
-      end
+      (1..@vrows).each { |x| CDK.deleteCursesWindow @cell[x][0] }
+      (1..@vcols).each { |x| CDK.deleteCursesWindow @cell[0][x] }
+
       (1..@vrows).each do |x|
         (1..@vcols).each do |y|
-          CDK.deleteCursesWindow(@cell[x][y])
+          CDK.deleteCursesWindow @cell[x][y]
         end
       end
 
-      CDK.deleteCursesWindow(@shadow_win)
-      CDK.deleteCursesWindow(@win)
+      CDK.deleteCursesWindow @shadow_win
+      CDK.deleteCursesWindow @win
 
       # Clean the key bindings.
       self.cleanBindings(:MATRIX)
@@ -895,20 +902,19 @@ module CDK
     def erase
       if self.validCDKObject
         # Clear the matrix cells.
-        CDK.eraseCursesWindow(@cell[0][0])
-        (1..@vrows).each do |x|
-          CDK.eraseCursesWindow(@cell[x][0])
-        end
-        (1..@vcols).each do |x|
-          CDK.eraseCursesWindow(@cell[0][x])
-        end
+        CDK.eraseCursesWindow @cell[0][0]
+
+        (1..@vrows).each { |x| CDK.eraseCursesWindow @cell[x][0] }
+        (1..@vcols).each { |x| CDK.eraseCursesWindow @cell[0][x] }
+
         (1..@vrows).each do |x|
           (1..@vcols).each do |y|
-            CDK.eraseCursesWindow(@cell[x][y])
+            CDK.eraseCursesWindow @cell[x][y]
           end
         end
-        CDK.eraseCursesWindow(@shadow_win)
-        CDK.eraseCursesWindow(@win)
+
+        CDK.eraseCursesWindow @shadow_win
+        CDK.eraseCursesWindow @win
       end
     end
 
@@ -1130,11 +1136,16 @@ module CDK
     end
 
     def focusCurrent
-      Draw.attrbox(self.CurMatrixCell, Ncurses::ACS_ULCORNER,
-          Ncurses::ACS_URCORNER, Ncurses::ACS_LLCORNER,
-          Ncurses::ACS_LRCORNER, Ncurses::ACS_HLINE,
-          Ncurses::ACS_VLINE, Ncurses::A_BOLD)
-      self.CurMatrixCell.wrefresh
+      Draw.attrbox(self.CurMatrixCell,
+                   Ncurses::ACS_ULCORNER,
+                   Ncurses::ACS_URCORNER,
+                   Ncurses::ACS_LLCORNER,
+                   Ncurses::ACS_LRCORNER,
+                   Ncurses::ACS_HLINE,
+                   Ncurses::ACS_VLINE,
+                   Ncurses::A_BOLD)
+
+      Ncurses.wrefresh self.CurMatrixCell
       self.highlightCell
     end
 
@@ -1149,7 +1160,9 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
+
+      # TODO what the hell?
       (0..@vrows).each do |x|
         (0..@vcols).each do |y|
           # wbkgd (MATRIX_CELL (widget, x, y), attrib);

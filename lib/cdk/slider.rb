@@ -50,8 +50,7 @@ module CDK
       # Make sure we didn't extend beyond the dimensions of the window.
       box_width = [box_width, parent_width].min
       box_height = [box_height, parent_height].min
-      field_width = [field_width,
-          box_width - @label_len - high_value_len - 1].min
+      field_width = [field_width, box_width - @label_len - high_value_len - 1].min
 
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
@@ -71,9 +70,11 @@ module CDK
 
       # Create the widget's label window.
       if @label.size > 0
-        @label_win = Ncurses.subwin(@win, 1, @label_len,
-            ypos + @title_lines + @border_size,
-            xpos + horizontal_adjust + @border_size)
+        @label_win = Ncurses.subwin(@win,
+                                    1,
+                                    @label_len,
+                                    ypos + @title_lines + @border_size,
+                                    xpos + horizontal_adjust + @border_size)
         if @label_win.nil?
           self.destroy
           return nil
@@ -81,15 +82,17 @@ module CDK
       end
 
       # Create the widget's data field window.
-      @field_win = Ncurses.subwin(@win, 1, field_width + high_value_len - 1,
-          ypos + @title_lines + @border_size,
-          xpos + @label_len + horizontal_adjust + @border_size)
+      @field_win = Ncurses.subwin(@win,
+                                  1,
+                                  field_width + high_value_len - 1,
+                                  ypos + @title_lines + @border_size,
+                                  xpos + @label_len + horizontal_adjust + @border_size)
 
       if @field_win.nil?
         self.destroy
         return nil
       end
-      @field_win.keypad(true)
+      Ncurses.keypad(@field_win, true)
       Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
@@ -117,8 +120,10 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos + 1, xpos + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width,
+                                     ypos + 1,
+                                     xpos + 1)
         if @shadow_win.nil?
           self.destroy
           return nil
@@ -176,8 +181,9 @@ module CDK
 
     # Move the cursor to the given edit-position.
     def moveToEditPosition(new_position)
-      return @field_win.wmove(0,
-          @field_width + self.formattedSize(@current) - new_position)
+      return Ncurses.wmove(@field_win,
+                           0,
+                           @field_width + self.formattedSize(@current) - new_position)
     end
 
     # Check if the cursor is on a valid edit-position. This must be one of
@@ -189,7 +195,7 @@ module CDK
       if self.moveToEditPosition(new_position) == Ncurses::ERR
         return false
       end
-      ch = @field_win.winch
+      ch = Ncurses.winch(@field_win)
       if CDK.CharOf(ch) != ' '
         return true
       end
@@ -198,7 +204,7 @@ module CDK
         if self.moveToEditPosition(new_position - 1) == Ncurses::ERR
           return false
         end
-        ch = @field_win.winch
+        ch = Ncurses.winch(@field_win)
         return CDK.CharOf(ch) != ' '
       end
       return false
@@ -247,8 +253,8 @@ module CDK
       if adj != 0
         temp  = ' ' * adj
       end
-      @field_win.wmove(0, base)
-      @field_win.winnstr(temp, need)
+      Ncurses.wmove(@field_win, 0, base)
+      Ncurses.winnstr(@field_win, temp, need)
       temp << ' '
       if CDK.isChar(input)  # Replace the char at the cursor
         temp[col] = input.chr
@@ -384,8 +390,8 @@ module CDK
     # This moves the widget's data field to the given location.
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-          windows, [])
+
+      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
     # This function draws the widget.
@@ -406,7 +412,7 @@ module CDK
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,
             0, @label_len)
-        @label_win.wrefresh
+        Ncurses.wrefresh(@label_win)
       end
       Ncurses.wrefresh @win
 
@@ -421,11 +427,11 @@ module CDK
       # Determine how many filler characters need to be drawn.
       filler_characters = (@current - @low) * step
 
-      @field_win.werase
+      Ncurses.werase(@field_win)
 
       # Add the character to the window.
       (0...filler_characters).each do |x|
-        @field_win.mvwaddch(0, x, @filler)
+        Ncurses.mvwaddch(@field_win, 0, x, @filler)
       end
 
       # Draw the value in the field.
@@ -433,17 +439,15 @@ module CDK
           Ncurses::A_NORMAL, CDK::HORIZONTAL, 0, @current.to_s.size)
 
       self.moveToEditPosition(@field_edit)
-      @field_win.wrefresh
+      Ncurses.wrefresh(@field_win)
     end
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
       # Set the widget's background attribute.
-      @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # This function destroys the widget.

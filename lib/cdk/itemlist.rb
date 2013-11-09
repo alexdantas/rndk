@@ -252,11 +252,9 @@ module CDK
 
     # This sets the background attribute of the widget
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # This function draws the contents of the field.
@@ -268,7 +266,7 @@ module CDK
       len = [@item_len[current_item], @field_width].min
 
       # Erase the field window.
-      @field_win.werase
+      Ncurses.werase(@field_win)
 
       # Draw in the current item in the field.
       (0...len).each do |x|
@@ -278,11 +276,11 @@ module CDK
           c = c.ord | Ncurses::A_REVERSE
         end
 
-        @field_win.mvwaddch(0, x + @item_pos[current_item], c)
+        Ncurses.mvwaddch(@field_win, 0, x + @item_pos[current_item], c)
       end
 
       # Redraw the field window.
-      @field_win.wrefresh
+      Ncurses.wrefresh(@field_win)
     end
 
     # This function removes the widget from the screen.
@@ -456,8 +454,9 @@ module CDK
     # Make the field window.
     def createFieldWin(ypos, xpos)
       @field_win = Ncurses.subwin(@win, 1, @field_width, ypos, xpos)
+
       unless @field_win.nil?
-        @field_win.keypad(true)
+        Ncurses.keypad(@field_win, true)
         @input_window = @field_win
         return true
       end

@@ -349,7 +349,7 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
       unless @scrollbar_win.nil?
         @scrollbar_win.wbkgd(attrib)
       end

@@ -78,8 +78,10 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos + 1, xpos + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width,
+                                     ypos + 1,
+                                     xpos + 1)
       end
 
       cdkscreen.register(:HISTOGRAM, self)
@@ -307,7 +309,7 @@ module CDK
 
     # Set the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
     end
 
     # Move the histogram field to the given location.
@@ -323,7 +325,7 @@ module CDK
       hist_x = @title_lines + 1
       hist_y = @bar_size
 
-      @win.werase
+      Ncurses.werase(@win)
 
       # Box the widget if asked.
       if box
@@ -366,12 +368,12 @@ module CDK
       # Draw the histogram bar.
       (hist_x...@box_height - 1).to_a.each do |x|
         (1..hist_y).each do |y|
-          battr = @win.mvwinch(x, y)
+          battr = Ncurses.mvwinch(@win, x, y)
 
           if battr == ' '.ord
-            @win.mvwaddch(x, y, @filler)
+            Ncurses.mvwaddch(@win, x, y, @filler)
           else
-            @win.mvwaddch(x, y, battr | fattr)
+            Ncurses.mvwaddch(@win, x, y, battr | fattr)
           end
         end
       end

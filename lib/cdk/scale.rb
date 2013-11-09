@@ -72,9 +72,11 @@ module CDK
 
       # Create the widget's label window.
       if @label.size > 0
-        @label_win = Ncurses.subwin(@win, 1, @label_len,
-            ypos + @title_lines + @border_size,
-            xpos + horizontal_adjust + @border_size)
+        @label_win = Ncurses.subwin(@win,
+                                    1,
+                                    @label_len,
+                                    ypos + @title_lines + @border_size,
+                                    xpos + horizontal_adjust + @border_size)
         if @label_win.nil?
           self.destroy
           return nil
@@ -82,15 +84,17 @@ module CDK
       end
 
       # Create the widget's data field window.
-      @field_win = Ncurses.subwin(@win, 1, field_width,
-          ypos + @title_lines + @border_size,
-          xpos + @label_len + horizontal_adjust + @border_size)
-
+      @field_win = Ncurses.subwin(@win,
+                                  1,
+                                  field_width,
+                                  ypos + @title_lines + @border_size,
+                                  xpos + @label_len + horizontal_adjust + @border_size)
       if @field_win.nil?
         self.destroy
         return nil
       end
-      @field_win.keypad(true)
+
+      Ncurses.keypad(@field_win, true)
       Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
@@ -114,8 +118,10 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos + 1, xpos + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width,
+                                     ypos + 1,
+                                     xpos + 1)
         if @shadow_win.nil?
           self.destroy
           return nil
@@ -175,7 +181,7 @@ module CDK
 
     # Move the cursor to the given edit-position
     def moveToEditPosition(new_position)
-      return @field_win.wmove(0, @field_width - new_position - 1)
+      return Ncurses.wmove(@field_win, 0, @field_width - new_position - 1)
     end
 
     # Check if the cursor is on a valid edit-position. This must be one of
@@ -187,7 +193,7 @@ module CDK
       if self.moveToEditPosition(new_position) == Ncurses::ERR
         return false
       end
-      ch = @field_win.winch
+      ch = Ncurses.winch(@field_win)
       if ch.chr != ' '
         return true
       end
@@ -196,7 +202,7 @@ module CDK
         if self.moveToEditPosition(new_position - 1) == Ncurses::ERR
           return false
         end
-        ch = @field_win.winch
+        ch = Ncurses.winch(@field_win)
         return ch.chr != ' '
       end
       return false
@@ -241,8 +247,8 @@ module CDK
       temp = ''
       col = need - @field_edit - 1
 
-      @field_win.wmove(0, base)
-      @field_win.winnstr(temp, need)
+      Ncurses.wmove(@field_win, 0, base)
+      Ncurses.winnstr(@field_win, temp, need)
       temp << ' '
       if CDK.isChar(input)  # Replace the char at the cursor
         temp[col] = input.chr
@@ -381,8 +387,8 @@ module CDK
     # This moves the widget's data field to the given location.
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-          windows, [])
+
+      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
     # This function draws the widget.
@@ -401,9 +407,13 @@ module CDK
 
       # Draw the label.
       unless @label_win.nil?
-        Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,
-            0, @label_len)
-        @label_win.wrefresh
+        Draw.writeChtype(@label_win,
+                         0,
+                         0,
+                         @label, CDK::HORIZONTAL,
+                         0,
+                         @label_len)
+        Ncurses.wrefresh(@label_win)
       end
       Ncurses.wrefresh @win
 
@@ -413,25 +423,28 @@ module CDK
 
     # This draws the widget.
     def drawField
-      @field_win.werase
+      Ncurses.werase(@field_win)
 
       # Draw the value in the field.
       temp = @current.to_s
       Draw.writeCharAttrib(@field_win,
-          @field_width - temp.size - 1, 0, temp, @field_attr,
-          CDK::HORIZONTAL, 0, temp.size)
+                           @field_width - temp.size - 1,
+                           0,
+                           temp,
+                           @field_attr,
+                           CDK::HORIZONTAL,
+                           0,
+                           temp.size)
 
       self.moveToEditPosition(@field_edit)
-      @field_win.wrefresh
+      Ncurses.wrefresh(@field_win)
     end
 
     # This sets the background attribute of teh widget.
-    def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+    def setBKattr attrib
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # This function destroys the widget.
@@ -440,10 +453,10 @@ module CDK
       @label = []
 
       # Clean up the windows.
-      CDK.deleteCursesWindow(@field_win)
-      CDK.deleteCursesWindow(@label_win)
-      CDK.deleteCursesWindow(@shadow_win)
-      CDK.deleteCursesWindow(@win)
+      CDK.deleteCursesWindow @field_win
+      CDK.deleteCursesWindow @label_win
+      CDK.deleteCursesWindow @shadow_win
+      CDK.deleteCursesWindow @win
 
       # Clean the key bindings.
       self.cleanBindings(self.object_type)
@@ -455,10 +468,10 @@ module CDK
     # This function erases the widget from the screen.
     def erase
       if self.validCDKObject
-        CDK.eraseCursesWindow(@label_win)
-        CDK.eraseCursesWindow(@field_win)
-        CDK.eraseCursesWindow(@win)
-        CDK.eraseCursesWindow(@shadow_win)
+        CDK.eraseCursesWindow @label_win
+        CDK.eraseCursesWindow @field_win
+        CDK.eraseCursesWindow @win
+        CDK.eraseCursesWindow @shadow_win
       end
     end
 

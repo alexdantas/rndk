@@ -91,10 +91,18 @@ module CDK
         @title[x1] = CDK.char2Chtype(menu_list[x][0], title_len, [])
         @title_len[x1] = title_len[0]
         @subsize[x1] = subsize[x] - CDK::MENU::TITLELINES
-        @title_win[x1] = Ncurses.subwin(cdkscreen.window, CDK::MENU::TITLELINES,
-            @title_len[x1] + 2, ypos + y1, xpos + x2)
-        @pull_win[x1] = Ncurses.subwin(cdkscreen.window, high, max + 2,
-            ypos + y2, xpos + x2)
+        @title_win[x1] = Ncurses.subwin(cdkscreen.window,
+                                        CDK::MENU::TITLELINES,
+                                        @title_len[x1] + 2,
+                                        ypos + y1,
+                                        xpos + x2)
+
+        @pull_win[x1] = Ncurses.subwin(cdkscreen.window,
+                                       high,
+                                       max + 2,
+                                       ypos + y2,
+                                       xpos + x2)
+
         if @title_win[x1].nil? || @pull_win[x1].nil?
           self.destroy
           return nil
@@ -151,23 +159,35 @@ module CDK
     end
 
     def drawTitle(item)
-      Draw.writeChtype(@title_win[item], 0, 0, @title[item],
-          CDK::HORIZONTAL, 0, @title_len[item])
+      Draw.writeChtype(@title_win[item],
+                       0,
+                       0,
+                       @title[item],
+                       CDK::HORIZONTAL,
+                       0,
+                       @title_len[item])
     end
 
     def drawItem(item, offset)
-      Draw.writeChtype(@pull_win[@current_title], 1,
-          item + CDK::MENU::TITLELINES - offset,
-          @sublist[@current_title][item],
-          CDK::HORIZONTAL, 0, @sublist_len[@current_title][item])
+      Draw.writeChtype(@pull_win[@current_title],
+                       1,
+                       item + CDK::MENU::TITLELINES - offset,
+                       @sublist[@current_title][item],
+                       CDK::HORIZONTAL,
+                       0,
+                       @sublist_len[@current_title][item])
     end
 
     # Highlight the current sub-menu item
     def selectItem(item, offset)
-      Draw.writeChtypeAttrib(@pull_win[@current_title], 1,
-          item + CDK::MENU::TITLELINES - offset,
-          @sublist[@current_title][item], @subtitle_attr,
-          CDK::HORIZONTAL, 0, @sublist_len[@current_title][item])
+      Draw.writeChtypeAttrib(@pull_win[@current_title],
+                             1,
+                             item + CDK::MENU::TITLELINES - offset,
+                             @sublist[@current_title][item],
+                             @subtitle_attr,
+                             CDK::HORIZONTAL,
+                             0,
+                             @sublist_len[@current_title][item])
     end
 
     def withinSubmenu(step)
@@ -177,8 +197,7 @@ module CDK
       if next_item != @current_subtitle
         ymax = Ncurses.getmaxy(@screen.window)
 
-        if 1 + @pull_win[@current_title].getbegy + @subsize[@current_title] >=
-            ymax
+        if 1 + Ncurses.getbegy(@pull_win[@current_title]) + @subsize[@current_title] >= ymax
           @current_subtitle = next_item
           self.drawSubwin
         else
