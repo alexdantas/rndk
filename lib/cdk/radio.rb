@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, splace, height, width, title,
         list, list_size, choice_char, def_item, highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       box_height = height
       widest_item = 0
@@ -20,7 +20,7 @@ module CDK
         '<'           => Ncurses::KEY_HOME,
         '>'           => Ncurses::KEY_END,
       }
-      
+
       self.setBox(box)
 
       # If the height is a negative value, height will be ROWS-height,
@@ -69,7 +69,7 @@ module CDK
       ypos = ytmp[0]
 
       # Make the radio window
-      @win = Ncurses::WINDOW.new(@box_height, @box_width, ypos, xpos)
+      @win = Ncurses.newwin(@box_height, @box_width, ypos, xpos)
 
       # Is the window nil?
       if @win.nil?
@@ -78,14 +78,14 @@ module CDK
       end
 
       # Turn on the keypad.
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Create the scrollbar window.
       if splace == CDK::RIGHT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), xpos + @box_width - @border_size - 1)
       elsif splace == CDK::LEFT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(xpos))
       else
         @scrollbar_win = nil
@@ -111,7 +111,7 @@ module CDK
 
       # Do we need to create the shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width + 1,
+        @shadow_win = Ncurses.newwin(box_height, box_width + 1,
             ypos + 1, xpos + 1)
       end
 

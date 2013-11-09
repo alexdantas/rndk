@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, title, label, plate,
         overlay, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = 0
       box_height = if box then 3 else 1 end
       plate_len = 0
@@ -66,24 +66,24 @@ module CDK
       ypos = ytmp[0]
 
       # Make the template window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       # Is the template window nil?
       if @win.nil?
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Make the label window.
       if label.size > 0
-        @label_win = @win.subwin(1, @label_len,
+        @label_win = Ncurses.subwin(@win, 1, @label_len,
             ypos + @title_lines + @border_size,
             xpos + horizontal_adjust + @border_size)
       end
 
       # Make the field window
-      @field_win = @win.subwin(1, field_width,
+      @field_win = Ncurses.subwin(@win, 1, field_width,
             ypos + @title_lines + @border_size,
             xpos + @label_len + horizontal_adjust + @border_size)
       @field_win.keypad(true)
@@ -183,7 +183,7 @@ module CDK
 
       # Do we need to create a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -399,7 +399,7 @@ module CDK
 
       self.drawTitle(@win)
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       self.drawField
     end
@@ -407,7 +407,7 @@ module CDK
     # Draw the template field
     def drawField
       field_color = 0
-      
+
       # Draw in the label and the template object.
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, CDK::HORIZONTAL,

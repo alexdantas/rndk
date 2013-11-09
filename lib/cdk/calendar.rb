@@ -58,8 +58,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, title, day, month, year,
         day_attrib, month_attrib, year_attrib, highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = 24
       box_height = 11
       dayname = 'Su Mo Tu We Th Fr Sa '
@@ -89,14 +89,14 @@ module CDK
       ypos = ytmp[0]
 
       # Create the calendar window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       # Is the window nil?
       if @win.nil?
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Set some variables.
       @x_offset = (box_width - 20) / 2
@@ -126,14 +126,14 @@ module CDK
       @input_window = @win
       @week_base = 0
       @shadow = shadow
-      @label_win = @win.subwin(1, @field_width,
+      @label_win = Ncurses.subwin(@win, 1, @field_width,
           ypos + @title_lines + 1, xpos + 1 + @border_size)
       if @label_win.nil?
         self.destroy
         return nil
       end
 
-      @field_win = @win.subwin(7, 20,
+      @field_win = Ncurses.subwin(@win, 7, 20,
           ypos + @title_lines + 3, xpos + @x_offset)
       if @field_win.nil?
         self.destroy
@@ -159,7 +159,7 @@ module CDK
 
       # If a shadow was requested, then create the shadow window.
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -309,7 +309,7 @@ module CDK
             @day_name[src..-1], CDK::HORIZONTAL, 0, col_len)
       end
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
       self.drawField
     end
 
@@ -406,7 +406,7 @@ module CDK
       month << @month
       year << @year
     end
-    
+
     # This sets the attribute of the days in the calendar.
     def setDayAttribute(attribute)
       @day_attrib = attribute

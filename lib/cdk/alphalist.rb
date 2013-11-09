@@ -7,8 +7,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, height, width, title, label,
         list, list_size, filler_char, highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       box_height = height
       label_len = 0
@@ -47,13 +47,13 @@ module CDK
       ypos = ytmp[0]
 
       # Make the file selector window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       if @win.nil?
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Set some variables.
       @screen = cdkscreen
@@ -67,7 +67,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -116,7 +116,7 @@ module CDK
           CDK.Beep
           return true
         end
-        
+
         # Look for a unique word match.
         index = CDK.searchList(alphalist.list, alphalist.list.size, entry.info)
 

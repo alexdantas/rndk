@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, height, width, orient,
         title, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
 
       self.setBox(box)
 
@@ -41,7 +41,7 @@ module CDK
       # Set up the histogram data
       @screen = cdkscreen
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @box_width = box_width
       @box_height = box_height
@@ -56,7 +56,7 @@ module CDK
         return nil
       end
 
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Set up some default values.
       @filler = '#'.ord | Ncurses::A_REVERSE
@@ -78,7 +78,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -367,7 +367,7 @@ module CDK
       (hist_x...@box_height - 1).to_a.each do |x|
         (1..hist_y).each do |y|
           battr = @win.mvwinch(x, y)
-          
+
           if battr == ' '.ord
             @win.mvwaddch(x, y, @filler)
           else
@@ -377,7 +377,7 @@ module CDK
       end
 
       # Refresh the window
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # Destroy the widget.

@@ -31,23 +31,23 @@ module CDK
     def Draw.boxWindow(window, attr)
       tlx = 0
       tly = 0
-      brx = window.getmaxx - 1
-      bry = window.getmaxy - 1
+      brx = Ncurses.getmaxx(window) - 1
+      bry = Ncurses.getmaxy(window) - 1
 
       # Draw horizontal lines.
-      window.mvwhline(tly, 0, Ncurses::ACS_HLINE | attr, window.getmaxx)
-      window.mvwhline(bry, 0, Ncurses::ACS_HLINE | attr, window.getmaxx)
+      Ncurses.mvwhline(window, tly, 0, Ncurses::ACS_HLINE | attr, Ncurses.getmaxx(window))
+      Ncurses.mvwhline(window, bry, 0, Ncurses::ACS_HLINE | attr, Ncurses.getmaxx(window))
 
       # Draw horizontal lines.
-      window.mvwvline(0, tlx, Ncurses::ACS_VLINE | attr, window.getmaxy)
-      window.mvwvline(0, brx, Ncurses::ACS_VLINE | attr, window.getmaxy)
+      Ncurses.mvwvline(window, 0, tlx, Ncurses::ACS_VLINE | attr, Ncurses.getmaxy(window))
+      Ncurses.mvwvline(window, 0, brx, Ncurses::ACS_VLINE | attr, Ncurses.getmaxy(window))
 
       # Draw in the corners.
-      window.mvwaddch(tly, tlx, Ncurses::ACS_ULCORNER | attr)
-      window.mvwaddch(tly, brx, Ncurses::ACS_URCORNER | attr)
-      window.mvwaddch(bry, tlx, Ncurses::ACS_LLCORNER | attr)
-      window.mvwaddch(bry, brx, Ncurses::ACS_LRCORNER | attr)
-      window.wrefresh
+      Ncurses.mvwaddch(window, tly, tlx, Ncurses::ACS_ULCORNER | attr)
+      Ncurses.mvwaddch(window, tly, brx, Ncurses::ACS_URCORNER | attr)
+      Ncurses.mvwaddch(window, bry, tlx, Ncurses::ACS_LLCORNER | attr)
+      Ncurses.mvwaddch(window, bry, brx, Ncurses::ACS_LRCORNER | attr)
+      Ncurses.wrefresh(window)
     end
 
     # This draws a box with attributes and lets the user define each
@@ -55,43 +55,43 @@ module CDK
     def Draw.attrbox(win, tlc, trc, blc, brc, horz, vert, attr)
       x1 = 0
       y1 = 0
-      y2 = win.getmaxy - 1
-      x2 = win.getmaxx - 1
+      y2 = Ncurses.getmaxy(win) - 1
+      x2 = Ncurses.getmaxx(win) - 1
       count = 0
 
       # Draw horizontal lines
       if horz != 0
-        win.mvwhline(y1, 0, horz | attr, win.getmaxx)
-        win.mvwhline(y2, 0, horz | attr, win.getmaxx)
+        Ncurses.mvwhline(win, y1, 0, horz | attr, Ncurses.getmaxx(win))
+        Ncurses.mvwhline(win, y2, 0, horz | attr, Ncurses.getmaxx(win))
         count += 1
       end
 
       # Draw vertical lines
       if vert != 0
-        win.mvwvline(0, x1, vert | attr, win.getmaxy)
-        win.mvwvline(0, x2, vert | attr, win.getmaxy)
+        Ncurses.mvwvline(win, 0, x1, vert | attr, Ncurses.getmaxy(win))
+        Ncurses.mvwvline(win, 0, x2, vert | attr, Ncurses.getmaxy(win))
         count += 1
       end
 
       # Draw in the corners.
       if tlc != 0
-        win.mvwaddch(y1, x1, tlc | attr)
+        Ncurses.mvwaddch(win, y1, x1, tlc | attr)
         count += 1
       end
       if trc != 0
-        win.mvwaddch(y1, x2, trc | attr)
+        Ncurses.mvwaddch(win, y1, x2, trc | attr)
         count += 1
       end
       if blc != 0
-        win.mvwaddch(y2, x1, blc | attr)
+        Ncurses.mvwaddch(win, y2, x1, blc | attr)
         count += 1
       end
       if brc != 0
-        win.mvwaddch(y2, x2, brc | attr)
+        Ncurses.mvwaddch(win, y2, x2, brc | attr)
         count += 1
       end
       if count != 0
-        win.wrefresh
+        Ncurses.wrefresh win
       end
     end
 
@@ -113,11 +113,11 @@ module CDK
       # Determine if we're drawing a horizontal or vertical line.
       if ydiff == 0
         if xdiff > 0
-          window.mvwhline(starty, startx, line, xdiff)
+          Ncurses.mvwhline(window, starty, startx, line, xdiff)
         end
       elsif xdiff == 0
         if ydiff > 0
-          window.mvwvline(starty, startx, line, ydiff)
+          Ncurses.mvwvline(window, starty, startx, line, ydiff)
         end
       else
         # We need to determine the angle of the line.
@@ -133,7 +133,7 @@ module CDK
         y = starty
         while x!= endx && y != endy
           # Add the char to the window
-          window.mvwaddch(y, x, line)
+          Ncurses.mvwaddch(window, y, x, line)
 
           # Make the x and y adjustments.
           if xadj != xratio
@@ -155,19 +155,19 @@ module CDK
     # This draws a shadow around a window.
     def Draw.drawShadow(shadow_win)
       unless shadow_win.nil?
-        x_hi = shadow_win.getmaxx - 1
-        y_hi = shadow_win.getmaxy - 1
+        x_hi = Ncurses.getmaxx(shadow_win) - 1
+        y_hi = Ncurses.getmaxy(shadow_win) - 1
 
         # Draw the line on the bottom.
-        shadow_win.mvwhline(y_hi, 1, Ncurses::ACS_HLINE | Ncurses::A_DIM, x_hi)
+        Ncurses.mvwhline(shadow_win, y_hi, 1, Ncurses::ACS_HLINE | Ncurses::A_DIM, x_hi)
 
         # Draw the line on teh right.
-        shadow_win.mvwvline(0, x_hi, Ncurses::ACS_VLINE | Ncurses::A_DIM, y_hi)
+        Ncurses.mvwvline(shadow_win, 0, x_hi, Ncurses::ACS_VLINE | Ncurses::A_DIM, y_hi)
 
-        shadow_win.mvwaddch(0, x_hi, Ncurses::ACS_URCORNER | Ncurses::A_DIM)
-        shadow_win.mvwaddch(y_hi, 0, Ncurses::ACS_LLCORNER | Ncurses::A_DIM)
-        shadow_win.mvwaddch(y_hi, x_hi, Ncurses::ACS_LRCORNER | Ncurses::A_DIM)
-        shadow_win.wrefresh
+        Ncurses.mvwaddch(shadow_win, 0, x_hi, Ncurses::ACS_URCORNER | Ncurses::A_DIM)
+        Ncurses.mvwaddch(shadow_win, y_hi, 0, Ncurses::ACS_LLCORNER | Ncurses::A_DIM)
+        Ncurses.mvwaddch(shadow_win, y_hi, x_hi, Ncurses::ACS_LRCORNER | Ncurses::A_DIM)
+        Ncurses.wrefresh shadow_win
       end
     end
 
@@ -195,15 +195,15 @@ module CDK
 
       if align == CDK::HORIZONTAL
         # Draw the message on a horizontal axis
-        display = [display, window.getmaxx - 1].min
+        display = [display, Ncurses.getmaxx(window) - 1].min
         (0...display).each do |x|
-          window.mvwaddch(ypos, xpos + x, string[x + start].ord | attr)
+          Ncurses.mvwaddch(window, ypos, xpos + x, string[x + start].ord | attr)
         end
       else
         # Draw the message on a vertical axis
-        display = [display, window.getmaxy - 1].min
+        display = [display, Ncurses.getmaxy(window) - 1].min
         (0...display).each do |x|
-          window.mvwaddch(ypos + x, xpos, string[x + start].ord | attr)
+          Ncurses.mvwaddch(window, ypos + x, xpos, string[x + start].ord | attr)
         end
       end
     end
@@ -222,15 +222,15 @@ module CDK
       x = 0
       if align == CDK::HORIZONTAL
         # Draw the message on a horizontal axis.
-        display = [diff, window.getmaxx - xpos].min
+        display = [diff, Ncurses.getmaxx(window) - xpos].min
         (0...display).each do |x|
-          window.mvwaddch(ypos, xpos + x, string[x + start].ord | attr)
+          Ncurses.mvwaddch(window, ypos, xpos + x, string[x + start].ord | attr)
         end
       else
         # Draw the message on a vertical axis.
-        display = [diff, window.getmaxy - ypos].min
+        display = [diff, Ncurses.getmaxy(window) - ypos].min
         (0...display).each do |x|
-          window.mvwaddch(ypos + x, xpos, string[x + start].ord | attr)
+          Ncurses.mvwaddch(window, ypos + x, xpos, string[x + start].ord | attr)
         end
       end
     end

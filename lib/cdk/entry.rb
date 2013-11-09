@@ -9,13 +9,13 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, title, label, field_attr, filler,
         disp_type, f_width, min, max, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       field_width = f_width
       box_width = 0
       xpos = xplace
       ypos = yplace
-      
+
       self.setBox(box)
       box_height = @border_size * 2 + 1
 
@@ -57,15 +57,15 @@ module CDK
       ypos = ytmp[0]
 
       # Make the label window.
-      @win = cdkscreen.window.subwin(box_height, box_width, ypos, xpos)
+      @win = Ncurses.subwin(cdkscreen.window, box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Make the field window.
-      @field_win = @win.subwin(1, field_width,
+      @field_win = Ncurses.subwin(@win, 1, field_width,
           ypos + @title_lines + @border_size,
           xpos + @label_len + horizontal_adjust + @border_size)
 
@@ -77,7 +77,7 @@ module CDK
 
       # make the label win, if we need to
       if !(label.nil?) && label.size > 0
-        @label_win = @win.subwin(1, @label_len,
+        @label_win = Ncurses.subwin(@win, 1, @label_len,
             ypos + @title_lines + @border_size,
             xpos + horizontal_adjust + @border_size)
       end
@@ -133,7 +133,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = cdkscreen.window.subwin(box_height, box_width,
+        @shadow_win = Ncurses.subwin(cdkscreen.window, box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -202,7 +202,7 @@ module CDK
 
       # Set the exit type
       self.setExitType(0)
-      
+
       # Refresh the widget field.
       self.drawField
 
@@ -279,7 +279,7 @@ module CDK
                   success = true
                 end
               end
-              
+
               if success
                 if input == Ncurses::KEY_BACKSPACE
                   if @screen_col > 0
@@ -360,7 +360,7 @@ module CDK
       self.move_specific(xplace, yplace, relative, refresh_flag,
           windows, [])
     end
-    
+
     # This erases the information in the entry field and redraws
     # a clean and empty entry field.
     def clean
@@ -393,7 +393,7 @@ module CDK
 
       self.drawTitle(@win)
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       # Draw in the label to the widget.
       unless @label_win.nil?

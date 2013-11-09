@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       box_height = height
       bindings = {
@@ -50,15 +50,15 @@ module CDK
       ypos = ytmp[0]
 
       # Make the scrolling window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Make the field window
-      @field_win = @win.subwin(box_height - @title_lines - 2, box_width - 2,
+      @field_win = Ncurses.subwin(@win, box_height - @title_lines - 2, box_width - 2,
           ypos + @title_lines + 1, xpos + 1)
       @field_win.keypad(true)
 
@@ -87,7 +87,7 @@ module CDK
 
       # Do we need to create a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -184,7 +184,7 @@ module CDK
         @list_pos += [0]
         @list_len += [0]
         self.setupLine(list, @list_size)
-        
+
         @max_left_char = @widest_line - (@box_width - 2)
 
         # Increment the item count and zero out the next row.
@@ -456,7 +456,7 @@ module CDK
 
       self.drawTitle(@win)
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       # Draw in the list.
       self.drawList(box)

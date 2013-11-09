@@ -8,8 +8,8 @@ module CDK
         list, list_size, choices, choice_count, highlight, box, shadow)
       super()
       widest_item = -1
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       bindings = {
         CDK::BACKCHAR => Ncurses::KEY_PPAGE,
@@ -69,7 +69,7 @@ module CDK
       ypos = ytmp[0]
 
       # Make the selection window.
-      @win = Ncurses::WINDOW.new(@box_height, @box_width, ypos, xpos)
+      @win = Ncurses.newwin(@box_height, @box_width, ypos, xpos)
 
       # Is the window nil?
       if @win.nil?
@@ -78,14 +78,14 @@ module CDK
       end
 
       # Turn the keypad on for this window.
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Create the scrollbar window.
       if splace == CDK::RIGHT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), xpos + @box_width - @border_size - 1)
       elsif splace == CDK::LEFT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(ypos))
       else
         @scrollbar_win = nil
@@ -124,7 +124,7 @@ module CDK
 
       # Do we need to create a shadow.
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -251,18 +251,18 @@ module CDK
             @screen.refresh
           end
         end
-  
+
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
           @post_process_func.call(:SELECTION, self, @post_process_data, input)
         end
       end
-  
+
       unless complete
         self.drawList(@box)
         self.setExitType(0)
       end
-  
+
       @result_data = ret
       self.fixCursorPosition
       return ret

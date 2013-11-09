@@ -14,8 +14,8 @@ module CDK
         title, rowtitles, coltitles, colwidths, colvalues, rspace, cspace,
         filler, dominant, box, box_cell, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_height = 0
       box_width = 0
       max_row_title_width = 0
@@ -123,7 +123,7 @@ module CDK
       ypos = ytmp[0]
 
       # Make the pop-up window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       if @win.nil?
         self.destroy
@@ -135,7 +135,7 @@ module CDK
       begy = ypos + borderw + @title_lines
 
       # Make the 'empty' 0x0 cell.
-      @cell[0][0] = @win.subwin(3, @maxrt, begy, begx)
+      @cell[0][0] = Ncurses.subwin(@win, 3, @maxrt, begy, begx)
 
       begx += @maxrt + 1
 
@@ -158,7 +158,7 @@ module CDK
         # Make the column titles.
         (1..vcols).each do |x|
           cell_width = colwidths[x] + 3
-          @cell[0][x] = @win.subwin(borderw, cell_width, begy, begx)
+          @cell[0][x] = Ncurses.subwin(@win, borderw, cell_width, begy, begx)
           if @cell[0][x].nil?
             self.destroy
             return nil
@@ -172,7 +172,7 @@ module CDK
       (1..vrows).each do |x|
         if have_rowtitles
           # Make the row titles
-          @cell[x][0] = @win.subwin(3, @maxrt, begy, xpos + borderw)
+          @cell[x][0] = Ncurses.subwin(@win, 3, @maxrt, begy, xpos + borderw)
 
           if @cell[x][0].nil?
             self.destroy
@@ -186,7 +186,7 @@ module CDK
         # Make the cells
         (1..vcols).each do |y|
           cell_width = colwidths[y] + 3
-          @cell[x][y] = @win.subwin(3, cell_width, begy, begx)
+          @cell[x][y] = Ncurses.subwin(@win, 3, cell_width, begy, begx)
 
           if @cell[x][y].nil?
             self.destroy
@@ -197,7 +197,7 @@ module CDK
         end
         begy += row_space + 2
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Keep the rest of the info.
       @screen = cdkscreen
@@ -266,7 +266,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -623,7 +623,7 @@ module CDK
       disptype = @colvalues[@col]
       highlight = @highlight
       infolen = @info[@row][@col].size
-      
+
       # Given the dominance of the color/attributes, we need to set the
       # current cell attribute.
       if @dominant == CDK::ROW
@@ -855,7 +855,7 @@ module CDK
 
       self.drawTitle(@win)
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       self.drawEachColTitle
       self.drawEachRowTitle

@@ -7,8 +7,8 @@ module CDK
     def initialize (cdkscreen, xplace, yplace, splace, height, width, title,
         list, list_size, numbers, highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       box_height = height
       xpos = xplace
@@ -33,7 +33,7 @@ module CDK
       # If the width is a negative value, the width will be COLS-width,
       # otherwise the width will be the given width
       box_width = CDK.setWidgetDimension(parent_width, width, 0)
-    
+
       box_width = self.setTitle(title, box_width)
 
       # Set the box height.
@@ -50,9 +50,9 @@ module CDK
       end
 
       # Make sure we didn't extend beyond the dimensions of the window.
-      @box_width = if box_width > parent_width 
-                   then parent_width - scroll_adjust 
-                   else box_width 
+      @box_width = if box_width > parent_width
+                   then parent_width - scroll_adjust
+                   else box_width
                    end
       @box_height = if box_height > parent_height
                     then parent_height
@@ -63,13 +63,13 @@ module CDK
 
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
-      ytmp = [ypos] 
+      ytmp = [ypos]
       CDK.alignxy(cdkscreen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Make the scrolling window
-      @win = Ncurses::WINDOW.new(@box_height, @box_width, ypos, xpos)
+      @win = Ncurses.newwin(@box_height, @box_width, ypos, xpos)
 
       # Is the scrolling window null?
       if @win.nil?
@@ -77,21 +77,21 @@ module CDK
       end
 
       # Turn the keypad on for the window
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Create the scrollbar window.
       if splace == CDK::RIGHT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), xpos + box_width - @border_size - 1)
       elsif splace == CDK::LEFT
-        @scrollbar_win = @win.subwin(self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
             self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(xpos))
       else
         @scrollbar_win = nil
       end
 
       # create the list window
-      @list_win = @win.subwin(self.maxViewSize,
+      @list_win = Ncurses.subwin(@win, self.maxViewSize,
           box_width - (2 * @border_size) - scroll_adjust,
           self.SCREEN_YPOS(ypos),
           self.SCREEN_XPOS(xpos) + (if splace == CDK::LEFT then 1 else 0 end))
@@ -118,7 +118,7 @@ module CDK
 
       # Do we need to create a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(@box_height, box_width,
+        @shadow_win = Ncurses.newwin(@box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -129,7 +129,7 @@ module CDK
       end
 
       cdkscreen.register(:SCROLL, self);
-      
+
       return self
     end
 
@@ -147,8 +147,8 @@ module CDK
       ypos = self.SCREEN_YPOS(@current_item - @current_top)
       xpos = self.SCREEN_XPOS(0) + scrollbar_adj
 
-      @input_window.wmove(ypos, xpos)
-      @input_window.wrefresh
+      Ncurses.wmove(@input_window, ypos, xpos)
+      Ncurses.wrefresh(@input_window)
     end
 
     # This actually does all the 'real' work of managing the scrolling list.
@@ -342,16 +342,23 @@ module CDK
           @toggle_pos = (@current_item * @step).floor
 
           # Make sure the toggle button doesn't go out of bounds.
-          
-          if @toggle_pos >= @scrollbar_win.getmaxy
-            @toggle_pos = @scrollbar_win.getmaxy - 1
+
+          if @toggle_pos >= Ncurses.getmaxy(@scrollbar_win)
+            @toggle_pos = Ncurses.getmaxy(@scrollbar_win) - 1
           end
 
           # Draw the scrollbar
-          @scrollbar_win.mvwvline(0, 0, Ncurses::ACS_CKBOARD,
-              @scrollbar_win.getmaxy)
-          @scrollbar_win.mvwvline(@toggle_pos, 0, ' '.ord | Ncurses::A_REVERSE,
-              @toggle_size)
+          Ncurses.mvwvline(@scrollbar_win,
+                           0,
+                           0,
+                           Ncurses::ACS_CKBOARD,
+                           Ncurses.getmaxy(@scrollbar_win))
+
+          Ncurses.mvwvline(@scrollbar_win,
+                           @toggle_pos,
+                           0,
+                           ' '.ord | Ncurses::A_REVERSE,
+                           @toggle_size)
         end
       end
 
@@ -361,15 +368,15 @@ module CDK
       end
 
       # Refresh the window
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      @list_win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@list_win, attrib)
       unless @scrollbar_win.nil?
-        @scrollbar_win.wbkgd(attrib)
+        Ncurses.wbkgd(@scrollbar_win, attrib)
       end
     end
 
@@ -598,15 +605,15 @@ module CDK
         self.setPosition(@current_item)
       end
     end
-    
+
     def focus
       self.drawCurrent
-      @list_win.wrefresh
+      Ncurses.wrefresh @list_win
     end
 
     def unfocus
       self.drawCurrent
-      @list_win.wrefresh
+      Ncurses.wrefresh @list_win
     end
 
     def AvailableWidth
@@ -628,8 +635,8 @@ module CDK
   class BUTTON < CDK::CDKOBJS
     def initialize(cdkscreen, xplace, yplace, text, callback, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = 0
       xpos = xplace
       ypos = yplace
@@ -670,7 +677,7 @@ module CDK
       @screen = cdkscreen
       # ObjOf (button)->fn = &my_funcs;
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @xpos = xpos
       @ypos = ypos
@@ -686,11 +693,11 @@ module CDK
         return nil
       end
 
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # If a shadow was requested, then create the shadow window.
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -790,7 +797,7 @@ module CDK
         Draw.drawObjBox(@win, self)
       end
       self.drawText
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This erases the button widget.
@@ -857,7 +864,7 @@ module CDK
             CDK.Beep
           end
         elsif key == Ncurses::KEY_DOWN || key == '2'.ord
-          if @win.getbegy + @win.getmaxy < @screen.window.getmaxy - 1
+          if @win.getbegy + @win.getmaxy < Ncurses.getmaxy(@screen.window) - 1
             self.move(0, 1, true, true)
           else
             CDK.Beep
@@ -869,7 +876,7 @@ module CDK
             CDK.Beep
           end
         elsif key == Ncurses::KEY_RIGHT || key == '6'.ord
-          if @win.getbegx + @win.getmaxx < @screen.window.getmaxx - 1
+          if @win.getbegx + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1
             self.move(1, 0, true, true)
           else
             CDK.Beep
@@ -881,7 +888,7 @@ module CDK
             CDK.Beep
           end
         elsif key == '9'.ord
-          if @win.getbegx + @win.getmaxx < @screen.window.getmaxx - 1 &&
+          if @win.getbegx + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1 &&
               @win.getbegy > 0
             self.move(1, -1, true, true)
           else
@@ -889,14 +896,14 @@ module CDK
           end
         elsif key == '1'.ord
           if @win.getbegx > 0 &&
-              @win.getbegx + @win.getmaxx < @screen.window.getmaxx - 1
+              @win.getbegx + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1
             self.move(-1, 1, true, true)
           else
             CDK.Beep
           end
         elsif key == '3'.ord
-          if @win.getbegx + @win.getmaxx < @screen.window.getmaxx - 1 &&
-              @win.getbegy + @win.getmaxy < @screen.window.getmaxy - 1
+          if @win.getbegx + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1 &&
+              @win.getbegy + @win.getmaxy < Ncurses.getmaxy(@screen.window) - 1
             self.move(1, 1, true, true)
           else
             CDK.Beep
@@ -979,12 +986,12 @@ module CDK
 
     def focus
       self.drawText
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     def unfocus
       self.drawText
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     def object_type

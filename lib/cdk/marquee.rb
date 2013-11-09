@@ -7,7 +7,7 @@ module CDK
 
       @screen = cdkscreen
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(1, 1, ypos, xpos)
+      @win = Ncurses.newwin(1, 1, ypos, xpos)
       @active = true
       @width = width
       @shadow = shadow
@@ -38,7 +38,7 @@ module CDK
 
       # Keep the box info, setting BorderOf()
       self.setBox(box)
-      
+
       padding = if mesg[-1] == ' ' then 0 else 1 end
 
       # Translate the string to a chtype array
@@ -67,7 +67,7 @@ module CDK
           @win.mvwaddch(@border_size, x, ch)
           y += 1
         end
-        @win.wrefresh
+        Ncurses.wrefresh @win
 
         # Set my variables
         if mesg_length[0] < view_limit
@@ -112,7 +112,7 @@ module CDK
 
           # Time to start over.
           @win.mvwaddch(@border_size, @border_size, ' '.ord)
-          @win.wrefresh
+          Ncurses.wrefresh @win
           first_time = true
         end
 
@@ -152,7 +152,7 @@ module CDK
       end
 
       # Refresh the window.
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This destroys the widget.
@@ -201,7 +201,7 @@ module CDK
 
     def layoutWidget(xpos, ypos)
       cdkscreen = @screen
-      parent_width = @screen.window.getmaxx
+      parent_width = Ncurses.getmaxx(@screen.window)
 
       CDK::MARQUEE.discardWin(@win)
       CDK::MARQUEE.discardWin(@shadow_win)
@@ -213,14 +213,14 @@ module CDK
       xtmp = [xpos]
       ytmp = [ypos]
       CDK.alignxy(@screen.window, xtmp, ytmp, box_width, box_height)
-      window = Ncurses::WINDOW.new(box_height, box_width, ytmp[0], xtmp[0])
+      window = Ncurses.newwin(box_height, box_width, ytmp[0], xtmp[0])
 
       unless window.nil?
         @win = window
         @box_height = box_height
         @box_width = box_width
 
-        @win.keypad(true)
+        Ncurses.keypad(@win, true)
 
         # Do we want a shadow?
         if @shadow

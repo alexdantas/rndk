@@ -171,7 +171,7 @@ module CDK
 
       junk1 = []
       junk2 = []
-      
+
       # Convert the value of the environment variable to a chtype
       holder = CDK.char2Chtype(color, junk1, junk2)
 
@@ -181,10 +181,10 @@ module CDK
 
     # Set the widget's title.
     def setTitle (title, box_width)
-      if !title.nil? 
+      if !title.nil?
         temp = title.split("\n")
         @title_lines = temp.size
-        
+
         if box_width >= 0
           max_width = 0
           temp.each do |line|
@@ -240,7 +240,7 @@ module CDK
       @post_process_func = fn
       @post_process_data = data
     end
-    
+
     # Set the object's exit-type based on the input.
     # The .exitType field should have been part of the CDKOBJS struct, but it
     # is used too pervasively in older applications to move (yet).
@@ -262,13 +262,13 @@ module CDK
       if CDK::ALL_OBJECTS.include?(self)
         result = self.validObjType(self.object_type)
       end
-      return result
+      result
     end
 
     def getc
       cdktype = self.object_type
       test = self.bindableObject(cdktype)
-      result = @input_window.wgetch
+      result = Ncurses.wgetch @input_window
 
       if result >= 0 && !(test.nil?) && test.binding_list.include?(result) &&
           test.binding_list[result][0] == :getc
@@ -379,8 +379,8 @@ module CDK
       orig_y = win.getbegy
       beg_x = parent.getbegx
       beg_y = parent.getbegy
-      end_x = beg_x + @screen.window.getmaxx
-      end_y = beg_y + @screen.window.getmaxy
+      end_x = beg_x + Ncurses.getmaxx(@screen.window)
+      end_y = beg_y + Ncurses.getmaxy(@screen.window)
 
       # Let them move the widget around until they hit return.
       while !([CDK::KEY_RETURN, Ncurses::KEY_ENTER].include?(

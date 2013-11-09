@@ -11,8 +11,8 @@ module CDK
         field_attribute, filler_char, highlight, d_attribute, f_attribute,
         l_attribute, s_attribute, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       bindings = {
           CDK::BACKCHAR => Ncurses::KEY_PPAGE,
           CDK::FORCHAR  => Ncurses::KEY_NPAGE,
@@ -40,14 +40,14 @@ module CDK
       box_height = [box_height, 6].max
 
       # Make the file selector window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       # is the window nil?
       if @win.nil?
         fselect.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Set some variables.
       @screen = cdkscreen
@@ -167,7 +167,7 @@ module CDK
         filename = entry.info.clone
         mydirname = CDK.dirName(filename)
         current_index = 0
-        
+
         # Make sure the filename is not nil/empty.
         if filename.nil? || filename.size == 0
           CDK.Beep
@@ -378,7 +378,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 

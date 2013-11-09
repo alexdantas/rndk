@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, title, label, field_attr,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       bindings = {
           'u'           => Ncurses::KEY_UP,
           'U'           => Ncurses::KEY_PPAGE,
@@ -62,7 +62,7 @@ module CDK
       ypos = ytmp[0]
 
       # Make the widget's window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
 
       # Is the main window nil?
       if @win.nil?
@@ -72,7 +72,7 @@ module CDK
 
       # Create the widget's label window.
       if @label.size > 0
-        @label_win = @win.subwin(1, @label_len,
+        @label_win = Ncurses.subwin(@win, 1, @label_len,
             ypos + @title_lines + @border_size,
             xpos + horizontal_adjust + @border_size)
         if @label_win.nil?
@@ -82,7 +82,7 @@ module CDK
       end
 
       # Create the widget's data field window.
-      @field_win = @win.subwin(1, field_width,
+      @field_win = Ncurses.subwin(@win, 1, field_width,
           ypos + @title_lines + @border_size,
           xpos + @label_len + horizontal_adjust + @border_size)
 
@@ -91,7 +91,7 @@ module CDK
         return nil
       end
       @field_win.keypad(true)
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
       @screen = cdkscreen
@@ -114,7 +114,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
         if @shadow_win.nil?
           self.destroy
@@ -405,7 +405,7 @@ module CDK
             0, @label_len)
         @label_win.wrefresh
       end
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       # Draw the field window.
       self.drawField
@@ -438,7 +438,7 @@ module CDK
     def destroy
       self.cleanTitle
       @label = []
-      
+
       # Clean up the windows.
       CDK.deleteCursesWindow(@field_win)
       CDK.deleteCursesWindow(@label_win)

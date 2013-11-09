@@ -8,8 +8,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, height, width,
         buttons, button_count, button_highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       box_width = width
       box_height = height
       button_width = 0
@@ -40,14 +40,14 @@ module CDK
       ypos = ytmp[0]
 
       # Make the viewer window.
-      @win= Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win= Ncurses.newwin(box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
       end
 
       # Turn the keypad on for the viewer.
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Create the buttons.
       @button_count = button_count
@@ -92,7 +92,7 @@ module CDK
 
       # Do we need to create a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width + 1,
+        @shadow_win = Ncurses.newwin(box_height, box_width + 1,
             ypos + 1, xpos + 1)
         if @shadow_win.nil?
           self.destroy
@@ -596,7 +596,7 @@ module CDK
       end
       return found
     end
-    
+
     # This allows us to 'jump' to a given line in the file.
     def jumpToLine
       newline = CDK::SCALE.new(@screen, CDK::CENTER, CDK::CENTER,
@@ -637,7 +637,7 @@ module CDK
       # Box it if it was asked for.
       if box
         Draw.drawObjBox(@win, self)
-        @win.wrefresh
+        Ncurses.wrefresh @win
       end
 
       # Draw the info in the viewer.
@@ -668,7 +668,7 @@ module CDK
       end
 
       # Refresh the window.
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This sets the background attribute of the widget.
@@ -765,7 +765,7 @@ module CDK
       # Box it if we have to.
       if @box
         Draw.drawObjBox(@win, self)
-        @win.wrefresh
+        Ncurses.wrefresh @win
       end
 
       # Draw the separation line.

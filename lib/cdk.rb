@@ -730,8 +730,8 @@ module CDK
   def CDK.eraseCursesWindow (window)
     return if window.nil?
 
-    window.werase
-    window.wrefresh
+    Ncurses.werase window
+    Ncurses.wrefresh window
   end
 
   # This safely deletes a given window.
@@ -739,7 +739,7 @@ module CDK
     return if window.nil?
 
     CDK.eraseCursesWindow(window)
-    window.delwin
+    Ncurses.delwin window
   end
 
   # This moves a given window (if we're able to set the window's beginning).
@@ -749,12 +749,12 @@ module CDK
 
     xpos = []
     ypos = []
-    window.getbegyx(ypos, xpos)
-    if window.mvwin(ypos[0], xpos[0]) != Ncurses::ERR
+    Ncurses.getbegyx(window, ypos, xpos)
+    if Ncurses.mvwin(window, ypos[0], xpos[0]) != Ncurses::ERR
       xpos[0] += xdiff
       ypos[0] += ydiff
-      window.werase
-      window.mvwin(ypos[0], xpos[0])
+      Ncurses.werase window
+      Ncurses.mvwin(window, ypos[0], xpos[0])
     else
       CDK.Beep
     end

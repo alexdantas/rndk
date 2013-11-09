@@ -9,16 +9,22 @@ module CDK
     attr_reader :current_title, :current_subtitle
     attr_reader :sublist
 
-    def initialize(cdkscreen, menu_list, menu_items, subsize,
-        menu_location, menu_pos, title_attr, subtitle_attr)
+    def initialize(cdkscreen,
+                   menu_list,
+                   menu_items,
+                   subsize,
+                   menu_location,
+                   menu_pos,
+                   title_attr,
+                   subtitle_attr)
       super()
 
       right_count = menu_items - 1
-      rightloc = cdkscreen.window.getmaxx
+      rightloc = Ncurses.getmaxx cdkscreen.window
       leftloc = 0
-      xpos = cdkscreen.window.getbegx
-      ypos = cdkscreen.window.getbegy
-      ymax = cdkscreen.window.getmaxy
+      xpos = Ncurses.getbegx cdkscreen.window
+      ypos = Ncurses.getbegy cdkscreen.window
+      ymax = Ncurses.getmaxy cdkscreen.window
 
       # Start making a copy of the information.
       @screen = cdkscreen
@@ -85,9 +91,9 @@ module CDK
         @title[x1] = CDK.char2Chtype(menu_list[x][0], title_len, [])
         @title_len[x1] = title_len[0]
         @subsize[x1] = subsize[x] - CDK::MENU::TITLELINES
-        @title_win[x1] = cdkscreen.window.subwin(CDK::MENU::TITLELINES,
+        @title_win[x1] = Ncurses.subwin(cdkscreen.window, CDK::MENU::TITLELINES,
             @title_len[x1] + 2, ypos + y1, xpos + x2)
-        @pull_win[x1] = cdkscreen.window.subwin(high, max + 2,
+        @pull_win[x1] = Ncurses.subwin(cdkscreen.window, high, max + 2,
             ypos + y2, xpos + x2)
         if @title_win[x1].nil? || @pull_win[x1].nil?
           self.destroy
@@ -95,8 +101,8 @@ module CDK
         end
 
         leftloc += @title_len[x] + 1
-        @title_win[x1].keypad(true)
-        @pull_win[x1].keypad(true)
+        Ncurses.keypad(@title_win[x1], true)
+        Ncurses.keypad(@pull_win[x1], true)
       end
       @input_window = @title_win[@current_title]
 
@@ -169,7 +175,7 @@ module CDK
           @subsize[@current_title])
 
       if next_item != @current_subtitle
-        ymax = @screen.window.getmaxy
+        ymax = Ncurses.getmaxy(@screen.window)
 
         if 1 + @pull_win[@current_title].getbegy + @subsize[@current_title] >=
             ymax
@@ -185,7 +191,7 @@ module CDK
           # Draw the new sub-title.
           self.selectItem(@current_subtitle, 0)
 
-          @pull_win[@current_title].wrefresh
+          Ncurses.wrefresh @pull_win[@current_title]
         end
 
         @input_window = @title_win[@current_title]
@@ -198,7 +204,7 @@ module CDK
       if next_item != @current_title
         # Erase the menu sub-window.
         self.eraseSubwin
-#        @screen.refresh
+        @screen.refresh
 
         # Set the values.
         @current_title = next_item
@@ -279,7 +285,7 @@ module CDK
 
     # Draw a menu item subwindow
     def drawSubwin
-      high = @pull_win[@current_title].getmaxy - 2
+      high = Ncurses.getmaxy(@pull_win[@current_title]) - 2
       x0 = 0
       x1 = @subsize[@current_title]
 
@@ -294,12 +300,17 @@ module CDK
 
       # Box the window
       @pull_win[@current_title]
-      @pull_win[@current_title].box(Ncurses::ACS_VLINE, Ncurses::ACS_HLINE)
+      Ncurses.box(@pull_win[@current_title], Ncurses::ACS_VLINE, Ncurses::ACS_HLINE)
       if @menu_pos == CDK::BOTTOM
-        @pull_win[@current_title].mvwaddch(@subsize[@current_title] + 1,
-            0, Ncurses::ACS_LTEE)
+        Ncurses.mvwaddch(@pull_win[@current_title],
+                         @subsize[@current_title] + 1,
+                         0,
+                         Ncurses::ACS_LTEE)
       else
-        @pull_win[@current_title].mvwaddch(0, 0, Ncurses::ACS_LTEE)
+        Ncurses.mvwaddch(@pull_win[@current_title],
+                         0,
+                         0,
+                         Ncurses::ACS_LTEE)
       end
 
       # Draw the items.
@@ -308,13 +319,13 @@ module CDK
       end
 
       self.selectItem(@current_subtitle, x0)
-      @pull_win[@current_title].wrefresh
+      Ncurses.wrefresh @pull_win[@current_title]
 
       # Highlight the title.
       Draw.writeChtypeAttrib(@title_win[@current_title], 0, 0,
           @title[@current_title], @title_attr, CDK::HORIZONTAL,
           0, @title_len[@current_title])
-      @title_win[@current_title].wrefresh
+      Ncurses.wrefresh @title_win[@current_title]
     end
 
     # Erase a menu item subwindow
@@ -323,7 +334,7 @@ module CDK
 
       # Redraw the sub-menu title.
       self.drawTitle(@current_title)
-      @title_win[@current_title].wrefresh
+      Ncurses.wrefresh @title_win[@current_title]
     end
 
     # Draw the menu.
@@ -331,7 +342,7 @@ module CDK
       # Draw in the menu titles.
       (0...@menu_items).each do |x|
         self.drawTitle(x)
-        @title_win[x].wrefresh
+        Ncurses.wrefresh @title_win[x]
       end
     end
 
@@ -372,10 +383,10 @@ module CDK
     def erase
       if self.validCDKObject
         (0...@menu_items).each do |x|
-          @title_win[x].werase
-          @title_win[x].wrefresh
-          @pull_win[x].werase
-          @pull_win[x].wrefresh
+          Ncurses.werase   @title_win[x]
+          Ncurses.wrefresh @title_win[x]
+          Ncurses.werase   @pull_win[x]
+          Ncurses.wrefresh @pull_win[x]
         end
       end
     end
@@ -420,7 +431,7 @@ module CDK
     def cleanUpMenu
       # Erase the sub-menu.
       self.eraseSubwin
-      @pull_win[@current_title].wrefresh
+      Ncurses.wrefresh @pull_win[@current_title]
 
       # Refresh the screen.
       @screen.refresh

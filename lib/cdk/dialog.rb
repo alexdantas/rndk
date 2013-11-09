@@ -65,7 +65,7 @@ module CDK
       # Set up the dialog box attributes.
       @screen = cdkscreen
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
       @current_button = 0
@@ -83,7 +83,7 @@ module CDK
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Find the button positions.
       buttonadj = (box_width - button_width) / 2
@@ -100,7 +100,7 @@ module CDK
 
       # Was there a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -119,7 +119,7 @@ module CDK
       Draw.writeChtypeAttrib(@win, @button_pos[@current_button],
           @box_height - 1 - @border_size, @button_label[@current_button],
           @highlight, CDK::HORIZONTAL, 0, @button_len[@current_button])
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       if actions.nil? || actions.size == 0
         while true
@@ -208,7 +208,7 @@ module CDK
 
       unless complete
         self.drawButtons
-        @win.wrefresh
+        Ncurses.wrefresh @win
         self.setExitType(0)
       end
 
@@ -243,7 +243,7 @@ module CDK
       # Draw in the buttons.
       self.drawButtons
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This function destroys the dialog widget.
@@ -311,12 +311,12 @@ module CDK
         boxattr = @BXAttr
 
         (1...@box_width).each do |x|
-          @win.mvwaddch(@box_height - 2 - @border_size, x,
+          Ncurses.mvwaddch(@win, @box_height - 2 - @border_size, x,
               Ncurses::ACS_HLINE | boxattr)
         end
-        @win.mvwaddch(@box_height - 2 - @border_size, 0,
+        Ncurses.mvwaddch(@win, @box_height - 2 - @border_size, 0,
             Ncurses::ACS_LTEE | boxattr)
-        @win.mvwaddch(@box_height - 2 - @border_size, @win.getmaxx - 1,
+        Ncurses.mvwaddch(@win, @box_height - 2 - @border_size, @win.getmaxx - 1,
             Ncurses::ACS_RTEE | boxattr)
       end
       Draw.writeChtypeAttrib(@win, @button_pos[@current_button],
@@ -666,7 +666,7 @@ module CDK
 
       # If the count is zero then there aren't any points.
       if @count == 0
-        @win.wrefresh
+        Ncurses.wrefresh @win
         return
       end
 
@@ -676,14 +676,14 @@ module CDK
       (0...@count).each do |y|
         colheight = (@values[y] / @xscale) - 1
         # Add the marker on the Y axis.
-        @win.mvwaddch(@box_height - 3, (y + 1) * spacing + adj,
+        Ncurses.mvwaddch(@win, @box_height - 3, (y + 1) * spacing + adj,
             Ncurses::ACS_TTEE)
 
         # If this is a plot graph, all we do is draw a dot.
         if @display_type == :PLOT
           xpos = @box_height - 4 - colheight
           ypos = (y + 1) * spacing + adj
-          @win.mvwaddch(xpos, ypos, @graph_char[y])
+          Ncurses.mvwaddch(@win, xpos, ypos, @graph_char[y])
         else
           (0..@yscale).each do |x|
             xpos = @box_height - 3
@@ -695,12 +695,12 @@ module CDK
       end
 
       # Draw in the axis corners.
-      @win.mvwaddch(@title_lines, 2, Ncurses::ACS_URCORNER)
-      @win.mvwaddch(@box_height - 3, 2, Ncurses::ACS_LLCORNER)
-      @win.mvwaddch(@box_height - 3, @box_width, Ncurses::ACS_URCORNER)
+      Ncurses.mvwaddch(@win, @title_lines, 2, Ncurses::ACS_URCORNER)
+      Ncurses.mvwaddch(@win, @box_height - 3, 2, Ncurses::ACS_LLCORNER)
+      Ncurses.mvwaddch(@win, @box_height - 3, @box_width, Ncurses::ACS_URCORNER)
 
       # Refresh and lets see it
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     def destroy

@@ -5,8 +5,8 @@ module CDK
     def initialize(cdkscreen, xplace, yplace, title, label, item, count,
         default_item, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       field_width = 0
 
       if !self.createList(item, count)
@@ -48,7 +48,7 @@ module CDK
       ypos = ytmp[0]
 
       # Make the window.
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
@@ -56,7 +56,7 @@ module CDK
 
       # Make the label window if there was a label.
       if @label.size > 0
-        @label_win = @win.subwin(1, @label_len,
+        @label_win = Ncurses.subwin(@win, 1, @label_len,
             ypos + @border_size + @title_lines,
             xpos + @border_size)
 
@@ -66,7 +66,7 @@ module CDK
         end
       end
 
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Make the field window.
       if !self.createFieldWin(
@@ -94,7 +94,7 @@ module CDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
         if @shadow_win.nil?
           self.destroy
@@ -116,7 +116,7 @@ module CDK
 
       if actions.nil? || actions.size == 0
         input = 0
-        
+
         while true
           input = self.getch([])
 
@@ -244,7 +244,7 @@ module CDK
         Draw.drawObjBox(@win, self)
       end
 
-      @win.wrefresh
+      Ncurses.wrefresh @win
 
       # Draw in the field.
       self.drawField(false)
@@ -375,7 +375,7 @@ module CDK
         @default_item = default_item
       end
     end
-    
+
     def getDefaultItem
       return @default_item
     end
@@ -455,7 +455,7 @@ module CDK
 
     # Make the field window.
     def createFieldWin(ypos, xpos)
-      @field_win = @win.subwin(1, @field_width, ypos, xpos)
+      @field_win = Ncurses.subwin(@win, 1, @field_width, ypos, xpos)
       unless @field_win.nil?
         @field_win.keypad(true)
         @input_window = @field_win

@@ -14,7 +14,7 @@ module CDK
         # #ifdef HAVE_SETLOCALE
         # setlocale (LC_ALL, "");
         # #endif
-        
+
         Ncurses.noecho
         Ncurses.cbreak
       end
@@ -194,8 +194,8 @@ module CDK
     # it would not be necessary to touch the window to ensure that it covers
     # other windows.
     def SCREEN.refreshCDKWindow(win)
-      win.touchwin
-      win.wrefresh
+      Ncurses.touchwin win
+      Ncurses.wrefresh win
     end
 
     # This refreshes all the objects in the screen.
@@ -248,7 +248,7 @@ module CDK
       end
 
       # Refresh the screen.
-      @window.wrefresh
+      Ncurses.wrefresh(@window)
     end
 
     # Destroy all the objects on a screen

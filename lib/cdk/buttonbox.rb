@@ -7,8 +7,8 @@ module CDK
     def initialize(cdkscreen, x_pos, y_pos, height, width, title, rows, cols,
         buttons, button_count, highlight, box, shadow)
       super()
-      parent_width = cdkscreen.window.getmaxx
-      parent_height = cdkscreen.window.getmaxy
+      parent_width = Ncurses.getmaxx(cdkscreen.window)
+      parent_height = Ncurses.getmaxy(cdkscreen.window)
       col_width = 0
       current_button = 0
       @button = []
@@ -40,7 +40,7 @@ module CDK
       # Translate the buttons string to a chtype array
       (0...button_count).each do |x|
         button_len = []
-        @button << CDK.char2Chtype(buttons[x], button_len ,[]) 
+        @button << CDK.char2Chtype(buttons[x], button_len ,[])
         @button_len << button_len[0]
       end
 
@@ -76,7 +76,7 @@ module CDK
       # Set up the buttonbox box attributes.
       @screen = cdkscreen
       @parent = cdkscreen.window
-      @win = Ncurses::WINDOW.new(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
       @current_button = 0
@@ -105,11 +105,11 @@ module CDK
         self.destroy
         return nil
       end
-      @win.keypad(true)
+      Ncurses.keypad(@win, true)
 
       # Was there a shadow?
       if shadow
-        @shadow_win = Ncurses::WINDOW.new(box_height, box_width,
+        @shadow_win = Ncurses.newwin(box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
@@ -216,7 +216,7 @@ module CDK
         end
 
       end
-        
+
       unless complete
         self.drawButtons
         self.setExitType(0)
@@ -298,7 +298,7 @@ module CDK
       if cur_row >= 0 && cur_col >= 0
         @win.wmove(cur_row, cur_col)
       end
-      @win.wrefresh
+      Ncurses.wrefresh @win
     end
 
     # This erases the buttonbox box from the screen.
