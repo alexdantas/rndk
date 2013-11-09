@@ -280,8 +280,8 @@ module CDK
     # This moves the calendar field to the given location.
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-          windows, [])
+
+      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
     # This draws the calendar widget.
@@ -305,8 +305,13 @@ module CDK
       (0...7).each do |col|
         src = col_len * ((col + (@week_base % 7)) % 7)
         dst = col_len * col
-        Draw.writeChar(@win, @x_offset + dst, @title_lines + 2,
-            @day_name[src..-1], CDK::HORIZONTAL, 0, col_len)
+        Draw.writeChar(@win,
+                       @x_offset + dst,
+                       @title_lines + 2,
+                       @day_name[src..-1],
+                       CDK::HORIZONTAL,
+                       0,
+                       col_len)
       end
 
       Ncurses.wrefresh @win
@@ -338,24 +343,23 @@ module CDK
 
             if @day == day
               marker = @highlight
-              save_y = ypos + @field_win.getbegy - @input_window.getbegy
+              save_y = ypos + Ncurses.getbegy(@field_win) - Ncurses.getbegy(@input_window)
               save_x = 1
             else
               marker |= self.getMarker(day, @month, year_index)
             end
-            Draw.writeCharAttrib(@field_win, xpos, ypos, temp, marker,
-                CDK::HORIZONTAL, 0, 2)
+            Draw.writeCharAttrib(@field_win, xpos, ypos, temp, marker, CDK::HORIZONTAL, 0, 2)
           end
           day += 1
         end
       end
-      @field_win.wrefresh
+      Ncurses.wrefresh @field_win
 
       # Draw the month in.
       if !(@label_win.nil?)
         temp = '%s %d,' % [month_name, @day]
         Draw.writeChar(@label_win, 0, 0, temp, CDK::HORIZONTAL, 0, temp.size)
-        @label_win.wclrtoeol
+        Ncurses.wclrtoeol @label_win
 
         # Draw the year in.
         temp = '%d' % [@year]
@@ -363,17 +367,17 @@ module CDK
         Draw.writeChar(@label_win, @field_width - year_len, 0, temp,
             CDK::HORIZONTAL, 0, year_len)
 
-        @label_win.wmove(0, 0)
-        @label_win.wrefresh
+        Ncurses.wmove(@label_win, 0, 0)
+        Ncurses.wrefresh @label_win
+
       elsif save_y >= 0
-        @input_window.wmove(save_y, save_x)
-        @input_window.wrefresh
+        Ncurses.wmove(@input_window, save_y, save_x)
+        Ncurses.wrefresh @input_window
       end
     end
 
     # This sets multiple attributes of the widget
-    def set(day, month, year, day_attrib, month_attrib, year_attrib,
-        highlight, box)
+    def set(day, month, year, day_attrib, month_attrib, year_attrib, highlight, box)
       self.setDate(day, month, yar)
       self.setDayAttribute(day_attrib)
       self.setMonthAttribute(month_attrib)
@@ -445,20 +449,18 @@ module CDK
 
     # This sets the background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
-      @field_win.wbkgd(attrib)
-      unless @label_win.nil?
-        @label_win.wbkgd(attrib)
-      end
+      Ncurses.wbkgd(@win, attrib)
+      Ncurses.wbkgd(@field_win, attrib)
+      Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
     # This erases the calendar widget.
     def erase
       if self.validCDKObject
-        CDK.eraseCursesWindow(@label_win)
-        CDK.eraseCursesWindow(@field_win)
-        CDK.eraseCursesWindow(@win)
-        CDK.eraseCursesWindow(@shadow_win)
+        CDK.eraseCursesWindow @label_win
+        CDK.eraseCursesWindow @field_win
+        CDK.eraseCursesWindow @win
+        CDK.eraseCursesWindow @shadow_win
       end
     end
 
@@ -466,10 +468,10 @@ module CDK
     def destroy
       self.cleanTitle
 
-      CDK.deleteCursesWindow(@label_win)
-      CDK.deleteCursesWindow(@field_win)
-      CDK.deleteCursesWindow(@shadow_win)
-      CDK.deleteCursesWindow(@win)
+      CDK.deleteCursesWindow @label_win
+      CDK.deleteCursesWindow @field_win
+      CDK.deleteCursesWindow @shadow_win
+      CDK.deleteCursesWindow @win
 
       # Clean the key bindings.
       self.cleanBindings(:CALENDAR)

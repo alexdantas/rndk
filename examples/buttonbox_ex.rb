@@ -28,7 +28,7 @@ class ButtonboxExample < Example
 
     # Create the button box widget.
     button_widget = CDK::BUTTONBOX.new(cdkscreen,
-        entry.win.getbegx, entry.win.getbegy + entry.box_height - 1,
+        Ncurses.getbegx(entry.win), Ncurses.getbegy(entry.win) + entry.box_height - 1,
         1, entry.box_width - 1, '', 1, 2, buttons, 2, Ncurses::A_REVERSE,
         true, false)
 
@@ -54,7 +54,7 @@ class ButtonboxExample < Example
     end
 
     entry.bind(:ENTRY, CDK::KEY_TAB, entryCB, button_widget)
-    
+
     # Activate the entry field.
     button_widget.draw(true)
     info = entry.activate('')

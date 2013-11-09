@@ -243,7 +243,7 @@ module CDK
 
     # This sets th background attribute of the widget.
     def setBKattr(attrib)
-      @win.wbkgd(attrib)
+      Ncurses.wbkgd(@win, attrib)
     end
 
     # This draws the buttonbox box widget.
@@ -259,7 +259,7 @@ module CDK
       end
 
       # Draw in the title if there is one.
-      self.drawTitle(@win)
+      self.drawTitle @win
 
       # Draw in the buttons.
       self.drawButtons
@@ -285,9 +285,14 @@ module CDK
               cur_row = row
               cur_col = col
             end
-            Draw.writeChtypeAttrib(@win, col, row,
-                @button[current_button], attr, CDK::HORIZONTAL, 0,
-                @button_len[current_button])
+            Draw.writeChtypeAttrib(@win,
+                                   col,
+                                   row,
+                                   @button[current_button],
+                                   attr,
+                                   CDK::HORIZONTAL,
+                                   0,
+                                   @button_len[current_button])
             row += (1 + @row_adjust)
             current_button += 1
           end
@@ -296,7 +301,7 @@ module CDK
       end
 
       if cur_row >= 0 && cur_col >= 0
-        @win.wmove(cur_row, cur_col)
+        Ncurses.wmove(@win, cur_row, cur_col)
       end
       Ncurses.wrefresh @win
     end
@@ -304,8 +309,8 @@ module CDK
     # This erases the buttonbox box from the screen.
     def erase
       if self.validCDKObject
-        CDK.eraseCursesWindow(@win)
-        CDK.eraseCursesWindow(@shadow_win)
+        CDK.eraseCursesWindow @win
+        CDK.eraseCursesWindow @shadow_win
       end
     end
 
@@ -313,8 +318,8 @@ module CDK
     def destroy
       self.cleanTitle
 
-      CDK.deleteCursesWindow(@shadow_win)
-      CDK.deleteCursesWindow(@win)
+      CDK.deleteCursesWindow @shadow_win
+      CDK.deleteCursesWindow @win
 
       self.cleanBindings(:BUTTONBOX)
 
