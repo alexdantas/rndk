@@ -113,7 +113,7 @@ class Appointment
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -129,7 +129,7 @@ class Appointment
     # Is the widget nil?
     if calendar.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create the calendar. Is the window too small?"
       exit 1
@@ -325,7 +325,7 @@ class Appointment
     # Clean up.
     calendar.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
   end
 end
 
@@ -335,7 +335,7 @@ begin
 
 # In case something goes wrong
 rescue Exception => e
-  RNDK::SCREEN.endRNDK
+  RNDK::Screen.end_rndk
 
   puts e
   puts e.inspect

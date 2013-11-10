@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class TEMPLATE < RNDK::RNDKOBJS
+  class TEMPLATE < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, title, label, plate,
         overlay, box, shadow)
       super()
@@ -171,7 +171,7 @@ module RNDK
         end
 
         if failed
-          RNDK.Beep
+          RNDK.beep
         elsif change || moveby
           @info_pos += amount
           @plate_pos += amount
@@ -254,13 +254,13 @@ module RNDK
               self.clean
               self.drawField
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::COPY
             if @info.size > 0
               @@g_paste_buffer = @info.clone
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::PASTE
             if @@g_paste_buffer.size > 0
@@ -272,11 +272,11 @@ module RNDK
               end
               self.drawField
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             if @info.size < @min
-              RNDK.Beep
+              RNDK.beep
             else
               self.setExitType(input)
               ret = @info
@@ -469,7 +469,7 @@ module RNDK
       # Clean the key bindings.
       self.cleanBindings(:TEMPLATE)
 
-      RNDK::SCREEN.unregister(:TEMPLATE, self)
+      RNDK::Screen.unregister(:TEMPLATE, self)
     end
 
     # Erase the widget.

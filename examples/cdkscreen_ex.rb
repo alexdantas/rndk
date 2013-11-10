@@ -18,11 +18,11 @@ class RNDKScreenExample < Example
     curses_win = Ncurses.initscr
 
     # Create the screens
-    rndkscreen1 = RNDK::SCREEN.new(curses_win)
-    rndkscreen2 = RNDK::SCREEN.new(curses_win)
-    rndkscreen3 = RNDK::SCREEN.new(curses_win)
-    rndkscreen4 = RNDK::SCREEN.new(curses_win)
-    rndkscreen5 = RNDK::SCREEN.new(curses_win)
+    rndkscreen1 = RNDK::Screen.new(curses_win)
+    rndkscreen2 = RNDK::Screen.new(curses_win)
+    rndkscreen3 = RNDK::Screen.new(curses_win)
+    rndkscreen4 = RNDK::Screen.new(curses_win)
+    rndkscreen5 = RNDK::Screen.new(curses_win)
 
     # Create the first screen.
     title1_mesg = [
@@ -114,7 +114,7 @@ class RNDKScreenExample < Example
         rndkscreen3.destroy
         rndkscreen4.destroy
         rndkscreen5.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
         exit  # EXIT__SUCCESS
       end
     end

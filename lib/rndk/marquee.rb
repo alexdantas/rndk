@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class MARQUEE < RNDK::RNDKOBJS
+  class MARQUEE < RNDK::Widget
     def initialize(rndkscreen, xpos, ypos, width, box, shadow)
       super()
 
@@ -165,7 +165,7 @@ module RNDK
       self.cleanBindings(:MARQUEE)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:MARQUEE, self)
+      RNDK::Screen.unregister(:MARQUEE, self)
     end
 
     # This erases the widget.

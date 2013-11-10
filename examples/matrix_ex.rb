@@ -52,7 +52,7 @@ class MatrixExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -83,7 +83,7 @@ class MatrixExample < Example
     if course_list.nil?
       # Exit RNDK.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts 'Cannot create the matrix widget. Is the window too small?'
       exit  # EXIT_FAILURE
@@ -116,7 +116,7 @@ class MatrixExample < Example
     # Clean up
     course_list.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

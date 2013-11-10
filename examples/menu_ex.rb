@@ -36,7 +36,7 @@ class MenuExample < Example
 
     # Set up RNDK.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start color.
     RNDK::Draw.initRNDKColor
@@ -126,7 +126,7 @@ class MenuExample < Example
     menu.destroy
     info_box.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
 
     exit # EXIT_SUCCESS
   end

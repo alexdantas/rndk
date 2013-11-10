@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class GRAPH < RNDK::RNDKOBJS
+  class GRAPH < RNDK::Widget
     def initialize(rndkscreen,
                    xplace,
                    yplace,
@@ -270,7 +270,7 @@ module RNDK
       RNDK.moveCursesWindow(@shadow_win, -xdiff, -ydiff)
 
       # Touch the windows so they 'move'.
-      RNDK::SCREEN.refreshRNDKWindow(@screen.window)
+      RNDK::Screen.refresh_window(@screen.window)
 
       # Reraw the windowk if they asked for it
       if refresh_flag
@@ -379,7 +379,7 @@ module RNDK
     def destroy
       self.cleanTitle
       self.cleanBindings(:GRAPH)
-      RNDK::SCREEN.unregister(:GRAPH, self)
+      RNDK::Screen.unregister(:GRAPH, self)
       RNDK.deleteCursesWindow(@win)
     end
 

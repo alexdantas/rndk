@@ -28,7 +28,7 @@ class GraphExample < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -50,7 +50,7 @@ class GraphExample < CLIExample
     # Is the graph null?
     if graph.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make the graph widget.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -63,7 +63,7 @@ class GraphExample < CLIExample
     if pausep.nil?
       graph.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make the label widget. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -84,7 +84,7 @@ class GraphExample < CLIExample
     graph.destroy
     pausep.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

@@ -82,10 +82,10 @@ module RNDK
       # Create the scrollbar window.
       if splace == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), xpos + box_width - @border_size - 1)
+            self.Screen_YPOS(ypos), xpos + box_width - @border_size - 1)
       elsif splace == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(xpos))
+            self.Screen_YPOS(ypos), self.Screen_XPOS(xpos))
       else
         @scrollbar_win = nil
       end
@@ -93,8 +93,8 @@ module RNDK
       # create the list window
       @list_win = Ncurses.subwin(@win, self.maxViewSize,
           box_width - (2 * @border_size) - scroll_adjust,
-          self.SCREEN_YPOS(ypos),
-          self.SCREEN_XPOS(xpos) + (if splace == RNDK::LEFT then 1 else 0 end))
+          self.Screen_YPOS(ypos),
+          self.Screen_XPOS(xpos) + (if splace == RNDK::LEFT then 1 else 0 end))
 
       # Set the rest of the variables
       @screen = rndkscreen
@@ -144,8 +144,8 @@ module RNDK
     # Put the cursor on the currently-selected item's row.
     def fixCursorPosition
       scrollbar_adj = if @scrollbar_placement == LEFT then 1 else 0 end
-      ypos = self.SCREEN_YPOS(@current_item - @current_top)
-      xpos = self.SCREEN_XPOS(0) + scrollbar_adj
+      ypos = self.Screen_YPOS(@current_item - @current_top)
+      xpos = self.Screen_XPOS(0) + scrollbar_adj
 
       Ncurses.wmove(@input_window, ypos, xpos)
       Ncurses.wrefresh(@input_window)
@@ -393,7 +393,7 @@ module RNDK
       self.cleanBindings(:SCROLL)
 
       # Unregister this object
-      RNDK::SCREEN.unregister(:SCROLL, self)
+      RNDK::Screen.unregister(:SCROLL, self)
     end
 
     # This function erases the scrolling list from the screen.

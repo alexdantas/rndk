@@ -67,7 +67,7 @@ class CalendarExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -84,7 +84,7 @@ class CalendarExample < Example
     if calendar.nil?
       # Exit RNDK.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts 'Cannot create the calendar. Is the window too small?'
       exit  # EXIT_FAILURE
@@ -136,7 +136,7 @@ class CalendarExample < Example
     # Clean up
     calendar.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     $stdout.flush
     puts 'Selected Time: %s' % ret_val.ctime
     #ExitProgram (EXIT_SUCCESS);

@@ -24,7 +24,7 @@ class FileView
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -58,7 +58,7 @@ class FileView
         fselect.destroy
 
         rndkscreen.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
 
         exit  # EXIT_SUCCESS
       end
@@ -76,7 +76,7 @@ class FileView
       rndkscreen.destroy
 
       # End curses...
-      RNDK.endRNDK
+      RNDK.end_rndk
 
       puts "Cannot create viewer. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -118,7 +118,7 @@ class FileView
     # Clean up
     example.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

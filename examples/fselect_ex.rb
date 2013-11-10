@@ -76,7 +76,7 @@ class FselectExample < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -89,7 +89,7 @@ class FselectExample < CLIExample
 
     if fselect.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       $stderr.puts "Cannot create widget."
       exit #EXIT_FAILURE
@@ -214,7 +214,7 @@ class FselectExample < CLIExample
       # Exit RNDK.
       fselect.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
       exit  # EXIT_SUCCESS
     end
 
@@ -227,7 +227,7 @@ class FselectExample < CLIExample
       # Exit RNDK.
       fselect.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Can't seem to create viewer. Is the window too small?"
       exit  # EXIT_SUCCESS
@@ -239,7 +239,7 @@ class FselectExample < CLIExample
     if lines == -1
       fselect.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Coult not open \"%s\"" % [filename]
 
@@ -276,7 +276,7 @@ class FselectExample < CLIExample
     # Clean up.
     example.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

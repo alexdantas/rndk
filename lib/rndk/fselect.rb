@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class FSELECT < RNDK::RNDKOBJS
+  class FSELECT < RNDK::Widget
     attr_reader :scroll_field, :entry_field
     attr_reader :dir_attribute, :file_attribute, :link_attribute, :highlight
     attr_reader :sock_attribute, :field_attribute, :filler_character
@@ -170,7 +170,7 @@ module RNDK
 
         # Make sure the filename is not nil/empty.
         if filename.nil? || filename.size == 0
-          RNDK.Beep
+          RNDK.beep
           return true
         end
 
@@ -211,7 +211,7 @@ module RNDK
 
         # If the index is less than zero, return we didn't find a match.
         if index < 0
-          RNDK.Beep
+          RNDK.beep
         else
           # Move to the current item in the scrolling list.
           # difference = Index - scrollp->currentItem;
@@ -262,7 +262,7 @@ module RNDK
               end
 
               if secondary_matches != matches
-                RNDK.Beep
+                RNDK.beep
                 break
               end
 
@@ -346,7 +346,7 @@ module RNDK
 
           return true
         end
-        RNDK.Beep
+        RNDK.beep
         return false
       end
 
@@ -558,7 +558,7 @@ module RNDK
 
         # Change directories.
         if Dir.chdir(new_directory) != 0
-          RNDK.Beep
+          RNDK.beep
 
           # Could not get into the directory, pop up a little message.
           mesg = [
@@ -595,7 +595,7 @@ module RNDK
 
       # Get the directory contents.
       unless self.setDirContents
-        RNDK.Beep
+        RNDK.beep
         return
       end
 
@@ -854,7 +854,7 @@ module RNDK
 
       # Clean the key bindings.
       # Unregister the object.
-      RNDK::SCREEN.unregister(:FSELECT, self)
+      RNDK::Screen.unregister(:FSELECT, self)
     end
 
     # Currently a wrapper for File.expand_path

@@ -28,7 +28,7 @@ class LabelExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -52,7 +52,7 @@ class LabelExample < Example
     #   destroyRNDKScreen (rndkscreen);
     #
     #   # End curses...
-    #   endRNDK ();
+    #   end_rndk ();
     #
     #   printf ("Cannot create the label. Is the window too small?\n");
     #   ExitProgram (EXIT_FAILURE);
@@ -65,7 +65,7 @@ class LabelExample < Example
     # Clean up
     demo.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

@@ -36,6 +36,19 @@ Currently implemented widgets:
  * Template
  * Viewer
 
+## WARNING
+
+This is a very unstable Work-in-Progress library.
+
+I'm currently reviewing `tawny-cdk`'s API, so a lot of things are
+changing real fast.
+
+Be sure to know that whenever I remove this notice, things will be
+nicer.
+
+For now, I recommend you to **not** use `rndk` for production
+programs!
+
 ## Requirements
 
 `rndk` requires the gem `ffi-ncurses`.
@@ -66,41 +79,6 @@ There's also some more comples demo applications under the `demos`
 directory. Do the same:
 
     ruby -Ilib demos/YOUR_DEMO_HERE
-
-Here's a sample that shows a colored "Hello, World!" on the screen:
-
-    # Set up CDK
-    curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
-
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
-
-    # Set the labels up.
-	# They're easy ways to format text.
-    mesg = [
-        "</5><#UL><#HL(30)><#UR>",
-        "</5><#VL(10)>Hello, World!<#VL(10)>",
-        "</5><#LL><#HL(30)><#LR)"
-    ]
-
-    # Declare the labels.
-    demo = CDK::LABEL.new(cdkscreen,
-	                      1,    # x
-						  1,    # y
-						  mesg, # labels
-						  3,    # lines no.
-						  true, # box?
-						  true) # shadow?
-
-    # Draw the CDK screen.
-    cdkscreen.refresh
-    demo.wait(' ')
-
-    # Clean up
-    demo.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
 
 ## Contributing
 

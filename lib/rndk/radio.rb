@@ -83,10 +83,10 @@ module RNDK
       # Create the scrollbar window.
       if splace == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), xpos + @box_width - @border_size - 1)
+            self.Screen_YPOS(ypos), xpos + @box_width - @border_size - 1)
       elsif splace == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(xpos))
+            self.Screen_YPOS(ypos), self.Screen_XPOS(xpos))
       else
         @scrollbar_win = nil
       end
@@ -126,8 +126,8 @@ module RNDK
     # Put the cursor on the currently-selected item.
     def fixCursorPosition
       scrollbar_adj = if @scrollbar_placement == RNDK::LEFT then 1 else 0 end
-      ypos = self.SCREEN_YPOS(@current_item - @current_top)
-      xpos = self.SCREEN_XPOS(0) + scrollbar_adj
+      ypos = self.Screen_YPOS(@current_item - @current_top)
+      xpos = self.Screen_XPOS(0) + scrollbar_adj
 
       Ncurses.wmove(@input_window, ypos, xpos)
       Ncurses.wrefresh @input_window
@@ -273,10 +273,10 @@ module RNDK
       (0...@view_size).each do |j|
         k = j + @current_top
         if k < @list_size
-          xpos = self.SCREEN_XPOS(0)
-          ypos = self.SCREEN_YPOS(j)
+          xpos = self.Screen_XPOS(0)
+          ypos = self.Screen_YPOS(j)
 
-          screen_pos = self.SCREENPOS(k, scrollbar_adj)
+          screen_pos = self.ScreenPOS(k, scrollbar_adj)
 
           # Draw the empty string.
           Draw.writeBlanks(@win, xpos, ypos, RNDK::HORIZONTAL, 0,
@@ -302,8 +302,8 @@ module RNDK
       if @has_focus
         k = @current_item
         if k < @list_size
-          screen_pos = self.SCREENPOS(k, scrollbar_adj)
-          ypos = self.SCREEN_YPOS(@current_high)
+          screen_pos = self.ScreenPOS(k, scrollbar_adj)
+          ypos = self.Screen_YPOS(@current_high)
 
           Draw.writeChtypeAttrib(@win,
               if screen_pos >= 0 then screen_pos else 1 + scrollbar_adj end,
@@ -362,7 +362,7 @@ module RNDK
       self.cleanBindings(:RADIO)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:RADIO, self)
+      RNDK::Screen.unregister(:RADIO, self)
     end
 
     # This function erases the radio widget
@@ -389,7 +389,7 @@ module RNDK
 
       # Clean up the display.
       (0...@view_size).each do |j|
-        Draw.writeBlanks(@win, self.SCREEN_XPOS(0), self.SCREEN_YPOS(j),
+        Draw.writeBlanks(@win, self.Screen_XPOS(0), self.Screen_YPOS(j),
             RNDK::HORIZONTAL, 0, @box_width - @border_size)
       end
 
@@ -527,7 +527,7 @@ module RNDK
       @max_left_char + self.AvailableWidth
     end
 
-    def SCREENPOS(n, scrollbar_adj)
+    def ScreenPOS(n, scrollbar_adj)
       @item_pos[n] - @left_char + scrollbar_adj + @border_size
     end
 

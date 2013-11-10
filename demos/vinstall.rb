@@ -118,7 +118,7 @@ class Vinstall
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -178,7 +178,7 @@ class Vinstall
       # Clean up and leave.
       title_win.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
       exit  # EXIT_FAILURE
     end
 
@@ -186,7 +186,7 @@ class Vinstall
     if Vinstall.verifyDirectory(rndkscreen, dest_dir) != 0
       title_win.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
       exit  # EXIT_FAILURE
     end
 
@@ -317,7 +317,7 @@ class Vinstall
     progress_bar.destroy
     install_output.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

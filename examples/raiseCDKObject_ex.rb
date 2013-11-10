@@ -29,7 +29,7 @@ class RaiseRNDKObjectExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     mesg1 = [
         "label1 label1 label1 label1 label1 label1 label1",
@@ -113,13 +113,13 @@ class RaiseRNDKObjectExample < Example
     while (ch = STDIN.getc.chr) != 'q'
       case ch
       when '1'
-        RNDK::SCREEN.raiseRNDKObject(:LABEL, label1)
+        RNDK::Screen.raiseRNDKObject(:LABEL, label1)
       when '2'
-        RNDK::SCREEN.raiseRNDKObject(:LABEL, label2)
+        RNDK::Screen.raiseRNDKObject(:LABEL, label2)
       when '3'
-        RNDK::SCREEN.raiseRNDKObject(:LABEL, label3)
+        RNDK::Screen.raiseRNDKObject(:LABEL, label3)
       when '4'
-        RNDK::SCREEN.raiseRNDKObject(:LABEL, label4)
+        RNDK::Screen.raiseRNDKObject(:LABEL, label4)
       when 'r'
         rndkscreen.refresh
       else
@@ -141,7 +141,7 @@ class RaiseRNDKObjectExample < Example
     label4.destroy
     instruct.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

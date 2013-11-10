@@ -52,7 +52,7 @@ class Viewer2Example < CLIExample
 
     # Start curses
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start RNDK colors.
     RNDK::Draw.initRNDKColor
@@ -66,7 +66,7 @@ class Viewer2Example < CLIExample
 
       if f_select.nil?
         rndkscreen.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
 
         $stderr.puts 'Cannot create fselect-widget'
         exit  # EXIT_FAILURE
@@ -93,7 +93,7 @@ class Viewer2Example < CLIExample
         # Exit RNDK.
         f_select.destroy
         rndkscreen.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
         exit  # EXIT_SUCCESS
       end
     end
@@ -118,7 +118,7 @@ class Viewer2Example < CLIExample
 
     # Clean up.
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

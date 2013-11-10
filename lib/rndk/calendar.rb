@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class CALENDAR < RNDK::RNDKOBJS
+  class CALENDAR < RNDK::Widget
     attr_accessor :week_base
     attr_reader :day, :month, :year
 
@@ -471,7 +471,7 @@ module RNDK
       self.cleanBindings(:CALENDAR)
 
       # Unregister the object.
-      RNDK::SCREEN.unregister(:CALENDAR, self)
+      RNDK::Screen.unregister(:CALENDAR, self)
     end
 
     # This sets a marker on the calendar.
@@ -587,7 +587,7 @@ module RNDK
                 '<C></U>Error',
                 'Can not go past the year 1900'
             ]
-            RNDK.Beep
+            RNDK.beep
             @screen.popupLabel(mesg, 2)
             return
           end
@@ -639,7 +639,7 @@ module RNDK
               '<C></U>Error',
               'Can not go past the year 1900',
           ]
-          RNDK.Beep
+          RNDK.beep
           @screen.popupLabel(mesg, 2)
           return
         else
@@ -693,7 +693,7 @@ module RNDK
             '<C></U>Error',
             'Can not go past the year 1900',
         ]
-        RNDK.Beep
+        RNDK.beep
         @screen.popupLabel(mesg, 2)
         return
       end

@@ -13,7 +13,7 @@ class StopSign
   def StopSign.main
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -68,7 +68,7 @@ class StopSign
     title.destroy
     stop_sign.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

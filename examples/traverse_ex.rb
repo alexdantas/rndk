@@ -294,7 +294,7 @@ class TraverseExample < Example
       x = RNDK::RIGHT
       y = 2
     else
-      RNDK.Beep
+      RNDK.beep
       return
     end
 
@@ -355,7 +355,7 @@ class TraverseExample < Example
     when :VIEWER
       func = :make_viewer
     when :MENU, :TRAVERSE, :NULL
-      RNDK.Beep
+      RNDK.beep
       return
     end
 
@@ -368,7 +368,7 @@ class TraverseExample < Example
 
     # Create the new widget
     if func.nil?
-      RNDK.Beep
+      RNDK.beep
     else
       widget = self.send(func, rndkscreen, x, y)
       if widget.nil?
@@ -420,7 +420,7 @@ class TraverseExample < Example
 
     # Create the curses window.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start RNDK colours.
     RNDK::Draw.initRNDKColor
@@ -431,7 +431,7 @@ class TraverseExample < Example
 
     if menu.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts '? Cannot create menus'
       exit  # EXIT_FAILURE
@@ -474,7 +474,7 @@ class TraverseExample < Example
     end
     menu.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
 
     exit  # EXIT_SUCCESS
   end

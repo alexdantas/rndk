@@ -15,7 +15,7 @@ class ButtonboxExample < Example
 
     # Set up RNDK.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start color.
     RNDK::Draw.initRNDKColor
@@ -27,7 +27,7 @@ class ButtonboxExample < Example
 
     if entry.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       $stderr.puts "Cannot create entry-widget"
       exit # EXIT_FAILURE
@@ -41,7 +41,7 @@ class ButtonboxExample < Example
 
     if button_widget.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       $stderr.puts "Cannot create buttonbox-widget"
       exit # EXIT_FAILURE
@@ -71,7 +71,7 @@ class ButtonboxExample < Example
     button_widget.destroy
     entry.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
 
     puts "You typed in (%s) and selected button (%s)" % [
         if !(info.nil?) && info.size > 0 then info else '<null>' end,

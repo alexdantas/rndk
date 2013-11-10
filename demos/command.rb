@@ -70,7 +70,7 @@ class Command
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -95,7 +95,7 @@ class Command
     history_up_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds
       if history.current == 0
-        RNDK.Beep
+        RNDK.beep
         return false
       end
 
@@ -111,7 +111,7 @@ class Command
     history_down_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds
       if history.current == @count
-        RNDK.Beep
+        RNDK.beep
         return false
       end
 
@@ -230,7 +230,7 @@ class Command
         command_output.destroy
         rndkscreen.destroy
 
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
 
         exit  # EXIT_SUCCESS
       elsif command == 'clear'

@@ -5,11 +5,11 @@ module RNDK
     end
 
     def Traverse.exitOKRNDKScreen(screen)
-      screen.exit_status = RNDK::SCREEN::EXITOK
+      screen.exit_status = RNDK::Screen::EXITOK
     end
 
     def Traverse.exitCancelRNDKScreen(screen)
-      screen.exit_status = RNDK::SCREEN::EXITCANCEL
+      screen.exit_status = RNDK::Screen::EXITCANCEL
     end
 
     def Traverse.exitOKRNDKScreenOf(obj)
@@ -171,10 +171,10 @@ module RNDK
       unless curobj.nil?
         refreshDataRNDKScreen(screen)
 
-        screen.exit_status = RNDK::SCREEN::NOEXIT
+        screen.exit_status = RNDK::Screen::NOEXIT
 
         while !((curobj = getRNDKFocusCurrent(screen)).nil?) &&
-            screen.exit_status == RNDK::SCREEN::NOEXIT
+            screen.exit_status == RNDK::Screen::NOEXIT
           function = []
           key = curobj.getch(function)
 
@@ -188,7 +188,7 @@ module RNDK
               function[0], check_menu_key)
         end
 
-        if screen.exit_status == RNDK::SCREEN::EXITOK
+        if screen.exit_status == RNDK::Screen::EXITOK
           saveDataRNDKScreen(screen)
           result = 1
         end

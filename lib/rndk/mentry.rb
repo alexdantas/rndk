@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class MENTRY < RNDK::RNDKOBJS
+  class MENTRY < RNDK::Widget
     attr_accessor :info, :current_col, :current_row, :top_row
     attr_reader :disp_type, :field_width, :rows, :field_win
 
@@ -120,7 +120,7 @@ module RNDK
         newchar = Display.filterByDisplayType(mentry.disp_type, character)
 
         if newchar == Ncurses::ERR
-          RNDK.Beep
+          RNDK.beep
         else
           mentry.info = mentry.info[0...cursor_pos] + newchar.chr +
               mentry.info[cursor_pos..-1]
@@ -223,7 +223,7 @@ module RNDK
       end
 
       if !moved[0] && !redraw[0]
-        RNDK.Beep
+        RNDK.beep
         result = false
       end
       return result
@@ -296,7 +296,7 @@ module RNDK
               moved = self.setCurPos(@current_row + 1, 0)
             end
             if !moved && !redraw
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_DOWN
             if @current_row != @rows - 1
@@ -309,7 +309,7 @@ module RNDK
               end
             end
             if !moved && !redraw
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_UP
             if @current_row != 0
@@ -318,20 +318,20 @@ module RNDK
               redraw = self.setTopRow(@top_row - 1)
             end
             if !moved && !redraw
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC
             if @disp_type == :VIEWONLY
-              RNDK.Beep
+              RNDK.beep
             elsif @info.length == 0
-              RNDK.Beep
+              RNDK.beep
             elsif input == Ncurses::KEY_DC
               cursor_pos = self.getCursorPos
               if cursor_pos < @info.size
                 @info = @info[0...cursor_pos] + @info[cursor_pos + 1..-1]
                 self.drawField
               else
-                RNDK.Beep
+                RNDK.beep
               end
             else
               mtmp = [moved]
@@ -345,13 +345,13 @@ module RNDK
                   @info = @info[0...cursor_pos] + @info[cursor_pos + 1..-1]
                   self.drawField
                 else
-                  RNDK.Beep
+                  RNDK.beep
                 end
               end
             end
           when RNDK::TRANSPOSE
             if cursor_pos >= @info.size - 1
-              RNDK.Beep
+              RNDK.beep
             else
               holder = @info[cursor_pos]
               @info[cursor_pos] = @info[cursor_pos + 1]
@@ -365,7 +365,7 @@ module RNDK
             end
           when RNDK::CUT
             if @info.size == 0
-              RNDK.Beep
+              RNDK.beep
             else
               @@g_paste_buffer = @info.clone
               self.clean
@@ -373,20 +373,20 @@ module RNDK
             end
           when RNDK::COPY
             if @info.size == 0
-              RNDK.Beep
+              RNDK.beep
             else
               @@g_paste_buffer = @info.clone
             end
           when RNDK::PASTE
             if @@g_paste_buffer.size == 0
-              RNDK.Beep
+              RNDK.beep
             else
               self.setValue(@@g_paste_buffer)
               self.draw(@box)
             end
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             if @info.size < @min + 1
-              RNDK.Beep
+              RNDK.beep
             else
               self.setExitType(input)
               ret = @info
@@ -403,7 +403,7 @@ module RNDK
             @screen.refresh
           else
             if @disp_type == :VIEWONLY || @info.size >= @total_width
-              RNDK.Beep
+              RNDK.beep
             else
               @callbackfn.call(self, input)
             end
@@ -522,7 +522,7 @@ module RNDK
       self.cleanBindings(:MENTRY)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:MENTRY, self)
+      RNDK::Screen.unregister(:MENTRY, self)
     end
 
     # This sets multiple attributes of the widget.

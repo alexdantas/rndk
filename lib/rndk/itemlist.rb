@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class ITEMLIST < RNDK::RNDKOBJS
+  class ITEMLIST < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, title, label, item, count,
         default_item, box, shadow)
       super()
@@ -198,7 +198,7 @@ module RNDK
             @screen.erase
             @screen.refresh
           else
-            RNDK.Beep
+            RNDK.beep
           end
         end
 
@@ -312,7 +312,7 @@ module RNDK
       # Clean the key bindings.
       self.cleanBindings(:ITEMLIST)
 
-      RNDK::SCREEN.unregister(:ITEMLIST, self)
+      RNDK::Screen.unregister(:ITEMLIST, self)
     end
 
     # This sets multiple attributes of the widget.

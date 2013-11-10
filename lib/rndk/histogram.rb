@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class HISTOGRAM < RNDK::RNDKOBJS
+  class HISTOGRAM < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, height, width, orient,
         title, box, shadow)
       super()
@@ -394,7 +394,7 @@ module RNDK
       self.cleanBindings(:HISTOGRAM)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:HISTOGRAM, self)
+      RNDK::Screen.unregister(:HISTOGRAM, self)
     end
 
     # Erase the widget from the screen.

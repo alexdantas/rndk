@@ -84,10 +84,10 @@ module RNDK
       # Create the scrollbar window.
       if splace == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), xpos + @box_width - @border_size - 1)
+            self.Screen_YPOS(ypos), xpos + @box_width - @border_size - 1)
       elsif splace == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
-            self.SCREEN_YPOS(ypos), self.SCREEN_XPOS(ypos))
+            self.Screen_YPOS(ypos), self.Screen_XPOS(ypos))
       else
         @scrollbar_win = nil
       end
@@ -144,8 +144,8 @@ module RNDK
                       then 1
                       else 0
                       end
-      ypos = self.SCREEN_YPOS(@current_item - @current_top)
-      xpos = self.SCREEN_XPOS(0) + scrollbar_adj
+      ypos = self.Screen_YPOS(@current_item - @current_top)
+      xpos = self.Screen_XPOS(0) + scrollbar_adj
 
       Ncurses.wmove(@input_window, ypos, xpos)
       Ncurses.wrefresh @input_window
@@ -235,7 +235,7 @@ module RNDK
                 @selections[@current_item] += 1
               end
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::KEY_ESC
             self.setExitType(input)
@@ -305,9 +305,9 @@ module RNDK
       while j < @view_size && (j + @current_top) < @list_size
         k = j + @current_top
         if k < @list_size
-          screen_pos = self.SCREENPOS(k, scrollbar_adj)
-          ypos = self.SCREEN_YPOS(j)
-          xpos = self.SCREEN_XPOS(0)
+          screen_pos = self.ScreenPOS(k, scrollbar_adj)
+          ypos = self.Screen_YPOS(j)
+          xpos = self.Screen_XPOS(0)
 
           # Draw the empty line.
           Draw.writeBlanks(@win, xpos, ypos, RNDK::HORIZONTAL, 0, Ncurses.getmaxx(@win))
@@ -380,7 +380,7 @@ module RNDK
       self.cleanBindings(:SELECTION)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:SELECTION, self)
+      RNDK::Screen.unregister(:SELECTION, self)
     end
 
     # This function erases the selection list from the screen.
@@ -408,8 +408,8 @@ module RNDK
       # Clean up the display
       (0...@view_size).each do |j|
         Draw.writeBlanks(@win,
-                         self.SCREEN_XPOS(0),
-                         self.SCREEN_YPOS(j),
+                         self.Screen_XPOS(0),
+                         self.Screen_YPOS(j),
                          RNDK::HORIZONTAL,
                          0,
                          Ncurses.getmaxx(@win))
@@ -615,7 +615,7 @@ module RNDK
       @max_left_char + self.AvailableWidth
     end
 
-    def SCREENPOS(n, scrollbar_adj)
+    def ScreenPOS(n, scrollbar_adj)
       @item_pos[n] - @left_char + scrollbar_adj
     end
 

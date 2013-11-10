@@ -60,7 +60,7 @@ class ScrollExample < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -79,7 +79,7 @@ class ScrollExample < CLIExample
 
     if scroll_list.nil?
       rndkscreen.destroyRNDKScreen
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make scrolling list.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -135,7 +135,7 @@ class ScrollExample < CLIExample
     # RNDKfreeStrings (item);
     scroll_list.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit #EXIT_SUCCESS
   end
 end

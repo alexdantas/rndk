@@ -629,7 +629,7 @@ class Rolodex
     # Add a pre-process function so no spaces are introduced.
     entry_pre_process_cb = lambda do |rndk_type, object, client_data, input|
       if input.ord == ' '.ord
-        RNDK.Beep
+        RNDK.beep
         return 0
       end
       return 1
@@ -706,7 +706,7 @@ class Rolodex
           lines_found += 1
         else
           # Bad line in the file
-          RNDK::SCREEN.endRNDK
+          RNDK::Screen.end_rndk
           puts "Bad line of size %d" % items.size
           print items
           puts
@@ -1119,7 +1119,7 @@ class Rolodex
   def Rolodex.main
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -1318,7 +1318,7 @@ class Rolodex
         rolodex_title.destroy
         rndkscreen.destroy
 
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
 
         exit  # EXIT_SUCCESS
       when 100

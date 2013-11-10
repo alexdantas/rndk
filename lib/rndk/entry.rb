@@ -1,7 +1,8 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class ENTRY < RNDK::RNDKOBJS
+
+  class ENTRY < RNDK::Widget
     attr_accessor :info, :left_char, :screen_col
     attr_reader :win, :box_height, :box_width, :max, :field_width
     attr_reader :min, :max
@@ -122,7 +123,7 @@ module RNDK
         plainchar = Display.filterByDisplayType(entry, character)
 
         if plainchar == Ncurses::ERR || entry.info.size >= entry.max
-          RNDK.Beep
+          RNDK.beep
         else
           # Update the screen and pointer
           if entry.screen_col != entry.field_width - 1
@@ -234,14 +235,14 @@ module RNDK
 
           case input
           when Ncurses::KEY_UP, Ncurses::KEY_DOWN
-            RNDK.Beep
+            RNDK.beep
           when Ncurses::KEY_HOME
             @left_char = 0
             @screen_col = 0
             self.drawField
           when RNDK::TRANSPOSE
             if curr_pos >= @info.size - 1
-              RNDK.Beep
+              RNDK.beep
             else
               holder = @info[curr_pos]
               @info[curr_pos] = @info[curr_pos + 1]
@@ -253,7 +254,7 @@ module RNDK
             self.drawField
           when Ncurses::KEY_LEFT
             if curr_pos <= 0
-              RNDK.Beep
+              RNDK.beep
             elsif @screen_col == 0
               # Scroll left.
               @left_char -= 1
@@ -264,7 +265,7 @@ module RNDK
             end
           when Ncurses::KEY_RIGHT
             if curr_pos >= @info.size
-              RNDK.Beep
+              RNDK.beep
             elsif @screen_col == @field_width - 1
               # Scroll to the right.
               @left_char += 1
@@ -276,7 +277,7 @@ module RNDK
             end
           when Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC
             if @disp_type == :VIEWONLY
-              RNDK.Beep
+              RNDK.beep
             else
               success = false
               if input == Ncurses::KEY_BACKSPACE
@@ -303,7 +304,7 @@ module RNDK
                 end
                 self.drawField
               else
-                RNDK.Beep
+                RNDK.beep
               end
             end
           when RNDK::KEY_ESC
@@ -320,20 +321,20 @@ module RNDK
               self.clean
               self.drawField
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::COPY
             if @info.size != 0
               @@g_paste_buffer = @info.clone
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::PASTE
             if @@g_paste_buffer != 0
               self.setValue(@@g_paste_buffer)
               self.drawField
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             if @info.size >= @min
@@ -341,7 +342,7 @@ module RNDK
               ret = @info
               complete = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::ERR
             self.setExitType(input)
@@ -466,7 +467,7 @@ module RNDK
 
       self.cleanBindings(:ENTRY)
 
-      RNDK::SCREEN.unregister(:ENTRY, self)
+      RNDK::Screen.unregister(:ENTRY, self)
     end
 
     # This sets specific attributes of the entry field.

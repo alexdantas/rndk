@@ -1,8 +1,8 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
   # TODO This Widget's very buggy! Somehow improve it later!
-  class SWINDOW < RNDK::RNDKOBJS
+  class SWINDOW < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
       super()
@@ -358,25 +358,25 @@ module RNDK
             if @current_top > 0
               @current_top -= 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_DOWN
             if @current_top >= 0 && @current_top < @max_top_line
               @current_top += 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_RIGHT
             if @left_char < @max_left_char
               @left_char += 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_LEFT
             if @left_char > 0
               @left_char -= 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_PPAGE
             if @current_top != 0
@@ -386,7 +386,7 @@ module RNDK
                 @current_top = 0
               end
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_NPAGE
             if @current_top != @max_top_line
@@ -396,7 +396,7 @@ module RNDK
                 @current_top = @max_top_line
               end
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_HOME
             @left_char = 0
@@ -525,7 +525,7 @@ module RNDK
       self.cleanBindings(:SWINDOW)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:SWINDOW, self)
+      RNDK::Screen.unregister(:SWINDOW, self)
     end
 
     # This function erases the scrolling window widget.

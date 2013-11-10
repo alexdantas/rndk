@@ -9,7 +9,7 @@ require 'rndk'
 begin
   # Set up RNDK
   curses_win = Ncurses.initscr
-  rndkscreen = RNDK::SCREEN.new curses_win
+  rndkscreen = RNDK::Screen.new curses_win
   RNDK::Draw.initRNDKColor
 
   # Initial time string
@@ -21,7 +21,7 @@ begin
   # Woops, something bad happened
   if label.nil?
     rndkscreen.destroy
-    RNDK.endRNDK
+    RNDK.end_rndk
 
     puts "Cannot create the label. Is the window too small?"
     exit 1
@@ -51,6 +51,6 @@ begin
   # Clean up
   label.destroy
   rndkscreen.destroy
-  RNDK::SCREEN.endRNDK
+  RNDK::Screen.end_rndk
 end
 

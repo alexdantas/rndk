@@ -28,7 +28,7 @@ class EntryExample < Example
 
     # Set up RNDK.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start color.
     RNDK::Draw.initRNDKColor
@@ -48,7 +48,7 @@ class EntryExample < Example
     if directory.nil?
       # Clean p
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create the entry box. Is the window too small?"
       exit # EXIT_FAILURE
@@ -92,7 +92,7 @@ class EntryExample < Example
 
     # Clean up and exit.
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

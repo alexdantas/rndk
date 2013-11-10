@@ -1,88 +1,108 @@
 #!/usr/bin/env ruby
-# NOTE: This example/demo might be weird/bad-formatted/ugly.
-#       I'm currently refactoring all demos/examples from the
-#       original 'tawny-cdk' repository and THIS FILE wasn't
-#       touched yet.
-#       I suggest you go look for files without this notice.
 #
+# Shows an Entry Widget, allowing you to move it around
+# the screen via the Widget#position method.
+# After positioning, you can interact with it normally.
+# At the end, it shows you what you've typed.
+#
+# The following key bindings can be used to move the
+# Widget around the screen:
+#
+# Up Arrow::    Moves the widget up one row.
+# Down Arrow::  Moves the widget down one row.
+# Left Arrow::  Moves the widget left one column
+# Right Arrow:: Moves the widget right one column
+# 1::           Moves the widget down one row and left one column.
+# 2::           Moves the widget down one row.
+# 3::           Moves the widget down one row and right one column.
+# 4::           Moves the widget left one column.
+# 5::           Centers the widget both vertically and horizontally.
+# 6::           Moves the widget right one column
+# 7::           Moves the widget up one row and left one column.
+# 8::           Moves the widget up one row.
+# 9::           Moves the widget up one row and right one column.
+# t::           Moves the widget to the top of the screen.
+# b::           Moves the widget to the bottom of the screen.
+# l::           Moves the widget to the left of the screen.
+# r::           Moves the widget to the right of the screen.
+# c::           Centers the widget between the left and right of the window.
+# C::           Centers the widget between the top and bottom of the window.
+# Escape::      Returns the widget to its original position.
+# Return::      Exits the function and leaves the Widget where it was.
+#
+require 'rndk/entry'
 
-require_relative 'example'
+begin
+  label = "</U/5>Position me:<!U!5> "
 
-class PositionExample < Example
-  def PositionExample.parse_opts(opts, param)
-    opts.banner = 'Usage: position_ex.rb [options]'
+  # Set up RNDK
+  curses_win = Ncurses.initscr
+  rndkscreen = RNDK::Screen.new(curses_win)
 
-    param.x_value = RNDK::CENTER
-    param.y_value = RNDK::CENTER
-    param.box = true
-    param.shadow = false
-    param.w_value = 40
+  # Set up RNDK colors
+  RNDK::Draw.initRNDKColor
 
-    super(opts, param)
+  # Create the entry field widget.
+  entry = RNDK::ENTRY.new(rndkscreen,
+                          RNDK::CENTER, # x
+                          RNDK::CENTER, # y
+                          '',
+                          label,
+                          Ncurses::A_NORMAL,
+                          '.',
+                          :MIXED,
+                          30, # w
+                          0,
+                          256,
+                          true,
+                          false)
 
-    opts.on('-w WIDTH', OptionParser::DecimalInteger, 'Field width') do |w|
-      param.w_value = w
-    end
-  end
-
-  # This demonstrates the positioning of a Rndk entry field widget.
-  def PositionExample.main
-    label = "</U/5>Directory:<!U!5> "
-    params = parse(ARGV)
-
-    # Set up RNDK
-    curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
-
-    # Set up RNDK colors
-    RNDK::Draw.initRNDKColor
-
-    # Create the entry field widget.
-    directory = RNDK::ENTRY.new(rndkscreen, params.x_value, params.y_value,
-        '', label, Ncurses::A_NORMAL, '.', :MIXED, params.w_value, 0, 256,
-        params.box, params.shadow)
-
-    # Is the widget nil?
-    if directory.nil?
-      # Clean up.
-      rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
-
-      puts "Cannot create the entry box. Is the window too small?"
-      exit  # EXIT_FAILURE
-    end
-
-    # Let the user move the widget around the window.
-    directory.draw(directory.box)
-    directory.position
-
-    # Activate the entry field.
-    info = directory.activate('')
-
-    # Tell them what they typed.
-    if directory.exit_type == :ESCAPE_HIT
-      mesg = [
-          "<C>You hit escape. No information passed back.",
-          "",
-          "<C>Press any key to continue."
-      ]
-      rndkscreen.popupLabel(mesg, 3)
-    elsif directory.exit_type == :NORMAL
-      mesg = [
-          "<C>You typed in the following",
-          "<C>%.*s" % [236, info],  # FIXME magic number
-          "",
-          "<C>Press any key to continue."
-      ]
-          rndkscreen.popupLabel(mesg, 4)
-    end
-
-    # Clean up
-    directory.destroy
+  if entry.nil?
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
-    #ExitProgram (EXIT_SUCCESS);
+    RNDK::Screen.end_rndk
+
+    puts "Cannot create the entry box. Is the window too small?"
+    exit 1
   end
+
+  # Let the user move the widget around the window.
+  entry.draw(entry.box)
+  entry.position
+
+  # Activate the entry field.
+  info = entry.activate('')
+
+  # Tell them what they typed.
+  if entry.exit_type == :ESCAPE_HIT
+    mesg = [
+            "<C>You hit escape. No information passed back.",
+            "",
+            "<C>Press any key to continue."
+           ]
+    rndkscreen.popupLabel mesg
+
+  elsif entry.exit_type == :NORMAL
+    mesg = [
+            "<C>You typed in the following",
+            "<C>%.*s" % [236, info],  # FIXME magic number
+            "",
+            "<C>Press any key to continue."
+           ]
+    rndkscreen.popupLabel mesg
+  end
+
+  # Clean up
+  entry.destroy
+  rndkscreen.destroy
+  RNDK::Screen.end_rndk
+
+# Just in case something bad happens.
+rescue Exception => e
+  RNDK::Screen.end_rndk
+
+  puts e
+  puts e.inspect
+  puts e.backtrace
+  exit 1
 end
 
-PositionExample.main

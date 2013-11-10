@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class BUTTON < RNDK::RNDKOBJS
+  class BUTTON < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, text, callback, box, shadow)
       super()
       parent_width = Ncurses.getmaxx(rndkscreen.window)
@@ -207,7 +207,7 @@ module RNDK
       RNDK.moveCursesWindow(@shadow_win, -xdiff, -ydiff)
 
       # Thouch the windows so they 'move'.
-      RNDK::SCREEN.refreshRNDKWindow(@screen.window)
+      RNDK::Screen.refresh_window(@screen.window)
 
       # Redraw the window, if they asked for it.
       if refresh_flag
@@ -230,52 +230,52 @@ module RNDK
           if Ncurses.getbegy(@win) > 0
             self.move(0, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == Ncurses::KEY_DOWN || key == '2'.ord
           if Ncurses.getbegy(@win) + Ncurses.getmaxy(@win) < Ncurses.getmaxy(@screen.window) - 1
             self.move(0, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == Ncurses::KEY_LEFT || key == '4'.ord
           if Ncurses.getbegx(@win) > 0
             self.move(-1, 0, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == Ncurses::KEY_RIGHT || key == '6'.ord
           if Ncurses.getbegx(@win) + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1
             self.move(1, 0, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == '7'.ord
           if Ncurses.getbegy(@win) > 0 && Ncurses.getbegx(@win) > 0
             self.move(-1, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == '9'.ord
           if Ncurses.getbegx(@win) + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1 &&
               Ncurses.getbegy(@win) > 0
             self.move(1, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == '1'.ord
           if Ncurses.getbegx(@win) > 0 &&
               Ncurses.getbegx(@win) + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1
             self.move(-1, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == '3'.ord
           if Ncurses.getbegx(@win) + @win.getmaxx < Ncurses.getmaxx(@screen.window) - 1 &&
               Ncurses.getbegy(@win) + Ncurses.getmaxy(@win) < Ncurses.getmaxy(@screen.window) - 1
             self.move(1, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         elsif key == '5'.ord
           self.move(RNDK::CENTER, RNDK::CENTER, false, true)
@@ -297,7 +297,7 @@ module RNDK
         elsif key == RNDK::KEY_ESC
           self.move(orig_x, orig_y, false, true)
         elsif key != RNDK::KEY_RETURN && key != Ncurses::KEY_ENTER
-          RNDK.Beep
+          RNDK.beep
         end
       end
     end
@@ -309,7 +309,7 @@ module RNDK
 
       self.cleanBindings(:BUTTON)
 
-      RNDK::SCREEN.unregister(:BUTTON, self)
+      RNDK::Screen.unregister(:BUTTON, self)
     end
 
     # This injects a single character into the widget.
@@ -341,7 +341,7 @@ module RNDK
           @screen.erase
           @screen.refresh
         else
-          RNDK.Beep
+          RNDK.beep
         end
       end
 

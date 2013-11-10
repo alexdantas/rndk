@@ -64,7 +64,7 @@ class ViewerExample < CLIExample
 
     # Start curses
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start RNDK colors.
     RNDK::Draw.initRNDKColor
@@ -78,7 +78,7 @@ class ViewerExample < CLIExample
 
       if f_select.nil?
         rndkscreen.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
 
         $stderr.puts 'Cannot create fselect-widget'
         exit  # EXIT_FAILURE
@@ -105,7 +105,7 @@ class ViewerExample < CLIExample
         # Exit RNDK.
         f_select.destroy
         rndkscreen.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
         exit  # EXIT_SUCCESS
       end
     end
@@ -119,7 +119,7 @@ class ViewerExample < CLIExample
     if example.nil?
       # Exit RNDK.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create the viewer. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -136,7 +136,7 @@ class ViewerExample < CLIExample
       # Open the file and read the contents.
       lines = RNDK.readFile(params.filename, info)
       if lines == -1
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
         puts 'Could not open "%s"' % [params.filename]
         exit  # EXIT_FAILURE
       end
@@ -175,7 +175,7 @@ class ViewerExample < CLIExample
     # Clean up.
     example.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

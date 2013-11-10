@@ -91,7 +91,7 @@ class MarqueeExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
     Ncurses.curs_set(0)
 
     # Set up RNDK colors
@@ -105,7 +105,7 @@ class MarqueeExample < Example
     if scroll_message.nil?
       # Exit Rndk.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create the marquee window.  Is the window too small?"
       exit # EXIT_FAILURE
@@ -141,7 +141,7 @@ class MarqueeExample < Example
     # Clean up.
     scroll_message.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit # EXIT_SUCCESS
   end
 end

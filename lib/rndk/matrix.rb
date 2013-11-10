@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class MATRIX < RNDK::RNDKOBJS
+  class MATRIX < RNDK::Widget
     attr_accessor :info
     attr_reader :colvalues, :row, :col, :colwidths, :filler
     attr_reader :crow, :ccol
@@ -232,9 +232,9 @@ module RNDK
         charcount = matrix.info[matrix.row][matrix.col].size
 
         if plainchar == Ncurses::ERR
-          RNDK.Beep
+          RNDK.beep
         elsif charcount == matrix.colwidths[matrix.col]
-          RNDK.Beep
+          RNDK.beep
         else
           # Update the screen.
           Ncurses.wmove(matrix.CurMatrixCell,
@@ -352,7 +352,7 @@ module RNDK
           when Ncurses::KEY_END
           when Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC
             if @colvalues[@col] == :VIEWONLY || charcount <= 0
-              RNDK.Beep
+              RNDK.beep
             else
               charcount -= 1
               Ncurses.mvwdelch(self.CurMatrixCell, 1, charcount + 1)
@@ -383,7 +383,7 @@ module RNDK
                 # We are at the far right column, we need to shift
                 # down one row, if we can.
                 if @row == @rows
-                  RNDK.Beep
+                  RNDK.beep
                 else
                   # Set up the columns info.
                   @col = 1
@@ -425,7 +425,7 @@ module RNDK
               else
                 # Shift up one line if we can...
                 if @row == 1
-                  RNDK.Beep
+                  RNDK.beep
                 else
                   # Set up the columns info.
                   @col = @cols
@@ -463,7 +463,7 @@ module RNDK
                 refresh_cells = true
                 moved_cell = true
               else
-                RNDK.Beep
+                RNDK.beep
               end
             end
           when Ncurses::KEY_DOWN
@@ -483,7 +483,7 @@ module RNDK
                 refresh_cells = true
                 moved_cell = true
               else
-                RNDK.Beep
+                RNDK.beep
               end
             end
           when Ncurses::KEY_NPAGE
@@ -495,10 +495,10 @@ module RNDK
                 refresh_cells = true
                 moved_cell = true
               else
-                RNDK.Beep
+                RNDK.beep
               end
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_PPAGE
             if @rows > @vrows
@@ -509,10 +509,10 @@ module RNDK
                 refresh_cells = true
                 moved_cell = true
               else
-                RNDK.Beep
+                RNDK.beep
               end
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when RNDK.CTRL('G')
             self.jumpToCell(-1, -1)
@@ -520,7 +520,7 @@ module RNDK
           when RNDK::PASTE
             if @@g_paste_buffer.size == 0 ||
                 @@g_paste_buffer.size > @colwidths[@ccol]
-              RNDK.Beep
+              RNDK.beep
             else
               self.CurMatrixInfo = @@g_paste_buffer.clone
               self.drawCurCell
@@ -895,7 +895,7 @@ module RNDK
       self.cleanBindings(:MATRIX)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:MATRIX, self)
+      RNDK::Screen.unregister(:MATRIX, self)
     end
 
     # This function erases the matrix widget from the screen.

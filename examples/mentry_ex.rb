@@ -45,7 +45,7 @@ class MentryExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -58,7 +58,7 @@ class MentryExample < Example
     if widget.nil?
       # Clean up.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create RNDK object. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -78,7 +78,7 @@ class MentryExample < Example
     # Clean up.
     widget.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
 
     puts "\n\n"
     puts "Your message was : <%s>" % [info]

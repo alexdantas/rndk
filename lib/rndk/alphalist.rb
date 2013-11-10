@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class ALPHALIST < RNDK::RNDKOBJS
+  class ALPHALIST < RNDK::Widget
     attr_reader :scroll_field, :entry_field, :list
 
     def initialize(rndkscreen, xplace, yplace, height, width, title, label,
@@ -101,7 +101,7 @@ module RNDK
           entry.draw(entry.box)
           return true
         end
-        RNDK.Beep
+        RNDK.beep
         return false
       end
 
@@ -113,7 +113,7 @@ module RNDK
         alt_words = []
 
         if entry.info.size == 0
-          RNDK.Beep
+          RNDK.beep
           return true
         end
 
@@ -122,7 +122,7 @@ module RNDK
 
         # if the index is less than zero, return we didn't find a match
         if index < 0
-          RNDK.Beep
+          RNDK.beep
           return true
         end
 
@@ -168,8 +168,8 @@ module RNDK
             # Destroy the scrolling list.
             scrollp.destroy
 
-            # Beep at the user.
-            RNDK.Beep
+            # beep at the user.
+            RNDK.beep
 
             # Redraw the alphalist and return.
             alphalist.draw(alphalist.box)
@@ -233,7 +233,7 @@ module RNDK
               scrollp.setPosition(index)
             alphalist.drawMyScroller
           else
-            RNDK.Beep
+            RNDK.beep
             result = 0
           end
         end
@@ -510,7 +510,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Unregister the object.
-      RNDK::SCREEN.unregister(:ALPHALIST, self)
+      RNDK::Screen.unregister(:ALPHALIST, self)
     end
 
     # This function sets the pre-process function.

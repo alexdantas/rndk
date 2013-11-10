@@ -28,7 +28,7 @@ class BindExample < Example
 
     # Set up RNDK.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start color.
     RNDK::Draw.initRNDKColor
@@ -50,7 +50,7 @@ class BindExample < Example
     # Check if we got a nil value back.
     if question.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot create the dialog box. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -128,7 +128,7 @@ class BindExample < Example
     # Clean up and exit.
     question.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

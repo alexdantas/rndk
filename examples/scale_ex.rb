@@ -48,7 +48,7 @@ class ScaleExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -62,7 +62,7 @@ class ScaleExample < Example
     if widget.nil?
       # Exit RNDK.
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make the widget. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -91,7 +91,7 @@ class ScaleExample < Example
     # Clean up
     widget.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

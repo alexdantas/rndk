@@ -1,6 +1,6 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 module RNDK
-  class SCROLLER < RNDK::RNDKOBJS
+  class SCROLLER < RNDK::Widget
     def initialize
       super()
     end
@@ -13,17 +13,17 @@ module RNDK
               @current_top -= 1
               @current_item -= 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           else
             @current_item -= 1
             @current_high -= 1
           end
         else
-          RNDK.Beep
+          RNDK.beep
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
@@ -35,41 +35,41 @@ module RNDK
               @current_top += 1
               @current_item += 1
             else
-              RNDK.Beep
+              RNDK.beep
             end
           else
             @current_item += 1
             @current_high += 1
           end
         else
-          RNDK.Beep
+          RNDK.beep
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
     def KEY_LEFT
       if @list_size > 0
         if @left_char == 0
-          RNDK.Beep
+          RNDK.beep
         else
           @left_char -= 1
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
     def KEY_RIGHT
       if @list_size > 0
         if @left_char >= @max_left_char
-          RNDK.Beep
+          RNDK.beep
         else
           @left_char += 1
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
@@ -83,10 +83,10 @@ module RNDK
             self.KEY_HOME
           end
         else
-          RNDK.Beep
+          RNDK.beep
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
@@ -102,10 +102,10 @@ module RNDK
             @current_high = @view_size - 1
           end
         else
-          RNDK.Beep
+          RNDK.beep
         end
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 

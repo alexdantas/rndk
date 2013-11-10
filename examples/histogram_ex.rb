@@ -37,7 +37,7 @@ class HistogramExample < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -55,7 +55,7 @@ class HistogramExample < CLIExample
     # Is the volume null?
     if volume.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make volume histogram.  Is the window big enough?"
       exit #EXIT_FAILURE
@@ -68,7 +68,7 @@ class HistogramExample < CLIExample
     if bass.nil?
       volume.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make bass histogram.  Is the window big enough?"
       exit  # EXIT_FAILURE
@@ -83,7 +83,7 @@ class HistogramExample < CLIExample
       volume.destroy
       bass.destroy
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make treble histogram.  Is the window big enough?"
       exit  # EXIT_FAILURE
@@ -154,7 +154,7 @@ class HistogramExample < CLIExample
     bass.destroy
     treble.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

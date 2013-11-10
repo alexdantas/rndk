@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class MENU < RNDK::RNDKOBJS
+  class MENU < RNDK::Widget
     TITLELINES = 1
     MAX_MENU_ITEMS = 30
     MAX_SUB_ITEMS = 98
@@ -395,7 +395,7 @@ module RNDK
       self.cleanBindings(:MENU)
 
       # Unregister the object
-      RNDK::SCREEN.unregister(:MENU, self)
+      RNDK::Screen.unregister(:MENU, self)
     end
 
     # Erase the menu widget from the screen.

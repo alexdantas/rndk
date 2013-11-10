@@ -47,7 +47,7 @@ class SubwindowExample < CLIExample
     sub_window = Ncurses.newwin(Ncurses.LINES - 5, Ncurses.LINES - 10, 2, 5)
 
     # Start Rndk.
-    rndkscreen = RNDK::SCREEN.new(sub_window)
+    rndkscreen = RNDK::Screen.new(sub_window)
 
     # Box our window.
     Ncurses.box(sub_window, Ncurses::ACS_VLINE, Ncurses::ACS_HLINE)
@@ -79,7 +79,7 @@ class SubwindowExample < CLIExample
     title.destroy
     RNDK.eraseCursesWindow(sub_window)
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
 
     # Tell them what they picked.
     puts "You picked %s" % [dow[pick]]

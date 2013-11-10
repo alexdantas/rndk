@@ -1,24 +1,26 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class LABEL < RNDK::RNDKOBJS
+
+  class LABEL < RNDK::Widget
+
+    # Raw Ncurses window.
     attr_accessor :win
 
     def initialize(rndkscreen, xplace, yplace, mesg, rows, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
+
+      parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
-      box_width = -2**30  # -INFINITY
+      box_width  = -2**30  # -INFINITY
       box_height = 0
       xpos = [xplace]
       ypos = [yplace]
       x = 0
 
-      if rows <= 0
-        return nil
-      end
+      return nil if rows <= 0
 
-      self.setBox(box)
+      self.setBox box
       box_height = rows + 2 * @border_size
 
       @info = []
@@ -27,12 +29,14 @@ module RNDK
 
       # Determine the box width.
       (0...rows).each do |x|
-        #Translate the string to a chtype array
+
+        # Translate the string to a chtype array
         info_len = []
         info_pos = []
         @info << RNDK.char2Chtype(mesg[x], info_len, info_pos)
         @info_len << info_len[0]
         @info_pos << info_pos[0]
+
         box_width = [box_width, @info_len[x]].max
       end
       box_width += 2 * @border_size
@@ -40,7 +44,8 @@ module RNDK
       # Create the string alignments.
       (0...rows).each do |x|
         @info_pos[x] = RNDK.justifyString(box_width - 2 * @border_size,
-            @info_len[x], @info_pos[x])
+                                          @info_len[x],
+                                          @info_pos[x])
       end
 
       # Make sure we didn't extend beyond the dimensions of the window.
@@ -55,18 +60,19 @@ module RNDK
 
       # Rejustify the x and y positions if we need to
       RNDK.alignxy(rndkscreen.window, xpos, ypos, box_width, box_height)
+
       @screen = rndkscreen
       @parent = rndkscreen.window
-      @win = Ncurses.newwin(box_height, box_width, ypos[0], xpos[0])
+      @win    = Ncurses.newwin(box_height, box_width, ypos[0], xpos[0])
       @shadow_win = nil
       @xpos = xpos[0]
       @ypos = ypos[0]
       @rows = rows
-      @box_width = box_width
-      @box_height = box_height
+      @box_width    = box_width
+      @box_height   = box_height
       @input_window = @win
       @has_focus = false
-      @shadow = shadow
+      @shadow    = shadow
 
       if @win.nil?
         self.destroy
@@ -77,8 +83,10 @@ module RNDK
 
       # If a shadow was requested, then create the shadow window.
       if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos[0] + 1, xpos[0] + 1)
+        @shadow_win = Ncurses.newwin(box_height,
+                                     box_width,
+                                     ypos[0] + 1,
+                                     xpos[0] + 1)
       end
 
       # Register this
@@ -98,9 +106,10 @@ module RNDK
 
     # This sets the information within the label.
     def setMessage(info, info_size)
-      # Clean out the old message.`
+
+      # Clean out the old message.
       (0...@rows).each do |x|
-        @info[x] = ''
+        @info[x]     = ''
         @info_pos[x] = 0
         @info_len[x] = 0
       end
@@ -117,7 +126,8 @@ module RNDK
         @info[x] = RNDK.char2Chtype(info[x], info_len, info_pos)
         @info_len[x] = info_len[0]
         @info_pos[x] = RNDK.justifyString(@box_width - 2 * @border_size,
-            @info_len[x], info_pos[0])
+                                          @info_len[x],
+                                          info_pos[0])
       end
 
       # Redraw the label widget.
@@ -145,24 +155,24 @@ module RNDK
 
     # This draws the label widget.
     def draw(box)
+
       # Is there a shadow?
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       # Box the widget if asked.
-      if @box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if @box
 
       # Draw in the message.
       (0...@rows).each do |x|
         Draw.writeChtype(@win,
-            @info_pos[x] + @border_size, x + @border_size,
-            @info[x], RNDK::HORIZONTAL, 0, @info_len[x])
+                         @info_pos[x] + @border_size,
+                         x + @border_size,
+                         @info[x],
+                         RNDK::HORIZONTAL,
+                         0,
+                         @info_len[x])
       end
 
-      # Refresh the window
       Ncurses.wrefresh @win
     end
 
@@ -184,24 +194,25 @@ module RNDK
 
       self.cleanBindings(:LABEL)
 
-      RNDK::SCREEN.unregister(:LABEL, self)
+      RNDK::Screen.unregister(:LABEL, self)
     end
 
     # This pauses until a user hits a key...
     def wait(key)
       function_key = []
+
       if key.ord == 0
         code = self.getch(function_key)
+
       else
         # Only exit when a specific key is hit
         while true
           code = self.getch(function_key)
-          if code == key.ord
-            break
-          end
+          break if code == key.ord
         end
       end
-      return code
+      code
     end
+
   end
 end

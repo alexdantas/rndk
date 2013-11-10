@@ -51,7 +51,7 @@ class Radio1Example < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -65,7 +65,7 @@ class Radio1Example < CLIExample
 
     if radio.nil?
       rndkscreen.destroyRNDKScreen
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       puts "Cannot make radio widget.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -95,7 +95,7 @@ class Radio1Example < CLIExample
     # Clean up.
     radio.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit #EXIT_SUCCESS
   end
 end

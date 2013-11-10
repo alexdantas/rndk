@@ -15,7 +15,7 @@ class PreProcessExample < Example
 
     # Set up RNDK.
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Start color.
     RNDK::Draw.initRNDKColor
@@ -28,7 +28,7 @@ class PreProcessExample < Example
     if widget.nil?
       # Clean up
       rndkscreen.destroy
-      RNDK.endRNDK
+      RNDK.end_rndk
 
       puts "Cannot create the entry box. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -84,7 +84,7 @@ class PreProcessExample < Example
     # Clean up and exit.
     widget.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

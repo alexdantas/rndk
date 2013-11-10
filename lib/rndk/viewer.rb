@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class VIEWER < RNDK::RNDKOBJS
+  class VIEWER < RNDK::Widget
     DOWN = 0
     UP = 1
 
@@ -379,28 +379,28 @@ module RNDK
               @current_top -= 1
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_DOWN
             if @current_top < @max_top_line
               @current_top += 1
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_RIGHT
             if @left_char < @max_left_char
               @left_char += 1
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_LEFT
             if @left_char > 0
               @left_char -= 1
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_PPAGE
             if @current_top > 0
@@ -411,7 +411,7 @@ module RNDK
               end
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_NPAGE
             if @current_top < @max_top_line
@@ -422,7 +422,7 @@ module RNDK
               end
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when Ncurses::KEY_HOME
             @left_char = 0
@@ -442,7 +442,7 @@ module RNDK
               @current_top = x
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when 'l'.ord
             x = @current_top / 2
@@ -450,7 +450,7 @@ module RNDK
               @current_top = x
               refresh = true
             else
-              RNDK.Beep
+              RNDK.beep
             end
           when '?'.ord
             @search_direction = RNDK::VIEWER::UP
@@ -497,7 +497,7 @@ module RNDK
             @screen.erase
             @screen.refresh
           else
-            RNDK.Beep
+            RNDK.beep
           end
         end
 
@@ -705,7 +705,7 @@ module RNDK
       self.cleanBindings(:VIEWER)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:VIEWER, self)
+      RNDK::Screen.unregister(:VIEWER, self)
     end
 
     # This function erases the viewer widget from the screen.

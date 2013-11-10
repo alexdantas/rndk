@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class SLIDER < RNDK::RNDKOBJS
+  class SLIDER < RNDK::Widget
     def initialize(rndkscreen, xplace, yplace, title, label, filler,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()
@@ -172,10 +172,10 @@ module RNDK
     def limitCurrentValue
       if @current < @low
         @current = @low
-        RNDK.Beep
+        RNDK.beep
       elsif @current > @high
         @current = @high
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
@@ -215,13 +215,13 @@ module RNDK
     # modify cells by typing in replacement characters for the field's value.
     def setEditPosition(new_position)
       if new_position < 0
-        RNDK.Beep
+        RNDK.beep
       elsif new_position == 0
         @field_edit = new_position
       elsif self.validEditPosition(new_position)
         @field_edit = new_position
       else
-        RNDK.Beep
+        RNDK.beep
       end
     end
 
@@ -350,7 +350,7 @@ module RNDK
           else
             if @field_edit != 0
               if !self.performEdit(input)
-                RNDK.Beep
+                RNDK.beep
               end
             else
               # The cursor is not within the editable text. Interpret
@@ -365,7 +365,7 @@ module RNDK
             when '0'.ord
               return self.inject(Ncurses::KEY_HOME)
             else
-              RNDK.Beep
+              RNDK.beep
             end
             end
           end
@@ -465,7 +465,7 @@ module RNDK
       self.cleanBindings(:SLIDER)
 
       # Unregister this object.
-      RNDK::SCREEN.unregister(:SLIDER, self)
+      RNDK::Screen.unregister(:SLIDER, self)
     end
 
     # This function erases the widget from the screen.

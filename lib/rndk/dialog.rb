@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class DIALOG < RNDK::RNDKOBJS
+  class DIALOG < RNDK::Widget
     attr_reader :current_button
     MIN_DIALOG_WIDTH = 10
 
@@ -187,7 +187,7 @@ module RNDK
               @current_button += 1
             end
           when Ncurses::KEY_UP, Ncurses::KEY_DOWN
-            RNDK.Beep
+            RNDK.beep
           when RNDK::REFRESH
             @screen.erase
             @screen.refresh
@@ -264,7 +264,7 @@ module RNDK
       self.cleanBindings(:DIALOG)
 
       # Unregister this object
-      RNDK::SCREEN.unregister(:DIALOG, self)
+      RNDK::Screen.unregister(:DIALOG, self)
     end
 
     # This function erases the dialog widget from the screen.

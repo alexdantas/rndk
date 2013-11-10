@@ -1,7 +1,7 @@
-require 'rndk/rndk_objs'
+require 'rndk'
 
 module RNDK
-  class BUTTONBOX < RNDK::RNDKOBJS
+  class BUTTONBOX < RNDK::Widget
     attr_reader :current_button
 
     def initialize(rndkscreen, x_pos, y_pos, height, width, title, rows, cols,
@@ -323,7 +323,7 @@ module RNDK
 
       self.cleanBindings(:BUTTONBOX)
 
-      RNDK::SCREEN.unregister(:BUTTONBOX, self)
+      RNDK::Screen.unregister(:BUTTONBOX, self)
     end
 
     def setCurrentButton(button)

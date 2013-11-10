@@ -84,7 +84,7 @@ class AlphalistExample < CLIExample
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -99,7 +99,7 @@ class AlphalistExample < CLIExample
 
     if alpha_list.nil?
       rndkscreen.destroy
-      RNDK::SCREEN.endRNDK
+      RNDK::Screen.end_rndk
 
       $stderr.puts "Cannot create widget."
       exit #EXIT_FAILURE
@@ -229,7 +229,7 @@ class AlphalistExample < CLIExample
     # Clean up.
     alpha_list.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

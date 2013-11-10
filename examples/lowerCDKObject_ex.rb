@@ -25,7 +25,7 @@ class LowerRNDKObjectExample < Example
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    rndkscreen = RNDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::Screen.new(curses_win)
 
     mesg1 = [
         "label1 label1 label1 label1 label1 label1 label1",
@@ -65,9 +65,9 @@ class LowerRNDKObjectExample < Example
     while (ch = STDIN.getc.chr) != 'q'
       case ch
       when '1'
-        RNDK::SCREEN.lowerRNDKObject(:LABEL, label1)
+        RNDK::Screen.lowerRNDKObject(:LABEL, label1)
       when '2'
-        RNDK::SCREEN.lowerRNDKObject(:LABEL, label2)
+        RNDK::Screen.lowerRNDKObject(:LABEL, label2)
       else
         next
       end
@@ -79,7 +79,7 @@ class LowerRNDKObjectExample < Example
     label2.destroy
     instruct.destroy
     rndkscreen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     #ExitProgram (EXIT_SUCCESS);
   end
 end

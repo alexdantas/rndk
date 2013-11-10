@@ -139,7 +139,7 @@ class SQLiteDemo
 
     # Set up RNDK
     curses_win = Ncurses.initscr
-    @@gp_rndk_screen = RNDK::SCREEN.new(curses_win)
+    @@gp_rndk_screen = RNDK::Screen.new(curses_win)
 
     # Set up RNDK colors
     RNDK::Draw.initRNDKColor
@@ -171,7 +171,7 @@ class SQLiteDemo
     history_up_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds
       if history.current == 0
-        RNDK.Beep
+        RNDK.beep
         return true
       end
 
@@ -187,7 +187,7 @@ class SQLiteDemo
     history_down_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds.
       if history.current == history.count
-        RNDK.Beep
+        RNDK.beep
         return true
       end
 
@@ -288,7 +288,7 @@ class SQLiteDemo
         # All done.
         command_entry.destroy
         command_output.destroy
-        RNDK::SCREEN.endRNDK
+        RNDK::Screen.end_rndk
         exit  # EXIT_SUCCESS
       elsif command == 'clear'
         # Clear the scrolling window.
@@ -332,7 +332,7 @@ class SQLiteDemo
 
     # Clean up
     @@gp_rndk_screen.destroy
-    RNDK::SCREEN.endRNDK
+    RNDK::Screen.end_rndk
     exit  # EXIT_SUCCESS
   end
 end

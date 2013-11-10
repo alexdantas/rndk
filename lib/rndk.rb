@@ -1,95 +1,85 @@
 # Welcome to the Ruby Ncurses Development Kit!
+
 require 'ffi-ncurses'
 require 'scanf'
-require 'rndk/draw'
-require 'rndk/display'
-require 'rndk/traverse'
 
-require 'rndk/screen'
-
-require 'rndk/alphalist'
-require 'rndk/button'
-require 'rndk/buttonbox'
-require 'rndk/calendar'
-require 'rndk/dialog'
-require 'rndk/dscale'
-require 'rndk/entry'
-require 'rndk/fscale'
-require 'rndk/fslider'
-require 'rndk/fselect'
-require 'rndk/graph'
-require 'rndk/histogram'
-require 'rndk/itemlist'
-require 'rndk/label'
-require 'rndk/marquee'
-require 'rndk/matrix'
-require 'rndk/mentry'
-require 'rndk/menu'
-require 'rndk/radio'
-require 'rndk/scale'
-require 'rndk/scroll'
-require 'rndk/selection'
-require 'rndk/slider'
-require 'rndk/swindow'
-require 'rndk/template'
-require 'rndk/uscale'
-require 'rndk/uslider'
-require 'rndk/viewer'
+require 'rndk/core/draw'
+require 'rndk/core/display'
+require 'rndk/core/traverse'
+require 'rndk/core/widget'
+require 'rndk/core/screen'
 
 # Shortcut to avoid typing FFI::NCurses all the time.
+# You can use it too!
 Ncurses = FFI::NCurses
 
+# The main RNDK module - contains everything we need.
+#
+# ## Developer Notes
+#
+# * Any questions on what a `Ncurses.*` function do, check it's man
+#   page with `man lowercase_function_name`.
+#
 module RNDK
-  # some useful global values
 
-  def RNDK.CTRL(c)
-    c.ord & 0x1f
-  end
+  # Some nice global constants.
 
   RNDK_PATHMAX = 256
 
   L_MARKER = '<'
   R_MARKER = '>'
 
-  LEFT = 9000
-  RIGHT = 9001
-  CENTER = 9002
-  TOP = 9003
-  BOTTOM = 9004
+  LEFT       = 9000
+  RIGHT      = 9001
+  CENTER     = 9002
+  TOP        = 9003
+  BOTTOM     = 9004
   HORIZONTAL = 9005
-  VERTICAL = 9006
-  FULL = 9007
+  VERTICAL   = 9006
+  FULL       = 9007
 
   NONE = 0
-  ROW = 1
-  COL = 2
+  ROW  = 1
+  COL  = 2
 
   MAX_BINDINGS = 300
-  MAX_ITEMS = 2000
-  MAX_BUTTONS = 200
+  MAX_ITEMS    = 2000
+  MAX_BUTTONS  = 200
 
-  REFRESH = RNDK.CTRL('L')
-  PASTE = RNDK.CTRL('V')
-  COPY = RNDK.CTRL('Y')
-  ERASE = RNDK.CTRL('U')
-  CUT = RNDK.CTRL('X')
-  BEGOFLINE = RNDK.CTRL('A')
-  ENDOFLINE = RNDK.CTRL('E')
-  BACKCHAR = RNDK.CTRL('B')
-  FORCHAR = RNDK.CTRL('F')
-  TRANSPOSE = RNDK.CTRL('T')
-  NEXT = RNDK.CTRL('N')
-  PREV = RNDK.CTRL('P')
-  DELETE = "\177".ord
-  KEY_ESC = "\033".ord
+  # Key value when pressing Ctrl+`char`.
+  def RNDK.CTRL(char)
+    char.ord & 0x1f
+  end
+
+  # Aliasing the default keybindings
+  # for Widget interaction.
+  #
+  # Example:  `RNDK.CTRL('L')` is `Ctrl+L` or `C-l`
+  REFRESH    = RNDK.CTRL('L')
+  PASTE      = RNDK.CTRL('V')
+  COPY       = RNDK.CTRL('Y')
+  ERASE      = RNDK.CTRL('U')
+  CUT        = RNDK.CTRL('X')
+  BEGOFLINE  = RNDK.CTRL('A')
+  ENDOFLINE  = RNDK.CTRL('E')
+  BACKCHAR   = RNDK.CTRL('B')
+  FORCHAR    = RNDK.CTRL('F')
+  TRANSPOSE  = RNDK.CTRL('T')
+  NEXT       = RNDK.CTRL('N')
+  PREV       = RNDK.CTRL('P')
+  DELETE     = "\177".ord
+  KEY_ESC    = "\033".ord
   KEY_RETURN = "\012".ord
-  KEY_TAB = "\t".ord
+  KEY_TAB    = "\t".ord
 
   ALL_SCREENS = []
   ALL_OBJECTS = []
 
-  # This beeps then flushes the stdout stream
-  def RNDK.Beep
+  # This beeps then flushes the stdout stream.
+  #
+  # Normally it emits an audible bell - if that's not
+  # possible it flashes the screen.
+  def RNDK.beep
     Ncurses.beep
     $stdout.flush
   end
@@ -729,7 +719,7 @@ module RNDK
       Ncurses.werase window
       Ncurses.mvwin(window, ypos[0], xpos[0])
     else
-      RNDK.Beep
+      RNDK.beep
     end
   end
 
@@ -888,3 +878,35 @@ module RNDK
     return result
   end
 end
+
+# Why is this here?
+#
+# require 'rndk/alphalist'
+# require 'rndk/button'
+# require 'rndk/buttonbox'
+# require 'rndk/calendar'
+# require 'rndk/dialog'
+# require 'rndk/dscale'
+# require 'rndk/entry'
+# require 'rndk/fscale'
+# require 'rndk/fslider'
+# require 'rndk/fselect'
+# require 'rndk/graph'
+# require 'rndk/histogram'
+# require 'rndk/itemlist'
+# require 'rndk/label'
+# require 'rndk/marquee'
+# require 'rndk/matrix'
+# require 'rndk/mentry'
+# require 'rndk/menu'
+# require 'rndk/radio'
+# require 'rndk/scale'
+# require 'rndk/scroll'
+# require 'rndk/selection'
+# require 'rndk/slider'
+# require 'rndk/swindow'
+# require 'rndk/template'
+# require 'rndk/uscale'
+# require 'rndk/uslider'
+# require 'rndk/viewer'
+

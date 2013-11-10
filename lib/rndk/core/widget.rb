@@ -1,5 +1,10 @@
+require 'rndk'
+
 module RNDK
-  class RNDKOBJS
+
+  # Wrapper on common functionality between all RNDK Widgets.
+  #
+  class Widget
     attr_accessor :screen_index, :screen, :has_focus, :is_visible, :box
     attr_accessor :ULChar, :URChar, :LLChar, :LRChar, :HZChar, :VTChar, :BXAttr
     attr_reader :binding_list, :accepts_focus, :exit_type, :border_size
@@ -7,7 +12,7 @@ module RNDK
     @@g_paste_buffer = ''
 
     def initialize
-      @has_focus = true
+      @has_focus  = true
       @is_visible = true
 
       RNDK::ALL_OBJECTS << self
@@ -22,7 +27,7 @@ module RNDK
       @BXAttr = Ncurses::A_NORMAL
 
       # set default exit-types
-      @exit_type = :NEVER_ACTIVATED
+      @exit_type  = :NEVER_ACTIVATED
       @early_exit = :NEVER_ACTIVATED
 
       @accepts_focus = false
@@ -41,11 +46,11 @@ module RNDK
       true
     end
 
-    def SCREEN_XPOS(n)
+    def Screen_XPOS(n)
       n + @border_size
     end
 
-    def SCREEN_YPOS(n)
+    def Screen_YPOS(n)
       n + @border_size + @title_lines
     end
 
@@ -56,12 +61,10 @@ module RNDK
     end
 
     def move(xplace, yplace, relative, refresh_flag)
-      self.move_specific(xplace, yplace, relative, refresh_flag,
-          [@win, @shadow_win], [])
+      self.move_specific(xplace, yplace, relative, refresh_flag, [@win, @shadow_win], [])
     end
 
-    def move_specific(xplace, yplace, relative, refresh_flag,
-        windows, subwidgets)
+    def move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
       current_x = Ncurses.getbegx(@win)
       current_y = Ncurses.getbegy(@win)
       xpos = xplace
@@ -95,7 +98,7 @@ module RNDK
       end
 
       # Touch the windows so they 'move'
-      RNDK::SCREEN.refreshRNDKWindow(@screen.window)
+      RNDK::Screen.refresh_window(@screen.window)
 
       # Redraw the window, if they asked for it
       if refresh_flag
@@ -242,7 +245,7 @@ module RNDK
     end
 
     # Set the object's exit-type based on the input.
-    # The .exitType field should have been part of the RNDKOBJS struct, but it
+    # The .exitType field should have been part of the Widget struct, but it
     # is used too pervasively in older applications to move (yet).
     def setExitType(ch)
       case ch
@@ -341,7 +344,7 @@ module RNDK
       end
     end
 
-    # This checks to see if the binding for the key exists:
+    # Checks to see if the binding for the key exists:
     # If it does then it runs the command and returns its value, normally true
     # If it doesn't it returns a false.  This way we can 'overwrite' coded
     # bindings.
@@ -360,7 +363,7 @@ module RNDK
       return false
     end
 
-    # This checks to see if the binding for the key exists.
+    # Checks to see if the binding for the key exists.
     def isBind(type, key)
       result = false
       obj = self.bindableObject(type)
@@ -371,8 +374,34 @@ module RNDK
       return result
     end
 
-    # This allows the user to use the cursor keys to adjust the
-    # postion of the widget.
+    # Allows the user to move the Widget around the screen
+    # via the cursor/keypad keys.
+    #
+    # The following key bindings can be used to move the
+    # Widget around the screen:
+    #
+    # Up Arrow::    Moves the widget up one row.
+    # Down Arrow::  Moves the widget down one row.
+    # Left Arrow::  Moves the widget left one column
+    # Right Arrow:: Moves the widget right one column
+    # 1::           Moves the widget down one row and left one column.
+    # 2::           Moves the widget down one row.
+    # 3::           Moves the widget down one row and right one column.
+    # 4::           Moves the widget left one column.
+    # 5::           Centers the widget both vertically and horizontally.
+    # 6::           Moves the widget right one column
+    # 7::           Moves the widget up one row and left one column.
+    # 8::           Moves the widget up one row.
+    # 9::           Moves the widget up one row and right one column.
+    # t::           Moves the widget to the top of the screen.
+    # b::           Moves the widget to the bottom of the screen.
+    # l::           Moves the widget to the left of the screen.
+    # r::           Moves the widget to the right of the screen.
+    # c::           Centers the widget between the left and right of the window.
+    # C::           Centers the widget between the top and bottom of the window.
+    # Escape::      Returns the widget to its original position.
+    # Return::      Exits the function and leaves the Widget where it was.
+    #
     def position(win)
       parent = @screen.window
       orig_x = Ncurses.getbegx win
@@ -382,59 +411,63 @@ module RNDK
       end_x = beg_x + Ncurses.getmaxx(@screen.window)
       end_y = beg_y + Ncurses.getmaxy(@screen.window)
 
-      # Let them move the widget around until they hit return.
-      while not [RNDK::KEY_RETURN, Ncurses::KEY_ENTER].include?(
-        (key = self.getch([])))
+      loop do
+        key = self.getch([])
+
+        # Let them move the widget around until they hit return.
+        break if [RNDK::KEY_RETURN, Ncurses::KEY_ENTER].include? key
+
         case key
         when Ncurses::KEY_UP, '8'.ord
           if Ncurses.getbegy(win) > beg_y
             self.move(0, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when Ncurses::KEY_DOWN, '2'.ord
           if (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(0, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when Ncurses::KEY_LEFT, '4'.ord
           if Ncurses.getbegx(win) > beg_x
             self.move(-1, 0, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when Ncurses::KEY_RIGHT, '6'.ord
           if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x
             self.move(1, 0, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when '7'.ord
           if Ncurses.getbegy(win) > beg_y && Ncurses.getbegx(win) > beg_x
             self.move(-1, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when '9'.ord
           if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x && Ncurses.getbegy(win) > beg_y
             self.move(1, -1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when '1'.ord
           if Ncurses.getbegx(win) > beg_x && (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(-1, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
         when '3'.ord
           if (Ncurses.getbegx(win) + Ncurses.getmaxx(win)) < end_x &&
               (Ncurses.getbegy(win) + Ncurses.getmaxy(win)) < end_y
             self.move(1, 1, true, true)
           else
-            RNDK.Beep
+            RNDK.beep
           end
+
         when '5'.ord
           self.move(RNDK::CENTER, RNDK::CENTER, false, true)
 
@@ -463,9 +496,11 @@ module RNDK
         when RNDK::KEY_ESC
           self.move(orig_x, orig_y, false, true)
         else
-          RNDK.Beep
+          RNDK.beep
         end
       end
     end
+
   end
 end
+
