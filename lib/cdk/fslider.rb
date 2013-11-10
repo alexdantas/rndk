@@ -1,4 +1,4 @@
-require_relative 'slider'
+require 'cdk/slider'
 
 module CDK
   class FSLIDER < CDK::SLIDER

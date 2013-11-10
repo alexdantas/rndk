@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   # TODO This Widget's very buggy! Somehow improve it later!

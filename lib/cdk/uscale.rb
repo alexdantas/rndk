@@ -1,4 +1,4 @@
-require_relative 'scale'
+require 'cdk/scale'
 
 module CDK
   class USCALE < CDK::SCALE

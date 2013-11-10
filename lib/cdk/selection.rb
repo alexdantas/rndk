@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   # TODO This Widget's very buggy! Somehow improve it later!

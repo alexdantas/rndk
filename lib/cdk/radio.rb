@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   class RADIO < CDK::SCROLLER

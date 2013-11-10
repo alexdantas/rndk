@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 module CDK
   class SCROLLER < CDK::CDKOBJS
     def initialize

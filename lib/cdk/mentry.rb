@@ -1,4 +1,4 @@
-require_relative 'cdk_objs'
+require 'cdk/cdk_objs'
 
 module CDK
   class MENTRY < CDK::CDKOBJS
@@ -442,7 +442,7 @@ module CDK
     def drawField
       currchar = @field_width * @top_row
 
-      self.drawTitle(@win)
+      self.drawTitle @win
       Ncurses.wrefresh @win
 
       lastpos = @info.size

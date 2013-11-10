@@ -1,4 +1,4 @@
-require_relative 'scroller'
+require 'cdk/scroller'
 
 module CDK
   class SCROLL < CDK::SCROLLER
@@ -342,7 +342,6 @@ module CDK
           @toggle_pos = (@current_item * @step).floor
 
           # Make sure the toggle button doesn't go out of bounds.
-
           if @toggle_pos >= Ncurses.getmaxy(@scrollbar_win)
             @toggle_pos = Ncurses.getmaxy(@scrollbar_win) - 1
           end

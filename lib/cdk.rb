@@ -782,7 +782,7 @@ module CDK
   end
 
   def CDK.Version
-    return "%d.%d - %d" %
+    return "%d.%d.%d" %
         [CDK::VERSION_MAJOR, CDK::VERSION_MINOR, CDK::VERSION_PATCH]
   end
 
