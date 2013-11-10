@@ -28,12 +28,12 @@ class HistogramExample < CLIExample
   def HistogramExample.main
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the histogram objects.
     volume_title = "<C></5>Volume<!5>"
@@ -41,113 +41,113 @@ class HistogramExample < CLIExample
     treble_title = "<C></5>Treble<!5>"
     box = params.box
 
-    volume = CDK::HISTOGRAM.new(cdkscreen, params.x_value, params.y_vol,
-        params.h_value, params.w_value, CDK::HORIZONTAL, volume_title,
+    volume = RNDK::HISTOGRAM.new(rndkscreen, params.x_value, params.y_vol,
+        params.h_value, params.w_value, RNDK::HORIZONTAL, volume_title,
         box, params.shadow)
 
     # Is the volume null?
     if volume.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make volume histogram.  Is the window big enough?"
       exit #EXIT_FAILURE
     end
 
-    bass = CDK::HISTOGRAM.new(cdkscreen, params.x_value, params.y_bass,
-        params.h_value, params.w_value, CDK::HORIZONTAL, bass_title,
+    bass = RNDK::HISTOGRAM.new(rndkscreen, params.x_value, params.y_bass,
+        params.h_value, params.w_value, RNDK::HORIZONTAL, bass_title,
         box, params.shadow)
 
     if bass.nil?
       volume.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make bass histogram.  Is the window big enough?"
       exit  # EXIT_FAILURE
     end
 
 
-    treble = CDK::HISTOGRAM.new(cdkscreen, params.x_value, params.y_treb,
-        params.h_value, params.w_value, CDK::HORIZONTAL, treble_title,
+    treble = RNDK::HISTOGRAM.new(rndkscreen, params.x_value, params.y_treb,
+        params.h_value, params.w_value, RNDK::HORIZONTAL, treble_title,
         box, params.shadow)
 
     if treble.nil?
       volume.destroy
       bass.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make treble histogram.  Is the window big enough?"
       exit  # EXIT_FAILURE
     end
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 6,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 6,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 7,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 7,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 8,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 8,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 1,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 1,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 9,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 9,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 7,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 7,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 1,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 1,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 8,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 8,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 3,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Set the histogram values.
-    volume.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
+    volume.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    bass.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
+    bass.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    treble.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
+    treble.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 10,
         ' '.ord | Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(3), box)
-    cdkscreen.refresh
+    rndkscreen.refresh
     sleep(4)
 
     # Clean up
     volume.destroy
     bass.destroy
     treble.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

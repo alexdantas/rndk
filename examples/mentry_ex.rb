@@ -5,8 +5,8 @@ class MentryExample < Example
   def MentryExample.parse_opts(opts, param)
     opts.banner = 'Usage: mentry_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = false
     param.w = 20
@@ -28,7 +28,7 @@ class MentryExample < Example
     end
   end
 
-  # This demonstrates the positioning of a Cdk multiple-line entry
+  # This demonstrates the positioning of a Rndk multiple-line entry
   # field widget.
   def MentryExample.main
     label = "</R>Message"
@@ -36,29 +36,29 @@ class MentryExample < Example
 
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
-    widget = CDK::MENTRY.new(cdkscreen, params.x_value, params.y_value,
+    widget = RNDK::MENTRY.new(rndkscreen, params.x_value, params.y_value,
         title, label, Ncurses::A_BOLD, '.', :MIXED, params.w, params.h,
         params.rows, 0, params.box, params.shadow)
 
     # Is the widget nil?
     if widget.nil?
       # Clean up.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
-      puts "Cannot create CDK object. Is the window too small?"
+      puts "Cannot create RNDK object. Is the window too small?"
       exit  # EXIT_FAILURE
     end
 
-    # Draw the CDK screen.
-    cdkscreen.refresh
+    # Draw the RNDK screen.
+    rndkscreen.refresh
 
     # Set whatever was given from the command line.
     arg = if ARGV.size > 0 then ARGV[0] else '' end
@@ -70,8 +70,8 @@ class MentryExample < Example
 
     # Clean up.
     widget.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
 
     puts "\n\n"
     puts "Your message was : <%s>" % [info]

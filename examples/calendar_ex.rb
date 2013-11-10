@@ -5,15 +5,15 @@ class CalendarExample < Example
   def CalendarExample.parse_opts(opts, param)
     opts.banner = 'Usage: calendar_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = false
     param.day = 0
     param.month = 0
     param.year = 0
     param.week_base = 0
-    param.title = "<C></U>CDK Calendar Widget\n<C>Demo"
+    param.title = "<C></U>RNDK Calendar Widget\n<C>Demo"
 
     super(opts, param)
 
@@ -38,7 +38,7 @@ class CalendarExample < Example
     end
   end
 
-  # This program demonstrates the Cdk calendar widget.
+  # This program demonstrates the Rndk calendar widget.
   def CalendarExample.main
     params = parse(ARGV)
 
@@ -58,15 +58,15 @@ class CalendarExample < Example
       params.year = date_info.year
     end
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Declare the calendar widget.
-    calendar = CDK::CALENDAR.new(cdkscreen, params.x_value, params.y_value,
+    calendar = RNDK::CALENDAR.new(rndkscreen, params.x_value, params.y_value,
         params.title, params.day, params.month, params.year,
         Ncurses.COLOR_PAIR(16) | Ncurses::A_BOLD,
         Ncurses.COLOR_PAIR(24) | Ncurses::A_BOLD,
@@ -75,10 +75,10 @@ class CalendarExample < Example
         params.box, params.shadow)
 
     if calendar.nil?
-      # Exit CDK.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
-    
+      # Exit RNDK.
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
+
       puts 'Cannot create the calendar. Is the window too small?'
       exit  # EXIT_FAILURE
     end
@@ -115,7 +115,7 @@ class CalendarExample < Example
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif calendar.exit_type == :NORMAL
       mesg = [
           'You selected the following date',
@@ -123,13 +123,13 @@ class CalendarExample < Example
               calendar.day, calendar.month, calendar.year],
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     end
 
     # Clean up
     calendar.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     $stdout.flush
     puts 'Selected Time: %s' % ret_val.ctime
     #ExitProgram (EXIT_SUCCESS);

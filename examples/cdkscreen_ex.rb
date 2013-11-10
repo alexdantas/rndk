@@ -1,21 +1,21 @@
 #!/usr/bin/env ruby
 require_relative 'example'
 
-class CDKScreenExample < Example
-  # This demonstrates how to create four different Cdk screens
+class RNDKScreenExample < Example
+  # This demonstrates how to create four different Rndk screens
   # and flip between them.
-  def CDKScreenExample.main
+  def RNDKScreenExample.main
     buttons = ["Continue", "Exit"]
 
     # Create the curses window.
     curses_win = Ncurses.initscr
 
     # Create the screens
-    cdkscreen1 = CDK::SCREEN.new(curses_win)
-    cdkscreen2 = CDK::SCREEN.new(curses_win)
-    cdkscreen3 = CDK::SCREEN.new(curses_win)
-    cdkscreen4 = CDK::SCREEN.new(curses_win)
-    cdkscreen5 = CDK::SCREEN.new(curses_win)
+    rndkscreen1 = RNDK::SCREEN.new(curses_win)
+    rndkscreen2 = RNDK::SCREEN.new(curses_win)
+    rndkscreen3 = RNDK::SCREEN.new(curses_win)
+    rndkscreen4 = RNDK::SCREEN.new(curses_win)
+    rndkscreen5 = RNDK::SCREEN.new(curses_win)
 
     # Create the first screen.
     title1_mesg = [
@@ -24,7 +24,7 @@ class CDKScreenExample < Example
         "<C>Hit space to go to the next screen",
         "<C><#HL(30)>"
     ]
-    label1 = CDK::LABEL.new(cdkscreen1, CDK::CENTER, CDK::TOP, title1_mesg,
+    label1 = RNDK::LABEL.new(rndkscreen1, RNDK::CENTER, RNDK::TOP, title1_mesg,
         4, false, false)
 
     # Create the second screen.
@@ -34,7 +34,7 @@ class CDKScreenExample < Example
         "<C>Hit space to go to the next screen",
         "<C><#HL(30)>"
     ]
-    label2 = CDK::LABEL.new(cdkscreen2, CDK::RIGHT, CDK::CENTER, title2_mesg,
+    label2 = RNDK::LABEL.new(rndkscreen2, RNDK::RIGHT, RNDK::CENTER, title2_mesg,
         4, false, false)
 
     # Create the third screen.
@@ -44,7 +44,7 @@ class CDKScreenExample < Example
         "<C>Hit space to go to the next screen",
         "<C><#HL(30)>"
     ]
-    label3 = CDK::LABEL.new(cdkscreen3, CDK::CENTER, CDK::BOTTOM, title3_mesg,
+    label3 = RNDK::LABEL.new(rndkscreen3, RNDK::CENTER, RNDK::BOTTOM, title3_mesg,
         4, false, false)
 
     # Create the fourth screen.
@@ -54,7 +54,7 @@ class CDKScreenExample < Example
         "<C>Hit space to go to the next screen",
         "<C><#HL(30)>"
     ]
-    label4 = CDK::LABEL.new(cdkscreen4, CDK::LEFT, CDK::CENTER, title4_mesg,
+    label4 = RNDK::LABEL.new(rndkscreen4, RNDK::LEFT, RNDK::CENTER, title4_mesg,
         4, false, false)
 
     # Create the fifth screen.
@@ -66,33 +66,33 @@ class CDKScreenExample < Example
         "<C>Otherwise press the 'Exit' button",
         "<C><#HL(30)>"
     ]
-    dialog = CDK::DIALOG.new(cdkscreen5, CDK::CENTER, CDK::CENTER, dialog_mesg,
+    dialog = RNDK::DIALOG.new(rndkscreen5, RNDK::CENTER, RNDK::CENTER, dialog_mesg,
         6, buttons, 2, Ncurses::A_REVERSE, true, true, false)
 
     # Do this forever... (almost)
     while true
       # Draw the first screen.
-      cdkscreen1.draw
+      rndkscreen1.draw
       label1.wait(' ')
-      cdkscreen1.erase
+      rndkscreen1.erase
 
       # Draw the second screen.
-      cdkscreen2.draw
+      rndkscreen2.draw
       label2.wait(' ')
-      cdkscreen2.erase
+      rndkscreen2.erase
 
       # Draw the third screen.
-      cdkscreen3.draw
+      rndkscreen3.draw
       label3.wait(' ')
-      cdkscreen3.erase
+      rndkscreen3.erase
 
       # Draw the fourth screen.
-      cdkscreen4.draw
+      rndkscreen4.draw
       label4.wait(' ')
-      cdkscreen4.erase
+      rndkscreen4.erase
 
       # Draw the fifth screen
-      cdkscreen5.draw
+      rndkscreen5.draw
       answer = dialog.activate('')
 
       # Check the user's answer.
@@ -102,16 +102,16 @@ class CDKScreenExample < Example
         label3.destroy
         label4.destroy
         dialog.destroy
-        cdkscreen1.destroy
-        cdkscreen2.destroy
-        cdkscreen3.destroy
-        cdkscreen4.destroy
-        cdkscreen5.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen1.destroy
+        rndkscreen2.destroy
+        rndkscreen3.destroy
+        rndkscreen4.destroy
+        rndkscreen5.destroy
+        RNDK::SCREEN.endRNDK
         exit  # EXIT__SUCCESS
       end
     end
   end
 end
 
-CDKScreenExample.main
+RNDKScreenExample.main

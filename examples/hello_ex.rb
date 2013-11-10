@@ -5,24 +5,24 @@ class HelloExample < Example
   def HelloExample.parse_opts(opts, param)
     opts.banner = 'Usage: hello_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = true
     super(opts, param)
   end
 
-  # This program demonstrates the Cdk label widget.
+  # This program demonstrates the Rndk label widget.
   def HelloExample.main
     # Declare variables.
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Set the labels up.
     mesg = [
@@ -32,30 +32,30 @@ class HelloExample < Example
     ]
 
     # Declare the labels.
-    demo = CDK::LABEL.new(cdkscreen,
+    demo = RNDK::LABEL.new(rndkscreen,
         params.x_value, params.y_value, mesg, 3,
         params.box, params.shadow)
 
     # Is the label nll?
     if demo.nil?
       # Clean up the memory.
-      cdkscreen.destroy
+      rndkscreen.destroy
 
       # End curses...
-      CDK::SCREEN.endCDK
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the label. Is the window too small?"
       exit #  EXIT_FAILURE
     end
 
-    # Draw the CDK screen.
-    cdkscreen.refresh
+    # Draw the RNDK screen.
+    rndkscreen.refresh
     demo.wait(' ')
 
     # Clean up
     demo.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

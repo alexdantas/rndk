@@ -8,8 +8,8 @@ class GraphExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 10
     params.w_value = 20
 
@@ -19,12 +19,12 @@ class GraphExample < CLIExample
   def GraphExample.main
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the graph values.
     values = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
@@ -37,26 +37,26 @@ class GraphExample < CLIExample
     # Create the label values.
     mesg = ["Press any key when done viewing the graph."]
 
-    graph = CDK::GRAPH.new(cdkscreen, params.x_value, params.y_value,
+    graph = RNDK::GRAPH.new(rndkscreen, params.x_value, params.y_value,
         params.h_value, params.w_value, title, xtitle, ytitle)
 
     # Is the graph null?
     if graph.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make the graph widget.  Is the window too small?"
       exit #EXIT_FAILURE
     end
 
     # Create the label widget.
-    pausep = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::BOTTOM, mesg, 1,
+    pausep = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::BOTTOM, mesg, 1,
         true, false)
 
     if pausep.nil?
       graph.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make the label widget. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -66,7 +66,7 @@ class GraphExample < CLIExample
     graph.set(values, count, graph_chars, false, :PLOT)
 
     # Draw the screen.
-    cdkscreen.refresh
+    rndkscreen.refresh
     graph.draw(false)
     pausep.draw(true)
 
@@ -76,8 +76,8 @@ class GraphExample < CLIExample
     # Clean up
     graph.destroy
     pausep.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

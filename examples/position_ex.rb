@@ -5,8 +5,8 @@ class PositionExample < Example
   def PositionExample.parse_opts(opts, param)
     opts.banner = 'Usage: position_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = false
     param.w_value = 40
@@ -18,28 +18,28 @@ class PositionExample < Example
     end
   end
 
-  # This demonstrates the positioning of a Cdk entry field widget.
+  # This demonstrates the positioning of a Rndk entry field widget.
   def PositionExample.main
     label = "</U/5>Directory:<!U!5> "
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the entry field widget.
-    directory = CDK::ENTRY.new(cdkscreen, params.x_value, params.y_value,
+    directory = RNDK::ENTRY.new(rndkscreen, params.x_value, params.y_value,
         '', label, Ncurses::A_NORMAL, '.', :MIXED, params.w_value, 0, 256,
         params.box, params.shadow)
 
     # Is the widget nil?
     if directory.nil?
       # Clean up.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the entry box. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -59,7 +59,7 @@ class PositionExample < Example
           "",
           "<C>Press any key to continue."
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif directory.exit_type == :NORMAL
       mesg = [
           "<C>You typed in the following",
@@ -67,13 +67,13 @@ class PositionExample < Example
           "",
           "<C>Press any key to continue."
       ]
-          cdkscreen.popupLabel(mesg, 4)
+          rndkscreen.popupLabel(mesg, 4)
     end
 
     # Clean up
     directory.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

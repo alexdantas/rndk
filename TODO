@@ -1,4 +1,5 @@
-Tawny-Cdk TODO List
+RNDK TODO List
+(forked from Tawny-Cdk's TODO List)
 ------------------------------------------------------------------------------
 
 Now that Tawny CDK is basically a complete copy of Thomas Dickey version of
@@ -64,3 +65,4 @@ Mike Glover's CDK it is essentially usable, but there's still a lot to do:
      activate the focused widget, move affect all widgets in the collection as
      one, and things like that.  Basically, make it really easy to combine
      widgets in useful manners
+

@@ -5,12 +5,12 @@ class MatrixExample < Example
   def MatrixExample.parse_opts(opts, param)
     opts.banner = 'Usage: matrix_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = true
     param.title =
-        "<C>This is the CDK\n<C>matrix widget.\n<C><#LT><#HL(30)><#RT>"
+        "<C>This is the RNDK\n<C>matrix widget.\n<C><#LT><#HL(30)><#RT>"
     param.cancel_title = false
     param.cancel_row = false
     param.cancel_col = false
@@ -34,7 +34,7 @@ class MatrixExample < Example
     end
   end
 
-  # This program demonstrates the Cdk calendar widget.
+  # This program demonstrates the Rndk calendar widget.
   def MatrixExample.main
     rows = 8
     cols = 5
@@ -43,12 +43,12 @@ class MatrixExample < Example
 
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     coltitle = []
     unless params.cancel_col
@@ -67,17 +67,17 @@ class MatrixExample < Example
     end
 
     # Create the matrix object
-    course_list = CDK::MATRIX.new(cdkscreen, params.x_value, params.y_value,
+    course_list = RNDK::MATRIX.new(rndkscreen, params.x_value, params.y_value,
         rows, cols, vrows, vcols,
         if params.cancel_title then '' else params.title end,
         rowtitle, coltitle, colwidth, colvalue, -1, -1, '.',
         2, params.box, params.box, params.shadow)
 
     if course_list.nil?
-      # Exit CDK.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
-    
+      # Exit RNDK.
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
+
       puts 'Cannot create the matrix widget. Is the window too small?'
       exit  # EXIT_FAILURE
     end
@@ -92,7 +92,7 @@ class MatrixExample < Example
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif course_list.exit_type == :NORMAL
       mesg = [
           '<L>You exited the matrix normally',
@@ -103,13 +103,13 @@ class MatrixExample < Example
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 7)
+      rndkscreen.popupLabel(mesg, 7)
     end
 
     # Clean up
     course_list.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

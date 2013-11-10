@@ -7,8 +7,8 @@ class ItemlistExample < Example
   def ItemlistExample.parse_opts(opts, param)
     opts.banner = 'Usage: itemlist_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = false
     param.c = false
@@ -20,7 +20,7 @@ class ItemlistExample < Example
     end
   end
 
-  # This program demonstrates the Cdk itemlist widget.
+  # This program demonstrates the Rndk itemlist widget.
   #
   # Options (in addition to minimal CLI parameters):
   #      -c      create the data after the widget
@@ -32,12 +32,12 @@ class ItemlistExample < Example
     # Get the current date and set the default month to the current month.
     start_month = Time.new.localtime.mon
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the choice list.
     info = [
@@ -56,7 +56,7 @@ class ItemlistExample < Example
     ]
 
     # Create the itemlist widget.
-    monthlist = CDK::ITEMLIST.new(cdkscreen, params.x_value, params.y_value,
+    monthlist = RNDK::ITEMLIST.new(rndkscreen, params.x_value, params.y_value,
         title, label,
         if params.c then '' else info end,
         if params.c then 0 else ItemlistExample::MONTHS end,
@@ -65,8 +65,8 @@ class ItemlistExample < Example
     # Is the widget nil?
     if monthlist.nil?
       # Clean up.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the itemlist box. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -99,8 +99,8 @@ class ItemlistExample < Example
 
     # Clean up
     monthlist.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

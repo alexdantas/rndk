@@ -2,39 +2,39 @@
 require_relative 'example'
 
 class ButtonboxExample < Example
-  # This program demonstrates the Cdk buttonbox widget.
+  # This program demonstrates the Rndk buttonbox widget.
   def ButtonboxExample.main
     buttons = [" OK ", " Cancel "]
 
-    # Set up CDK.
+    # Set up RNDK.
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
     # Start color.
-    CDK::Draw.initCDKColor
+    RNDK::Draw.initRNDKColor
 
     # Create the entry widget.
-    entry = CDK::ENTRY.new(cdkscreen, CDK::CENTER, CDK::CENTER,
+    entry = RNDK::ENTRY.new(rndkscreen, RNDK::CENTER, RNDK::CENTER,
         "<C>Enter a name", "Name ", Ncurses::A_NORMAL, '.', :MIXED,
         40, 0, 256, true, false)
 
     if entry.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       $stderr.puts "Cannot create entry-widget"
       exit # EXIT_FAILURE
     end
 
     # Create the button box widget.
-    button_widget = CDK::BUTTONBOX.new(cdkscreen,
+    button_widget = RNDK::BUTTONBOX.new(rndkscreen,
         Ncurses.getbegx(entry.win), Ncurses.getbegy(entry.win) + entry.box_height - 1,
         1, entry.box_width - 1, '', 1, 2, buttons, 2, Ncurses::A_REVERSE,
         true, false)
 
     if button_widget.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       $stderr.puts "Cannot create buttonbox-widget"
       exit # EXIT_FAILURE
@@ -48,12 +48,12 @@ class ButtonboxExample < Example
 
     # Bind the Tab key in the entry field to send a
     # Tab key to the button box widget.
-    entryCB = lambda do |cdktype, object, client_data, key|
+    entryCB = lambda do |rndktype, object, client_data, key|
       client_data.inject(key)
       return true
     end
 
-    entry.bind(:ENTRY, CDK::KEY_TAB, entryCB, button_widget)
+    entry.bind(:ENTRY, RNDK::KEY_TAB, entryCB, button_widget)
 
     # Activate the entry field.
     button_widget.draw(true)
@@ -63,8 +63,8 @@ class ButtonboxExample < Example
     # Clean up.
     button_widget.destroy
     entry.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
 
     puts "You typed in (%s) and selected button (%s)" % [
         if !(info.nil?) && info.size > 0 then info else '<null>' end,

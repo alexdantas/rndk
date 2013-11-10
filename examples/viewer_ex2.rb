@@ -8,8 +8,8 @@ class Viewer2Example < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 20
     params.w_value = 65
     params.filename = ''
@@ -45,21 +45,21 @@ class Viewer2Example < CLIExample
 
     # Start curses
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Start CDK colors.
-    CDK::Draw.initCDKColor
+    # Start RNDK colors.
+    RNDK::Draw.initRNDKColor
 
     f_select = nil
     if params.filename == ''
-      f_select = CDK::FSELECT.new(cdkscreen, params.x_value, params.y_value,
+      f_select = RNDK::FSELECT.new(rndkscreen, params.x_value, params.y_value,
           params.h_value, params.w_value, title, label, Ncurses::A_NORMAL,
           '_', Ncurses::A_REVERSE, '</5>', '</48>', '</N>', '</N',
           params.box, params.shadow)
 
       if f_select.nil?
-        cdkscreen.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen.destroy
+        RNDK::SCREEN.endRNDK
 
         $stderr.puts 'Cannot create fselect-widget'
         exit  # EXIT_FAILURE
@@ -81,12 +81,12 @@ class Viewer2Example < CLIExample
             '',
             '<C>Press any key to continue.',
         ]
-        cdkscreen.popupLabel(mesg, 3)
+        rndkscreen.popupLabel(mesg, 3)
 
-        # Exit CDK.
+        # Exit RNDK.
         f_select.destroy
-        cdkscreen.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen.destroy
+        RNDK::SCREEN.endRNDK
         exit  # EXIT_SUCCESS
       end
     end
@@ -94,7 +94,7 @@ class Viewer2Example < CLIExample
     # Set up the viewer title and the contents to the widget.
     v_title = '<C></B/21>Filename:<!21></22>%20s<!22!B>' % [params.filename]
 
-    selected = CDK.viewFile(cdkscreen, v_title, params.filename, button, 2)
+    selected = RNDK.viewFile(rndkscreen, v_title, params.filename, button, 2)
 
     # Destroy the file selector widget (do not need filename anymore)
     unless f_select.nil?
@@ -107,11 +107,11 @@ class Viewer2Example < CLIExample
         '',
         '<C>Press any key to continue.'
     ]
-    cdkscreen.popupLabel(mesg, 3)
+    rndkscreen.popupLabel(mesg, 3)
 
     # Clean up.
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

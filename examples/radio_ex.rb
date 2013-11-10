@@ -8,12 +8,12 @@ class RadioExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 10
     params.w_value = 40
     params.c = false
-    params.spos = CDK::RIGHT
+    params.spos = RNDK::RIGHT
     params.title = "<C></5>Select a filename"
 
     super(opts, params)
@@ -32,7 +32,7 @@ class RadioExample < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk radio widget.
+  # This program demonstrates the Rndk radio widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -c      create the data after the widget
@@ -43,21 +43,21 @@ class RadioExample < CLIExample
 
     # Use the current directory list to fill the radio list
     item = []
-    count = CDK.getDirectoryContents(".", item)
+    count = RNDK.getDirectoryContents(".", item)
     if count <= 0
       $stderr.puts "Cannot get directory list"
       exit  # EXIT_FAILURE
     end
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the radio list.
-    radio = CDK::RADIO.new(cdkscreen,
+    radio = RNDK::RADIO.new(rndkscreen,
         params.x_value, params.y_value, params.spos,
         params.h_value, params.w_value, params.title,
         if params.c then [] else item end,
@@ -66,8 +66,8 @@ class RadioExample < CLIExample
         params.box, params.shadow)
 
     if radio.nil?
-      cdkscreen.destroyCDKScreen
-      CDK::SCREEN.endCDK
+      rndkscreen.destroyRNDKScreen
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make radio widget.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -79,7 +79,7 @@ class RadioExample < CLIExample
 
     # Loop until the user selects a file, or cancels
     while true
-    
+
       # Activate the radio widget.
       selection = radio.activate([])
 
@@ -90,7 +90,7 @@ class RadioExample < CLIExample
             '',
             '<C>Press any key to continue.'
         ]
-        cdkscreen.popupLabel(mesg, 3)
+        rndkscreen.popupLabel(mesg, 3)
         break
       elsif radio.exit_type == :NORMAL
         if File.directory?(item[selection])
@@ -100,9 +100,9 @@ class RadioExample < CLIExample
               "",
               "<C>Press any key to continue"
           ]
-          cdkscreen.popupLabel(mesg, 4)
+          rndkscreen.popupLabel(mesg, 4)
           nitem = []
-          count = CDK.getDirectoryContents(item[selection], nitem)
+          count = RNDK.getDirectoryContents(item[selection], nitem)
           if count > 0
             Dir.chdir(item[selection])
             item = nitem
@@ -114,7 +114,7 @@ class RadioExample < CLIExample
             "",
             "<C>Press any key to continue."
           ]
-          cdkscreen.popupLabel(mesg, 4);
+          rndkscreen.popupLabel(mesg, 4);
           break
         end
       end
@@ -122,8 +122,8 @@ class RadioExample < CLIExample
 
     # Clean up.
     radio.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit #EXIT_SUCCESS
   end
 end

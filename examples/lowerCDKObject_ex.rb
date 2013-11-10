@@ -1,24 +1,24 @@
 #!/usr/bin/env ruby
 require_relative 'example'
 
-class LowerCDKObjectExample < Example
-  def LowerCDKObjectExample.parse_opts(opts, param)
-    opts.banner = 'Usage: lowerCDKObject_ex.rb [options]'
+class LowerRNDKObjectExample < Example
+  def LowerRNDKObjectExample.parse_opts(opts, param)
+    opts.banner = 'Usage: lowerRNDKObject_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::BOTTOM
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::BOTTOM
     param.box = false
     param.shadow = false
     super(opts, param)
   end
 
-  def LowerCDKObjectExample.main
+  def LowerRNDKObjectExample.main
     # Declare variables.
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
     mesg1 = [
         "label1 label1 label1 label1 label1 label1 label1",
@@ -32,7 +32,7 @@ class LowerCDKObjectExample < Example
         "label1 label1 label1 label1 label1 label1 label1",
         "label1 label1 label1 label1 label1 label1 label1"
     ]
-    label1 = CDK::LABEL.new(cdkscreen, 8, 5, mesg1, 10, true, false)
+    label1 = RNDK::LABEL.new(rndkscreen, 8, 5, mesg1, 10, true, false)
 
     mesg2 = [
         "label2 label2 label2 label2 label2 label2 label2",
@@ -46,35 +46,35 @@ class LowerCDKObjectExample < Example
         "label2 label2 label2 label2 label2 label2 label2",
         "label2 label2 label2 label2 label2 label2 label2"
     ]
-    label2 = CDK::LABEL.new(cdkscreen, 14, 9, mesg2, 10, true, false)
+    label2 = RNDK::LABEL.new(rndkscreen, 14, 9, mesg2, 10, true, false)
 
     mesg = ["</B>1<!B> - lower </U>label1<!U>, </B>2<!B> - lower "]
     mesg[0] << "</U>label2<!U>, </B>q<!B> - </U>quit<!U>"
-    instruct = CDK::LABEL.new(cdkscreen, params.x_value, params.y_value,
+    instruct = RNDK::LABEL.new(rndkscreen, params.x_value, params.y_value,
         mesg, 1, params.box, params.shadow)
 
-    cdkscreen.refresh
+    rndkscreen.refresh
 
     while (ch = STDIN.getc.chr) != 'q'
       case ch
       when '1'
-        CDK::SCREEN.lowerCDKObject(:LABEL, label1)
+        RNDK::SCREEN.lowerRNDKObject(:LABEL, label1)
       when '2'
-        CDK::SCREEN.lowerCDKObject(:LABEL, label2)
+        RNDK::SCREEN.lowerRNDKObject(:LABEL, label2)
       else
         next
       end
-      cdkscreen.refresh
+      rndkscreen.refresh
     end
 
     # Clean up
     label1.destroy
     label2.destroy
     instruct.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end
 
-LowerCDKObjectExample.main
+LowerRNDKObjectExample.main

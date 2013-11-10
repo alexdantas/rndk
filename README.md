@@ -1,13 +1,14 @@
-# tawny-cdk
+# Ruby Ncurses Development Kit (RNDK)
 
-A Ruby version of Thomas Dickey version of the Curses Development Kit.
+This project aims to be a powerful, well-documented and easy-to-use
+Ncurses Development Kit in Ruby. Besides abstracting away Ncurses'
+details, it provides some widgets for rapid console app development.
 
-Why Tawny?  Because this is better than just a ruby port.  Or, rather, it
-will be.  At the moment it's pretty much just a Ruby port but the plan is
-a package that is easier to use and extend, with extra extensions to prove
-it.
+It means that you'll be able to master the dark arts of text-based
+applications, easily creating nice apps for the console.
 
-Currently requires ncurses-ruby (http://ncurses-ruby.berlios.de/).
+`RNDK` is a fork from `tawny-cdk`, a [Chris Sauro Ruby port][tawny]
+of [Thomas Dickey's Curses Development Kit][cdk] (in C).
 
 Currently implemented widgets:
 
@@ -35,33 +36,79 @@ Currently implemented widgets:
  * Template
  * Viewer
 
-Thomas Dickey's C project page: http://invisible-island.net/cdk/
+## Requirements
 
-## Examples
+`rndk` requires the gem `ffi-ncurses`.
 
-Crash course into `cdk`:
+## Installation
 
-    require 'cdk'     # it automatically requires ncurses
-    
+Add this line to your application's Gemfile:
+
+    gem 'rndk'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install rndk
+
+## Usage
+
+The `examples` directory contains lots of sample usages for every
+widget available.
+
+Here's a sample that shows a colored "Hello, World!" on the screen:
+
+    # Set up CDK
     curses_win = Ncurses.initscr
-    cdk_screen = CDK::SCREEN.new curses_win
-    
+    cdkscreen = CDK::SCREEN.new(curses_win)
+
+    # Set up CDK colors
     CDK::Draw.initCDKColor
-    
-    label = CDK::LABEL.new(cdk_screen,
-                           1,                # x
-                           1,                # y
-                           "Hello, World!",  # text
-                           1,                # text lines
-                           true,             # border?
-                           true)             # shadow?
-    
-    cdk_screen.refresh
-    label.wait ' '                           # waits for space key
-    
-    label.destroy
-    cdk_screen.destroy
+
+    # Set the labels up.
+	# They're easy ways to format text.
+    mesg = [
+        "</5><#UL><#HL(30)><#UR>",
+        "</5><#VL(10)>Hello, World!<#VL(10)>",
+        "</5><#LL><#HL(30)><#LR)"
+    ]
+
+    # Declare the labels.
+    demo = CDK::LABEL.new(cdkscreen,
+	                      1,    # x
+						  1,    # y
+						  mesg, # labels
+						  3,    # lines no.
+						  true, # box?
+						  true) # shadow?
+
+    # Draw the CDK screen.
+    cdkscreen.refresh
+    demo.wait(' ')
+
+    # Clean up
+    demo.destroy
+    cdkscreen.destroy
     CDK::SCREEN.endCDK
 
-The `examples` directory contains lots of sample usages for every widget
-available.
+## Contributing
+
+Currently `rndk` has a C-like API, since it was directly taken
+from `cdk`. The top priority is to make it more rubyish (maybe
+studying [rbcurse]?).
+
+Also, see the `TODO` file.
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
+
+[tawny]:https://github.com/masterzora/tawny-cdk
+[cdk]:http://invisible-island.net/cdk/
+[rbcurse]:https://github.com/rkumar/rbcurse
+

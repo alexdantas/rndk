@@ -15,12 +15,12 @@ class ScrollExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 10
     params.w_value = 50
     params.c = false
-    params.spos = CDK::RIGHT
+    params.spos = RNDK::RIGHT
     params.title = "<C></5>Pick a file"
 
     super(opts, params)
@@ -39,7 +39,7 @@ class ScrollExample < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk scrolling list widget.
+  # This program demonstrates the Rndk scrolling list widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -c      create the data after the widget
@@ -51,19 +51,19 @@ class ScrollExample < CLIExample
 
     params = parse(ARGV)
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Use the current directory list to fill the radio list
     item = []
-    count = CDK.getDirectoryContents(".", item)
+    count = RNDK.getDirectoryContents(".", item)
 
     # Create the scrolling list.
-    scroll_list = CDK::SCROLL.new(cdkscreen,
+    scroll_list = RNDK::SCROLL.new(rndkscreen,
         params.x_value, params.y_value, params.spos,
         params.h_value, params.w_value, params.title,
         if params.c then nil else item end,
@@ -71,8 +71,8 @@ class ScrollExample < CLIExample
         true, Ncurses::A_REVERSE, params.box, params.shadow)
 
     if scroll_list.nil?
-      cdkscreen.destroyCDKScreen
-      CDK::SCREEN.endCDK
+      rndkscreen.destroyRNDKScreen
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make scrolling list.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -103,9 +103,9 @@ class ScrollExample < CLIExample
     scroll_list.bind(:SCROLL, 'a', addItemCB, nil)
     scroll_list.bind(:SCROLL, 'i', insItemCB, nil);
     scroll_list.bind(:SCROLL, 'd', delItemCB, nil);
-    
+
     # Activate the scrolling list.
-    
+
     selection = scroll_list.activate('')
 
     # Determine how the widget was exited
@@ -113,22 +113,22 @@ class ScrollExample < CLIExample
       msg = ['<C>You hit escape. No file selected']
       msg << ''
       msg << '<C>Press any key to continue.'
-      cdkscreen.popupLabel(msg, 3)
+      rndkscreen.popupLabel(msg, 3)
     elsif scroll_list.exit_type == :NORMAL
-      the_item = CDK.chtype2Char(scroll_list.item[selection])
+      the_item = RNDK.chtype2Char(scroll_list.item[selection])
       msg = ['<C>You selected the following file',
           "<C>%.*s" % [236, the_item],  # FIXME magic number
           "<C>Press any key to continue."
       ]
-      cdkscreen.popupLabel(msg, 3);
+      rndkscreen.popupLabel(msg, 3);
       #freeChar (theItem);
     end
 
     # Clean up.
-    # CDKfreeStrings (item);
+    # RNDKfreeStrings (item);
     scroll_list.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit #EXIT_SUCCESS
   end
 end

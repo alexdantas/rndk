@@ -6,8 +6,8 @@ class BindExample < Example
   def BindExample.parse_opts(opts, param)
     opts.banner = 'Usage: dialog_ex.rb [options]'
 
-    param.x_value = CDK::CENTER
-    param.y_value = CDK::CENTER
+    param.x_value = RNDK::CENTER
+    param.y_value = RNDK::CENTER
     param.box = true
     param.shadow = false
     super(opts, param)
@@ -19,12 +19,12 @@ class BindExample < Example
 
     params = parse(ARGV)
 
-    # Set up CDK.
+    # Set up RNDK.
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
     # Start color.
-    CDK::Draw.initCDKColor
+    RNDK::Draw.initRNDKColor
 
     # Set up the dialog box.
     message = [
@@ -36,20 +36,20 @@ class BindExample < Example
     buttons = ["Who", "Time", "Date", "Quit"]
 
     # Create the dialog box
-    question = CDK::DIALOG.new(cdkscreen, params.x_value, params.y_value,
+    question = RNDK::DIALOG.new(rndkscreen, params.x_value, params.y_value,
         message, 3, buttons, 4, Ncurses::A_REVERSE, true,
         params.box, params.shadow)
 
     # Check if we got a nil value back.
     if question.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the dialog box. Is the window too small?"
       exit  # EXIT_FAILURE
     end
 
-    dialog_help_cb = lambda do |cdktype, dialog, client_data, key|
+    dialog_help_cb = lambda do |rndktype, dialog, client_data, key|
       mesg = []
       # Check which button we are on
       if dialog.current_button == 0
@@ -120,8 +120,8 @@ class BindExample < Example
 
     # Clean up and exit.
     question.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

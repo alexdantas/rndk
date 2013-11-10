@@ -8,17 +8,17 @@ class TraverseExample < Example
       'Oct', 'Nov', 'Dec']
   CHOICES = ['[ ]', '[*]']
   # Exercise all widgets except
-  #     CDKMENU
-  #     CDKTRAVERSE
+  #     RNDKMENU
+  #     RNDKTRAVERSE
   # The names in parentheses do not accept input, so they will never have
   # focus for traversal.  The names with leading '*' have some limitation
   # that makes them not useful in traversal.
   MENU_TABLE = [
-    ['(CDKGRAPH)',      :GRAPH],     # no traversal (not active)
-    ['(CDKHISTOGRAM)',  :HISTOGRAM], # no traversal (not active)
-    ['(CDKLABEL)',      :LABEL],     # no traversal (not active)
-    ['(CDKMARQUEE)',    :MARQUEE],   # hangs (leaves trash)
-    ['*CDKVIEWER',      :VIEWER],    # traversal out-only on OK
+    ['(RNDKGRAPH)',      :GRAPH],     # no traversal (not active)
+    ['(RNDKHISTOGRAM)',  :HISTOGRAM], # no traversal (not active)
+    ['(RNDKLABEL)',      :LABEL],     # no traversal (not active)
+    ['(RNDKMARQUEE)',    :MARQUEE],   # hangs (leaves trash)
+    ['*RNDKVIEWER',      :VIEWER],    # traversal out-only on OK
     ['ALPHALIST',       :ALPHALIST],
     ['BUTTON',          :BUTTON],
     ['BUTTONBOX',       :BUTTONBOX],
@@ -44,24 +44,24 @@ class TraverseExample < Example
   ]
   @@all_objects = [nil] * MY_MAX
 
-  def self.make_alphalist(cdkscreen, x, y)
-    return CDK::ALPHALIST.new(cdkscreen, x, y, 10, 15, 'AlphaList', '->',
+  def self.make_alphalist(rndkscreen, x, y)
+    return RNDK::ALPHALIST.new(rndkscreen, x, y, 10, 15, 'AlphaList', '->',
         TraverseExample::MONTHS, TraverseExample::MONTHS.size,
         '_'.ord, Ncurses::A_REVERSE, true, false)
   end
 
-  def self.make_button(cdkscreen, x, y)
-    return CDK::BUTTON.new(cdkscreen, x, y, 'A Button!', nil, true, false)
+  def self.make_button(rndkscreen, x, y)
+    return RNDK::BUTTON.new(rndkscreen, x, y, 'A Button!', nil, true, false)
   end
 
-  def self.make_buttonbox(cdkscreen, x, y)
-    return CDK::BUTTONBOX.new(cdkscreen, x, y, 10, 16, 'ButtonBox', 6, 2,
+  def self.make_buttonbox(rndkscreen, x, y)
+    return RNDK::BUTTONBOX.new(rndkscreen, x, y, 10, 16, 'ButtonBox', 6, 2,
         TraverseExample::MONTHS, TraverseExample::MONTHS.size,
         Ncurses::A_REVERSE, true, false)
   end
 
-  def self.make_calendar(cdkscreen, x, y)
-    return CDK::CALENDAR.new(cdkscreen, x, y, 'Calendar', 25, 1, 2000,
+  def self.make_calendar(rndkscreen, x, y)
+    return RNDK::CALENDAR.new(rndkscreen, x, y, 'Calendar', 25, 1, 2000,
         Ncurses.COLOR_PAIR(16) | Ncurses::A_BOLD,
         Ncurses.COLOR_PAIR(24) | Ncurses::A_BOLD,
         Ncurses.COLOR_PAIR(32) | Ncurses::A_BOLD,
@@ -69,88 +69,88 @@ class TraverseExample < Example
         true, false)
   end
 
-  def self.make_dialog(cdkscreen, x, y)
+  def self.make_dialog(rndkscreen, x, y)
     mesg = [
         'This is a simple dialog box',
         'Is it simple enough?',
     ]
 
-    return CDK::DIALOG.new(cdkscreen, x,y, mesg, mesg.size,
+    return RNDK::DIALOG.new(rndkscreen, x,y, mesg, mesg.size,
         TraverseExample::YES_NO, TraverseExample::YES_NO.size,
         Ncurses.COLOR_PAIR(2) | Ncurses::A_REVERSE,
         true, true, false)
   end
 
-  def self.make_dscale(cdkscreen, x, y)
-    return CDK::DSCALE.new(cdkscreen, x, y, 'DScale', 'Value',
+  def self.make_dscale(rndkscreen, x, y)
+    return RNDK::DSCALE.new(rndkscreen, x, y, 'DScale', 'Value',
         Ncurses::A_NORMAL, 15, 0.0, 0.0, 100.0, 1.0, (1.0 * 2.0), 1,
         true, false)
   end
 
-  def self.make_entry(cdkscreen, x, y)
-    return CDK::ENTRY.new(cdkscreen, x, y, '', 'Entry:', Ncurses::A_NORMAL,
+  def self.make_entry(rndkscreen, x, y)
+    return RNDK::ENTRY.new(rndkscreen, x, y, '', 'Entry:', Ncurses::A_NORMAL,
         '.'.ord, :MIXED, 40, 0, 256, true, false)
   end
 
-  def self.make_fscale(cdkscreen, x, y)
-    return CDK::FSCALE.new(cdkscreen, x, y, 'FScale', 'Value',
+  def self.make_fscale(rndkscreen, x, y)
+    return RNDK::FSCALE.new(rndkscreen, x, y, 'FScale', 'Value',
         Ncurses::A_NORMAL, 15, 0.0, 0.0, 100.0, 1.0, (1.0 * 2.0), 1,
         true, false)
   end
 
-  def self.make_fslider(cdkscreen, x, y)
+  def self.make_fslider(rndkscreen, x, y)
     low = -32.0
     high = 64.0
     inc = 0.1
-    return CDK::FSLIDER.new(cdkscreen, x, y, 'FSlider', 'Label',
+    return RNDK::FSLIDER.new(rndkscreen, x, y, 'FSlider', 'Label',
         Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(29) | ' '.ord,
         20, low, low, high, inc, (inc * 2), 3, true, false)
   end
 
-  def self.make_fselect(cdkscreen, x, y)
-    return CDK::FSELECT.new(cdkscreen, x, y, 15, 25, 'FSelect', '->',
+  def self.make_fselect(rndkscreen, x, y)
+    return RNDK::FSELECT.new(rndkscreen, x, y, 15, 25, 'FSelect', '->',
         Ncurses::A_NORMAL, '_'.ord, Ncurses::A_REVERSE, '</5>', '</48>',
         '</N>', '</N>', true, false)
   end
 
-  def self.make_graph(cdkscreen, x, y)
+  def self.make_graph(rndkscreen, x, y)
     values = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
     graph_chars = '0123456789'
-    widget = CDK::GRAPH.new(cdkscreen, x, y, 10, 25, 'title', 'X-axis',
+    widget = RNDK::GRAPH.new(rndkscreen, x, y, 10, 25, 'title', 'X-axis',
         'Y-axis')
     widget.set(values, values.size, graph_chars, true, :PLOT)
     return widget
   end
 
-  def self.make_histogram(cdkscreen, x, y)
-    widget = CDK::HISTOGRAM.new(cdkscreen, x, y, 1, 20, CDK::HORIZONTAL,
+  def self.make_histogram(rndkscreen, x, y)
+    widget = RNDK::HISTOGRAM.new(rndkscreen, x, y, 1, 20, RNDK::HORIZONTAL,
         'Histogram', true, false)
-    widget.set(:PERCENT, CDK::CENTER, Ncurses::A_BOLD, 0, 10, 6,
+    widget.set(:PERCENT, RNDK::CENTER, Ncurses::A_BOLD, 0, 10, 6,
         ' '.ord | Ncurses::A_REVERSE, true)
     return widget
   end
 
-  def self.make_itemlist(cdkscreen, x, y)
-    return CDK::ITEMLIST.new(cdkscreen, x, y, '', 'Month',
+  def self.make_itemlist(rndkscreen, x, y)
+    return RNDK::ITEMLIST.new(rndkscreen, x, y, '', 'Month',
         TraverseExample::MONTHS, TraverseExample::MONTHS.size, 1, true, false)
   end
 
-  def self.make_label(cdkscreen, x, y)
+  def self.make_label(rndkscreen, x, y)
     mesg = [
         'This is a simple label.',
         'Is it simple enough?',
     ]
-    return CDK::LABEL.new(cdkscreen, x, y, mesg, mesg.size, true, true)
+    return RNDK::LABEL.new(rndkscreen, x, y, mesg, mesg.size, true, true)
   end
 
-  def self.make_marquee(cdkscreen, x, y)
-    widget = CDK::MARQUEE.new(cdkscreen, x, y, 30, true, true)
+  def self.make_marquee(rndkscreen, x, y)
+    widget = RNDK::MARQUEE.new(rndkscreen, x, y, 30, true, true)
     widget.activate('This is a message', 5, 3, true)
     widget.destroy
     return nil
   end
 
-  def self.make_matrix(cdkscreen, x, y)
+  def self.make_matrix(rndkscreen, x, y)
     numrows = 8
     numcols = 5
     coltitle = []
@@ -176,91 +176,91 @@ class TraverseExample < Example
       end
     end
 
-    return CDK::MATRIX.new(cdkscreen, x, y, rows, cols, vrows, vcols,
+    return RNDK::MATRIX.new(rndkscreen, x, y, rows, cols, vrows, vcols,
         'Matrix', rowtitle, coltitle, colwidth, coltypes, -1, -1, '.'.ord,
-        CDK::COL, true, true, false)
+        RNDK::COL, true, true, false)
   end
 
-  def self.make_mentry(cdkscreen, x, y)
-    return CDK::MENTRY.new(cdkscreen, x, y, 'MEntry', 'Label',
+  def self.make_mentry(rndkscreen, x, y)
+    return RNDK::MENTRY.new(rndkscreen, x, y, 'MEntry', 'Label',
         Ncurses::A_BOLD, '.', :MIXED, 20, 5, 20, 0, true, false)
   end
 
-  def self.make_radio(cdkscreen, x, y)
-    return CDK::RADIO.new(cdkscreen, x, y, CDK::RIGHT, 10, 20, 'Radio',
+  def self.make_radio(rndkscreen, x, y)
+    return RNDK::RADIO.new(rndkscreen, x, y, RNDK::RIGHT, 10, 20, 'Radio',
         TraverseExample::MONTHS, TraverseExample::MONTHS.size,
         '#'.ord | Ncurses::A_REVERSE, 1, Ncurses::A_REVERSE, true, false)
   end
 
-  def self.make_scale(cdkscreen, x, y)
+  def self.make_scale(rndkscreen, x, y)
     low = 2
     high = 25
     inc = 2
-    return CDK::SCALE.new(cdkscreen, x, y, 'Scale', 'Label',
+    return RNDK::SCALE.new(rndkscreen, x, y, 'Scale', 'Label',
         Ncurses::A_NORMAL, 5, low, low, high, inc, (inc * 2), true, false)
   end
 
-  def self.make_scroll(cdkscreen, x, y)
-    return CDK::SCROLL.new(cdkscreen, x, y, CDK::RIGHT, 10, 20, 'Scroll',
+  def self.make_scroll(rndkscreen, x, y)
+    return RNDK::SCROLL.new(rndkscreen, x, y, RNDK::RIGHT, 10, 20, 'Scroll',
         TraverseExample::MONTHS, TraverseExample::MONTHS.size,
         true, Ncurses::A_REVERSE, true, false)
   end
 
-  def self.make_slider(cdkscreen, x, y)
+  def self.make_slider(rndkscreen, x, y)
     low = 2
     high = 25
     inc = 1
-    return CDK::SLIDER.new(cdkscreen, x, y, 'Slider', 'Label',
+    return RNDK::SLIDER.new(rndkscreen, x, y, 'Slider', 'Label',
         Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(29) | ' '.ord,
         20, low, low, high, inc, (inc * 2), true, false)
   end
 
-  def self.make_selection(cdkscreen, x, y)
-    return CDK::SELECTION.new(cdkscreen, x, y, CDK::NONE, 8, 20,
+  def self.make_selection(rndkscreen, x, y)
+    return RNDK::SELECTION.new(rndkscreen, x, y, RNDK::NONE, 8, 20,
         'Selection', TraverseExample::MONTHS, TraverseExample::MONTHS.size,
         TraverseExample::CHOICES, TraverseExample::CHOICES.size,
         Ncurses::A_REVERSE, true, false)
   end
 
-  def self.make_swindow(cdkscreen, x, y)
-    widget = CDK::SWINDOW.new(cdkscreen, x, y, 6, 25,
+  def self.make_swindow(rndkscreen, x, y)
+    widget = RNDK::SWINDOW.new(rndkscreen, x, y, 6, 25,
         'SWindow', 100, true, false)
     (0...30).each do |n|
-      widget.add('Line %d' % [n], CDK::BOTTOM)
+      widget.add('Line %d' % [n], RNDK::BOTTOM)
     end
     widget.activate([])
     return widget
   end
 
-  def self.make_template(cdkscreen, x, y)
+  def self.make_template(rndkscreen, x, y)
     overlay = '</B/6>(___)<!6> </5>___-____'
     plate = '(###) ###-####'
-    widget = CDK::TEMPLATE.new(cdkscreen, x, y, 'Template', 'Label',
+    widget = RNDK::TEMPLATE.new(rndkscreen, x, y, 'Template', 'Label',
         plate, overlay, true, false)
     widget.activate([])
     return widget
   end
 
-  def self.make_uscale(cdkscreen, x, y)
+  def self.make_uscale(rndkscreen, x, y)
     low = 0
     high = 65535
     inc = 1
-    return CDK::USCALE.new(cdkscreen, x, y, 'UScale', 'Label',
+    return RNDK::USCALE.new(rndkscreen, x, y, 'UScale', 'Label',
         Ncurses::A_NORMAL, 5, low, low, high, inc, (inc * 32), true, false)
   end
 
-  def self.make_uslider(cdkscreen, x, y)
+  def self.make_uslider(rndkscreen, x, y)
     low = 0
     high = 65535
     inc = 1
-    return CDK::USLIDER.new(cdkscreen, x, y, 'USlider', 'Label',
+    return RNDK::USLIDER.new(rndkscreen, x, y, 'USlider', 'Label',
         Ncurses::A_REVERSE | Ncurses.COLOR_PAIR(29) | ' '.ord, 20,
         low, low, high, inc, (inc * 32), true, false)
   end
 
-  def self.make_viewer(cdkscreen, x, y)
+  def self.make_viewer(rndkscreen, x, y)
     button = ['Ok']
-    widget = CDK::VIEWER.new(cdkscreen, x, y, 10, 20, button, 1,
+    widget = RNDK::VIEWER.new(rndkscreen, x, y, 10, 20, button, 1,
         Ncurses::A_REVERSE, true, false)
 
     widget.set('Viewer', TraverseExample::MONTHS, TraverseExample::MONTHS.size,
@@ -270,24 +270,24 @@ class TraverseExample < Example
   end
 
   def self.rebind_esc(obj)
-    obj.bind(obj.object_type, CDK::KEY_F(1), :getc, CDK::KEY_ESC)
+    obj.bind(obj.object_type, RNDK::KEY_F(1), :getc, RNDK::KEY_ESC)
   end
 
-  def self.make_any(cdkscreen, menu, type)
+  def self.make_any(rndkscreen, menu, type)
     func = nil
     # setup positions, staggered a little
     case menu
     when 0
-      x = CDK::LEFT
+      x = RNDK::LEFT
       y = 2
     when 1
-      x = CDK::CENTER
+      x = RNDK::CENTER
       y = 4
     when 2
-      x = CDK::RIGHT
+      x = RNDK::RIGHT
       y = 2
     else
-      CDK.Beep
+      RNDK.Beep
       return
     end
 
@@ -348,7 +348,7 @@ class TraverseExample < Example
     when :VIEWER
       func = :make_viewer
     when :MENU, :TRAVERSE, :NULL
-      CDK.Beep
+      RNDK.Beep
       return
     end
 
@@ -361,9 +361,9 @@ class TraverseExample < Example
 
     # Create the new widget
     if func.nil?
-      CDK.Beep
+      RNDK.Beep
     else
-      widget = self.send(func, cdkscreen, x, y)
+      widget = self.send(func, rndkscreen, x, y)
       if widget.nil?
         Ncurses.flash
       else
@@ -374,12 +374,12 @@ class TraverseExample < Example
   end
 
   # Whenever we get a menu selection, create the selected widget.
-  def self.preHandler(cdktype, object, client_data, input)
+  def self.preHandler(rndktype, object, client_data, input)
     screen = nil
     window = nil
 
     case input
-    when Ncurses::KEY_ENTER, CDK::KEY_RETURN
+    when Ncurses::KEY_ENTER, RNDK::KEY_RETURN
       mtmp = []
       stmp = []
       object.getCurrentItem(mtmp, stmp)
@@ -399,11 +399,11 @@ class TraverseExample < Example
     return 1
   end
 
-  # This demonstrates the Cdk widget-traversal
+  # This demonstrates the Rndk widget-traversal
   def TraverseExample.main
     menulist = [['Left'], ['Center'], ['Right']]
     submenusize = [TraverseExample::MENU_TABLE.size + 1] * 3
-    menuloc = [CDK::LEFT, CDK::LEFT, CDK::RIGHT]
+    menuloc = [RNDK::LEFT, RNDK::LEFT, RNDK::RIGHT]
 
     (0...TraverseExample::MY_MAX).each do |j|
       (0...TraverseExample::MENU_TABLE.size).each do |k|
@@ -413,51 +413,51 @@ class TraverseExample < Example
 
     # Create the curses window.
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Start CDK colours.
-    CDK::Draw.initCDKColor
+    # Start RNDK colours.
+    RNDK::Draw.initRNDKColor
 
-    menu = CDK::MENU.new(cdkscreen, menulist, TraverseExample::MY_MAX,
-        submenusize, menuloc, CDK::TOP, Ncurses::A_UNDERLINE,
+    menu = RNDK::MENU.new(rndkscreen, menulist, TraverseExample::MY_MAX,
+        submenusize, menuloc, RNDK::TOP, Ncurses::A_UNDERLINE,
         Ncurses::A_REVERSE)
 
     if menu.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts '? Cannot create menus'
       exit  # EXIT_FAILURE
     end
     TraverseExample.rebind_esc(menu)
 
-    pre_handler = lambda do |cdktype, object, client_data, input|
-      TraverseExample.preHandler(cdktype, object, client_data, input)
+    pre_handler = lambda do |rndktype, object, client_data, input|
+      TraverseExample.preHandler(rndktype, object, client_data, input)
     end
 
     menu.setPreProcess(pre_handler, nil)
 
     # Set up the initial display
-    TraverseExample.make_any(cdkscreen, 0, :ENTRY)
+    TraverseExample.make_any(rndkscreen, 0, :ENTRY)
     if TraverseExample::MY_MAX > 1
-      TraverseExample.make_any(cdkscreen, 1, :ITEMLIST)
+      TraverseExample.make_any(rndkscreen, 1, :ITEMLIST)
     end
     if TraverseExample::MY_MAX > 2
-      TraverseExample.make_any(cdkscreen, 2, :SELECTION)
+      TraverseExample.make_any(rndkscreen, 2, :SELECTION)
     end
 
     # Draw the screen
-    cdkscreen.refresh
+    rndkscreen.refresh
 
     # Traverse the screen
-    CDK::Traverse.traverseCDKScreen(cdkscreen)
+    RNDK::Traverse.traverseRNDKScreen(rndkscreen)
 
     mesg = [
         'Done',
         '',
         '<C>Press any key to continue'
     ]
-    cdkscreen.popupLabel(mesg, 3)
+    rndkscreen.popupLabel(mesg, 3)
 
     # clean up and exit
     (0...TraverseExample::MY_MAX).each do |j|
@@ -466,8 +466,8 @@ class TraverseExample < Example
       end
     end
     menu.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
 
     exit  # EXIT_SUCCESS
   end

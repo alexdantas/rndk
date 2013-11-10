@@ -8,11 +8,11 @@ class SubwindowExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 10
     params.w_value = 15
-    params.spos = CDK::RIGHT
+    params.spos = RNDK::RIGHT
 
     super(opts, params)
 
@@ -39,15 +39,15 @@ class SubwindowExample < CLIExample
     # Create a basic window.
     sub_window = Ncurses.newwin(Ncurses.LINES - 5, Ncurses.LINES - 10, 2, 5)
 
-    # Start Cdk.
-    cdkscreen = CDK::SCREEN.new(sub_window)
+    # Start Rndk.
+    rndkscreen = RNDK::SCREEN.new(sub_window)
 
     # Box our window.
     Ncurses.box(sub_window, Ncurses::ACS_VLINE, Ncurses::ACS_HLINE)
     Ncurses.wrefresh sub_window
 
     # Create a basic scrolling list inside the window.
-    dow_list = CDK::SCROLL.new(cdkscreen,
+    dow_list = RNDK::SCROLL.new(rndkscreen,
         params.x_value, params.y_value, params.spos,
         params.h_value, params.w_value, "<C></U>Pick a Day",
         dow, 7, false, Ncurses::A_REVERSE, params.box, params.shadow)
@@ -55,14 +55,14 @@ class SubwindowExample < CLIExample
     # Put a title within the window.
     mesg = [
         "<C><#HL(30)>",
-        "<C>This is a Cdk scrolling list",
+        "<C>This is a Rndk scrolling list",
         "<C>inside a curses window.",
         "<C><#HL(30)>"
     ]
-    title = CDK::LABEL.new(cdkscreen, CDK::CENTER, 0, mesg, 4, false, false)
+    title = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, 0, mesg, 4, false, false)
 
     # Refresh the screen.
-    cdkscreen.refresh
+    rndkscreen.refresh
 
     # Let the user play.
     pick = dow_list.activate('')
@@ -70,9 +70,9 @@ class SubwindowExample < CLIExample
     # Clean up.
     dow_list.destroy
     title.destroy
-    CDK.eraseCursesWindow(sub_window)
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    RNDK.eraseCursesWindow(sub_window)
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
 
     # Tell them what they picked.
     puts "You picked %s" % [dow[pick]]

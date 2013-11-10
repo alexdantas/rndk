@@ -8,8 +8,8 @@ class MarqueeExample < Example
     # default values
     params.box = false
     params.shadow = true
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::TOP
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::TOP
 
     params.message = ''
     params.repeat_count = 3
@@ -70,7 +70,7 @@ class MarqueeExample < Example
     end
   end
 
-  # This program demonstrates the Cdk marquee widget.
+  # This program demonstrates the Rndk marquee widget.
   def MarqueeExample.main
     # Declare variables.
     temp = ''
@@ -82,30 +82,30 @@ class MarqueeExample < Example
       params.end_attr = "<%s>" % [params.end_attr]
     end
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
     Ncurses.curs_set(0)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
-    scroll_message = CDK::MARQUEE.new(cdkscreen,
+    scroll_message = RNDK::MARQUEE.new(rndkscreen,
         params.x_value, params.y_value, params.width,
         params.box, params.shadow)
 
     # Check if the marquee is nil.
     if scroll_message.nil?
-      # Exit Cdk.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      # Exit Rndk.
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the marquee window.  Is the window too small?"
       exit # EXIT_FAILURE
     end
 
-    # Draw the CDK screen.
-    cdkscreen.refresh
+    # Draw the RNDK screen.
+    rndkscreen.refresh
 
     # Create the marquee message.
     if params.message == ''
@@ -133,8 +133,8 @@ class MarqueeExample < Example
 
     # Clean up.
     scroll_message.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit # EXIT_SUCCESS
   end
 end

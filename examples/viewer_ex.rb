@@ -8,8 +8,8 @@ class ViewerExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 20
     params.w_value = nil
     params.filename = ''
@@ -57,21 +57,21 @@ class ViewerExample < CLIExample
 
     # Start curses
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Start CDK colors.
-    CDK::Draw.initCDKColor
+    # Start RNDK colors.
+    RNDK::Draw.initRNDKColor
 
     f_select = nil
     if params.filename == ''
-      f_select = CDK::FSELECT.new(cdkscreen, params.x_value, params.y_value,
+      f_select = RNDK::FSELECT.new(rndkscreen, params.x_value, params.y_value,
           params.h_value, params.f_width, title, label, Ncurses::A_NORMAL,
           '_', Ncurses::A_REVERSE, '</5>', '</48>', '</N>', '</N',
           params.box, params.shadow)
 
       if f_select.nil?
-        cdkscreen.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen.destroy
+        RNDK::SCREEN.endRNDK
 
         $stderr.puts 'Cannot create fselect-widget'
         exit  # EXIT_FAILURE
@@ -93,26 +93,26 @@ class ViewerExample < CLIExample
             '',
             '<C>Press any key to continue.',
         ]
-        cdkscreen.popupLabel(mesg, 3)
+        rndkscreen.popupLabel(mesg, 3)
 
-        # Exit CDK.
+        # Exit RNDK.
         f_select.destroy
-        cdkscreen.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen.destroy
+        RNDK::SCREEN.endRNDK
         exit  # EXIT_SUCCESS
       end
     end
 
     # Create the file viewer to view the file selected.
-    example = CDK::VIEWER.new(cdkscreen, params.x_value, params.y_value,
+    example = RNDK::VIEWER.new(rndkscreen, params.x_value, params.y_value,
         params.h_value, params.v_width, button, 2, Ncurses::A_REVERSE,
         params.box, params.shadow)
 
     # Could we create the viewer widget?
     if example.nil?
-      # Exit CDK.
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      # Exit RNDK.
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the viewer. Is the window too small?"
       exit  # EXIT_FAILURE
@@ -127,9 +127,9 @@ class ViewerExample < CLIExample
     else
       example.set('reading...', 0, 0, Ncurses::A_REVERSE, true, true, true)
       # Open the file and read the contents.
-      lines = CDK.readFile(params.filename, info)
+      lines = RNDK.readFile(params.filename, info)
       if lines == -1
-        CDK::SCREEN.endCDK
+        RNDK::SCREEN.endRNDK
         puts 'Could not open "%s"' % [params.filename]
         exit  # EXIT_FAILURE
       end
@@ -155,20 +155,20 @@ class ViewerExample < CLIExample
           '',
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif example.exit_type == :NORMAL
       mesg = [
           '<C>You selected button %d' % [selected],
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     end
 
     # Clean up.
     example.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

@@ -1,6 +1,6 @@
 require 'optparse'
 require 'ostruct'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class Example
   def Example.parse_opts(opts, params)

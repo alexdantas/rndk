@@ -13,13 +13,13 @@ class SelectionExample < CLIExample
     params.header =  ''
     params.footer = ''
 
-    params.x_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
     params.y_value = nil
     params.h_value = 10
     params.w_value = 50
     params.box = true
     params.c = false
-    params.spos = CDK::RIGHT
+    params.spos = RNDK::RIGHT
     params.title = "<C></5>Pick one or more accounts."
     params.shadow = false
 
@@ -47,7 +47,7 @@ class SelectionExample < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk selection widget.
+  # This program demonstrates the Rndk selection widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -c      create the data after the widget
@@ -70,17 +70,17 @@ class SelectionExample < CLIExample
     end
     Etc.endpwent
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     if params.header != ''
       list = [params.header]
-      header = CDK::LABEL.new(cdkscreen, params.x_value,
-          if params.y_value.nil? then CDK::TOP else params.y_value end,
+      header = RNDK::LABEL.new(rndkscreen, params.x_value,
+          if params.y_value.nil? then RNDK::TOP else params.y_value end,
           list, 1, params.box, !params.shadow)
       unless header.nil?
         header.activate([])
@@ -89,8 +89,8 @@ class SelectionExample < CLIExample
 
     if params.footer != ''
       list = [params.footer]
-      footer = CDK::LABEL.new(cdkscreen, params.x_value,
-          if params.y_value.nil? then CDK::BOTTOM else params.y_value end,
+      footer = RNDK::LABEL.new(rndkscreen, params.x_value,
+          if params.y_value.nil? then RNDK::BOTTOM else params.y_value end,
           list, 1, params.box, !params.shadow)
       unless footer.nil?
         footer.activate([])
@@ -98,8 +98,8 @@ class SelectionExample < CLIExample
     end
 
     # Create the selection list.
-    selection = CDK::SELECTION.new(cdkscreen, params.x_value,
-        if params.y_value.nil? then CDK::CENTER else params.y_value end,
+    selection = RNDK::SELECTION.new(rndkscreen, params.x_value,
+        if params.y_value.nil? then RNDK::CENTER else params.y_value end,
         params.spos, params.h_value, params.w_value,
         params.title,
         if params.c then [] else item end,
@@ -107,8 +107,8 @@ class SelectionExample < CLIExample
         choices, 2, Ncurses::A_REVERSE, params.box, params.shadow)
 
     if selection.nil?
-      cdkscreen.destroyCDKScreen
-      CDK::SCREEN.endCDK
+      rndkscreen.destroyRNDKScreen
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make selection list.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -128,7 +128,7 @@ class SelectionExample < CLIExample
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif selection.exit_type == :NORMAL
       mesg = ["<C>Here are the accounts you selected."]
       (0...item.size).each do |x|
@@ -136,16 +136,16 @@ class SelectionExample < CLIExample
           mesg << "<C></5>%.*s" % [236, item[x]]  # FIXME magic number
         end
       end
-      cdkscreen.popupLabel(mesg, mesg.size)
+      rndkscreen.popupLabel(mesg, mesg.size)
     else
       mesg = ["<C>Unknown failure."]
-      cdkscreen.popupLabel(mesg, mesg.size)
+      rndkscreen.popupLabel(mesg, mesg.size)
     end
 
     # Clean up.
     selection.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit #EXIT_SUCCESS
   end
 end

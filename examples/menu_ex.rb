@@ -2,10 +2,10 @@
 require_relative 'example'
 
 class MenuExample < Example
-  # This program demonstrates the Cdk menu widget.
+  # This program demonstrates the Rndk menu widget.
   def MenuExample.main
-    menu_list = (0...CDK::MENU::MAX_MENU_ITEMS).map {
-        [nil] * CDK::MENU::MAX_SUB_ITEMS}.compact
+    menu_list = (0...RNDK::MENU::MAX_MENU_ITEMS).map {
+        [nil] * RNDK::MENU::MAX_SUB_ITEMS}.compact
     menu_info = [
         [
             "",
@@ -27,12 +27,12 @@ class MenuExample < Example
         ]
     ]
 
-    # Set up CDK.
+    # Set up RNDK.
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
     # Start color.
-    CDK::Draw.initCDKColor
+    RNDK::Draw.initRNDKColor
 
     # Set up the menu.
     menu_list[0][0] = "</B>File<!B>"
@@ -51,7 +51,7 @@ class MenuExample < Example
 
     submenusize = [3, 4, 4]
 
-    menuloc = [CDK::LEFT, CDK::LEFT, CDK::RIGHT]
+    menuloc = [RNDK::LEFT, RNDK::LEFT, RNDK::RIGHT]
 
     # Create the label window.
     mesg = [
@@ -61,15 +61,15 @@ class MenuExample < Example
         "                                          "
     ]
 
-    info_box = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::CENTER,
+    info_box = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER,
         mesg, 4, true, true)
 
     # Create the menu.
-    menu = CDK::MENU.new(cdkscreen, menu_list, 3, submenusize, menuloc,
-        CDK::TOP, Ncurses::A_UNDERLINE, Ncurses::A_REVERSE)
+    menu = RNDK::MENU.new(rndkscreen, menu_list, 3, submenusize, menuloc,
+        RNDK::TOP, Ncurses::A_UNDERLINE, Ncurses::A_REVERSE)
 
     # Create the post process function
-    display_callback = lambda do |cdktype, menu, info_box, key|
+    display_callback = lambda do |rndktype, menu, info_box, key|
       # Recreate the label message
       # FIXME magic numbers
       mesg = [
@@ -91,8 +91,8 @@ class MenuExample < Example
     # Create the post process function.
     menu.setPostProcess(display_callback, info_box)
 
-    # Draw the CDK screen.
-    cdkscreen.refresh
+    # Draw the RNDK screen.
+    rndkscreen.refresh
 
     # Activate the menu.
     selection = menu.activate('')
@@ -104,7 +104,7 @@ class MenuExample < Example
           "",
           "<C>Press any key to continue."
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif menu.exit_type == :NORMAL
       mesg = [
           "<C>You selected menu #%d, submenu #%d" %
@@ -112,14 +112,14 @@ class MenuExample < Example
           "",
           "<C>Press any key to continue."
       ]
-          cdkscreen.popupLabel(mesg, 3)
+          rndkscreen.popupLabel(mesg, 3)
     end
 
     # Clean up.
     menu.destroy
     info_box.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
 
     exit # EXIT_SUCCESS
   end

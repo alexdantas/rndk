@@ -41,8 +41,8 @@ class FselectExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 20
     params.w_value = 65
     params.dir = '.'
@@ -54,7 +54,7 @@ class FselectExample < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk alphalist widget.
+  # This program demonstrates the Rndk alphalist widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -c      create the data after the widget
@@ -67,28 +67,28 @@ class FselectExample < CLIExample
         '</5><Cancel><!5>'
     ]
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Get the filename.
-    fselect = CDK::FSELECT.new(cdkscreen, params.x_value, params.y_value,
+    fselect = RNDK::FSELECT.new(rndkscreen, params.x_value, params.y_value,
         params.h_value, params.w_value, title, label, Ncurses::A_NORMAL,
         '_', Ncurses::A_REVERSE, "</5>", "</48>", "</N>", "</N>",
         params.box, params.shadow)
 
     if fselect.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       $stderr.puts "Cannot create widget."
       exit #EXIT_FAILURE
     end
 
-    do_delete = lambda do |cdktype, object, widget, key|
+    do_delete = lambda do |rndktype, object, widget, key|
       size = []
       list = widget.getContents(size)
       size = size[0]
@@ -109,7 +109,7 @@ class FselectExample < CLIExample
       return result
     end
 
-    do_delete1 = lambda do |cdktype, object, widget, key|
+    do_delete1 = lambda do |rndktype, object, widget, key|
       size = []
       list = widget.getContents(size)
       size = size[0]
@@ -133,7 +133,7 @@ class FselectExample < CLIExample
       return result
     end
 
-    do_help = lambda do |cdktype, object, client_data, key|
+    do_help = lambda do |rndktype, object, client_data, key|
       message = [
           'File Selection tests:',
           '',
@@ -143,11 +143,11 @@ class FselectExample < CLIExample
           'F4 = reload all items',
           'F5 = undo deletion',
       ]
-      cdkscreen.popupLabel(message, message.size)
+      rndkscreen.popupLabel(message, message.size)
       return true
     end
 
-    do_reload = lambda do |cdktype, object, widget, key|
+    do_reload = lambda do |rndktype, object, widget, key|
       result = false
 
       if @@my_user_list.size > 0
@@ -159,7 +159,7 @@ class FselectExample < CLIExample
       return result
     end
 
-    do_undo = lambda do |cdktype, object, widget, key|
+    do_undo = lambda do |rndktype, object, widget, key|
       result = false
       if @@my_undo_list.size > 0
         size = []
@@ -179,11 +179,11 @@ class FselectExample < CLIExample
     end
 
     fselect.bind(:FSELECT, '?', do_help, nil)
-    fselect.bind(:FSELECT, CDK::KEY_F(1), do_help, nil)
-    fselect.bind(:FSELECT, CDK::KEY_F(2), do_delete, fselect)
-    fselect.bind(:FSELECT, CDK::KEY_F(3), do_delete1, fselect)
-    fselect.bind(:FSELECT, CDK::KEY_F(4), do_reload, fselect)
-    fselect.bind(:FSELECT, CDK::KEY_F(5), do_undo, fselect)
+    fselect.bind(:FSELECT, RNDK::KEY_F(1), do_help, nil)
+    fselect.bind(:FSELECT, RNDK::KEY_F(2), do_delete, fselect)
+    fselect.bind(:FSELECT, RNDK::KEY_F(3), do_delete1, fselect)
+    fselect.bind(:FSELECT, RNDK::KEY_F(4), do_reload, fselect)
+    fselect.bind(:FSELECT, RNDK::KEY_F(5), do_undo, fselect)
 
     # Set the starting directory. This is not necessary because when
     # the file selector starts it uses the present directory as a default.
@@ -202,25 +202,25 @@ class FselectExample < CLIExample
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
 
-      # Exit CDK.
+      # Exit RNDK.
       fselect.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
       exit  # EXIT_SUCCESS
     end
 
     # Create the file viewer to view the file selected.
-    example = CDK::VIEWER.new(cdkscreen, CDK::CENTER, CDK::CENTER, 20, -2,
+    example = RNDK::VIEWER.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, 20, -2,
         button, 2, Ncurses::A_REVERSE, true, false)
 
     # Could we create the viewer widget?
     if example.nil?
-      # Exit CDK.
+      # Exit RNDK.
       fselect.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Can't seem to create viewer. Is the window too small?"
       exit  # EXIT_SUCCESS
@@ -228,11 +228,11 @@ class FselectExample < CLIExample
 
     # Open the file and read the contents.
     info = []
-    lines = CDK::readFile(filename, info)
+    lines = RNDK::readFile(filename, info)
     if lines == -1
       fselect.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Coult not open \"%s\"" % [filename]
 
@@ -256,20 +256,20 @@ class FselectExample < CLIExample
           "",
           "<C>Press any key to continue."
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif example.exit_type == :NORMAL
       mesg = [
           '<C>You selected button %d' % [selected],
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     end
 
     # Clean up.
     example.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

@@ -8,11 +8,11 @@ class Radio1Example < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 5
     params.w_value = 20
-    params.spos = CDK::NONE
+    params.spos = RNDK::NONE
     params.title = ""
 
     super(opts, params)
@@ -27,7 +27,7 @@ class Radio1Example < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk radio widget.
+  # This program demonstrates the Rndk radio widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -s SPOS location for the scrollbar
@@ -42,23 +42,23 @@ class Radio1Example < CLIExample
         "Choice C",
     ]
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the radio list.
-    radio = CDK::RADIO.new(cdkscreen,
+    radio = RNDK::RADIO.new(rndkscreen,
         params.x_value, params.y_value, params.spos,
         params.h_value, params.w_value, params.title,
         item, 3, '#'.ord | Ncurses::A_REVERSE, true,
         Ncurses::A_REVERSE, params.box, params.shadow)
 
     if radio.nil?
-      cdkscreen.destroyCDKScreen
-      CDK::SCREEN.endCDK
+      rndkscreen.destroyRNDKScreen
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot make radio widget.  Is the window too small?"
       exit #EXIT_FAILURE
@@ -74,7 +74,7 @@ class Radio1Example < CLIExample
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif radio.exit_type == :NORMAL
       mesg = [
           "<C> You selected the filename",
@@ -82,13 +82,13 @@ class Radio1Example < CLIExample
           "",
           "<C>Press any key to continue"
       ]
-      cdkscreen.popupLabel(mesg, 4)
+      rndkscreen.popupLabel(mesg, 4)
     end
 
     # Clean up.
     radio.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit #EXIT_SUCCESS
   end
 end

@@ -41,8 +41,8 @@ class AlphalistExample < CLIExample
     # default values
     params.box = true
     params.shadow = false
-    params.x_value = CDK::CENTER
-    params.y_value = CDK::CENTER
+    params.x_value = RNDK::CENTER
+    params.y_value = RNDK::CENTER
     params.h_value = 0
     params.w_value = 0
     params.c = false
@@ -54,7 +54,7 @@ class AlphalistExample < CLIExample
     end
   end
 
-  # This program demonstrates the Cdk alphalist widget.
+  # This program demonstrates the Rndk alphalist widget.
   #
   # Options (in addition to normal CLI parameters):
   #   -c      create the data after the widget
@@ -75,15 +75,15 @@ class AlphalistExample < CLIExample
 
     @@my_user_list = user_list.clone
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the alphalist list.
-    alpha_list = CDK::ALPHALIST.new(cdkscreen,
+    alpha_list = RNDK::ALPHALIST.new(rndkscreen,
         params.x_value, params.y_value, params.h_value, params.w_value,
         title, label,
         if params.c then nil else user_list end,
@@ -91,14 +91,14 @@ class AlphalistExample < CLIExample
         '_', Ncurses::A_REVERSE, params.box, params.shadow)
 
     if alpha_list.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       $stderr.puts "Cannot create widget."
       exit #EXIT_FAILURE
     end
 
-    do_delete = lambda do |cdktype, object, widget, key|
+    do_delete = lambda do |rndktype, object, widget, key|
       size = []
       list = widget.getContents(size)
       size = size[0]
@@ -119,7 +119,7 @@ class AlphalistExample < CLIExample
       return result
     end
 
-    do_delete1 = lambda do |cdktype, object, widget, key|
+    do_delete1 = lambda do |rndktype, object, widget, key|
       size = []
       list = widget.getContents(size)
       size = size[0]
@@ -143,7 +143,7 @@ class AlphalistExample < CLIExample
       return result
     end
 
-    do_help = lambda do |cdktype, object, client_data, key|
+    do_help = lambda do |rndktype, object, client_data, key|
       message = [
           'Alpha List tests:',
           '',
@@ -153,11 +153,11 @@ class AlphalistExample < CLIExample
           'F4 = reload all items',
           'F5 = undo deletion',
       ]
-      cdkscreen.popupLabel(message, message.size)
+      rndkscreen.popupLabel(message, message.size)
       return true
     end
 
-    do_reload = lambda do |cdktype, object, widget, key|
+    do_reload = lambda do |rndktype, object, widget, key|
       result = false
 
       if @@my_user_list.size > 0
@@ -169,7 +169,7 @@ class AlphalistExample < CLIExample
       return result
     end
 
-    do_undo = lambda do |cdktype, object, widget, key|
+    do_undo = lambda do |rndktype, object, widget, key|
       result = false
       if @@my_undo_list.size > 0
         size = []
@@ -189,11 +189,11 @@ class AlphalistExample < CLIExample
     end
 
     alpha_list.bind(:ALPHALIST, '?', do_help, nil)
-    alpha_list.bind(:ALPHALIST, CDK::KEY_F(1), do_help, nil)
-    alpha_list.bind(:ALPHALIST, CDK::KEY_F(2), do_delete, alpha_list)
-    alpha_list.bind(:ALPHALIST, CDK::KEY_F(3), do_delete1, alpha_list)
-    alpha_list.bind(:ALPHALIST, CDK::KEY_F(4), do_reload, alpha_list)
-    alpha_list.bind(:ALPHALIST, CDK::KEY_F(5), do_undo, alpha_list)
+    alpha_list.bind(:ALPHALIST, RNDK::KEY_F(1), do_help, nil)
+    alpha_list.bind(:ALPHALIST, RNDK::KEY_F(2), do_delete, alpha_list)
+    alpha_list.bind(:ALPHALIST, RNDK::KEY_F(3), do_delete1, alpha_list)
+    alpha_list.bind(:ALPHALIST, RNDK::KEY_F(4), do_reload, alpha_list)
+    alpha_list.bind(:ALPHALIST, RNDK::KEY_F(5), do_undo, alpha_list)
 
     if params.c
       alpha_list.setContents(user_list, user_size)
@@ -209,20 +209,20 @@ class AlphalistExample < CLIExample
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif alpha_list.exit_type == :NORMAL
       mesg = ['<C>You selected the following',
           "<C>(%.*s)" % [246, word],  # FIXME magic number
           '',
           '<C>Press any key to continue.'
       ]
-      cdkscreen.popupLabel(mesg, 4);
+      rndkscreen.popupLabel(mesg, 4);
     end
 
     # Clean up.
     alpha_list.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end
