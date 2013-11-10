@@ -5,12 +5,12 @@ module RNDK
   class SELECTION < RNDK::SCROLLER
     attr_reader :selections
 
-    def initialize(cdkscreen, xplace, yplace, splace, height, width, title,
+    def initialize(rndkscreen, xplace, yplace, splace, height, width, title,
         list, list_size, choices, choice_count, highlight, box, shadow)
       super()
       widest_item = -1
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = width
       bindings = {
         RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
@@ -65,7 +65,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, @box_width, @box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -93,8 +93,8 @@ module RNDK
       end
 
       # Set the rest of the variables
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @scrollbar_placement = splace
       @max_left_char = 0
       @left_char = 0
@@ -135,7 +135,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:SELECTION, self)
+      rndkscreen.register(:SELECTION, self)
     end
 
     # Put the cursor on the currently-selected item.

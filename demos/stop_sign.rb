@@ -1,14 +1,22 @@
 #!/usr/bin/env ruby
-require_relative '../lib/cdk'
+#
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
+
+require 'rndk'
 
 class StopSign
   def StopSign.main
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Set the labels up.
     mesg = [
@@ -25,9 +33,9 @@ class StopSign
     ]
 
     # Declare the labels.
-    title = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::TOP,
+    title = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::TOP,
         mesg, 5, false, false)
-    stop_sign = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::CENTER,
+    stop_sign = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER,
         sign, 3, true, true)
 
     # Do this until they hit q or escape.
@@ -36,7 +44,7 @@ class StopSign
       stop_sign.draw(true)
 
       key = stop_sign.getch([])
-      if key == CDK::KEY_ESC || key == 'q'.ord || key == 'Q'.ord
+      if key == RNDK::KEY_ESC || key == 'q'.ord || key == 'Q'.ord
         break
       elsif key == 'r'.ord || key == 'R'.ord
         sign[0] = ' </B/16><#DI> '
@@ -59,8 +67,8 @@ class StopSign
     # Clean up
     title.destroy
     stop_sign.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

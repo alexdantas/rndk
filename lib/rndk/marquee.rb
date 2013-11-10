@@ -2,11 +2,11 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class MARQUEE < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xpos, ypos, width, box, shadow)
+    def initialize(rndkscreen, xpos, ypos, width, box, shadow)
       super()
 
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(1, 1, ypos, xpos)
       @active = true
       @width = width
@@ -18,7 +18,7 @@ module RNDK
         # return (0);
       end
 
-      cdkscreen.register(:MARQUEE, self)
+      rndkscreen.register(:MARQUEE, self)
     end
 
     # This activates the widget.
@@ -200,7 +200,7 @@ module RNDK
     end
 
     def layoutWidget(xpos, ypos)
-      cdkscreen = @screen
+      rndkscreen = @screen
       parent_width = Ncurses.getmaxx(@screen.window)
 
       RNDK::MARQUEE.discardWin(@win)

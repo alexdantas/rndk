@@ -3,11 +3,11 @@ require 'rndk/rndk_objs'
 module RNDK
   # TODO This Widget's very buggy! Somehow improve it later!
   class SWINDOW < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, height, width, title,
+    def initialize(rndkscreen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = width
       box_height = height
       bindings = {
@@ -46,7 +46,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -67,8 +67,8 @@ module RNDK
       Ncurses.keypad(@field_win, true)
 
       # Set the rest of the variables
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @box_height = box_height
       @box_width = box_width
@@ -101,7 +101,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:SWINDOW, self)
+      rndkscreen.register(:SWINDOW, self)
     end
 
     # This sets the lines and the box attribute of the scrolling window.

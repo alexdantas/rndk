@@ -1,7 +1,14 @@
 #!/usr/bin/env ruby
+#
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
 require 'ostruct'
 require 'optparse'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class Command
   MAXHISTORY = 5000
@@ -60,35 +67,35 @@ class Command
     if opts['t']
       title = opts['t']
     end
-    
-    # Set up CDK
-    curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK
+    curses_win = Ncurses.initscr
+    rndkscreen = RNDK::SCREEN.new(curses_win)
+
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the scrolling window.
-    command_output = CDK::SWINDOW.new(cdkscreen, CDK::CENTER, CDK::TOP,
+    command_output = RNDK::SWINDOW.new(rndkscreen, RNDK::CENTER, RNDK::TOP,
         -8, -2, title, 1000, true, false)
 
     # Convert the prompt to a chtype and determine its length
     prompt_len = []
-    convert = CDK.char2Chtype(prompt, prompt_len, [])
+    convert = RNDK.char2Chtype(prompt, prompt_len, [])
     prompt_len = prompt_len[0]
     command_field_width = Ncurses.COLS - prompt_len - 4
 
     # Create the entry field.
-    command_entry = CDK::ENTRY.new(cdkscreen, CDK::CENTER, CDK::BOTTOM,
+    command_entry = RNDK::ENTRY.new(rndkscreen, RNDK::CENTER, RNDK::BOTTOM,
         '', prompt, Ncurses::A_BOLD | Ncurses.COLOR_PAIR(8),
         Ncurses.COLOR_PAIR(24) | '_'.ord, :MIXED,
         command_field_width, 1, 512, false, false)
 
     # Create the key bindings.
-    history_up_cb = lambda do |cdktype, entry, history, key|
+    history_up_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds
       if history.current == 0
-        CDK.Beep
+        RNDK.Beep
         return false
       end
 
@@ -101,10 +108,10 @@ class Command
       return false
     end
 
-    history_down_cb = lambda do |cdktype, entry, history, key|
+    history_down_cb = lambda do |rndktype, entry, history, key|
       # Make sure we don't go out of bounds
       if history.current == @count
-        CDK.Beep
+        RNDK.Beep
         return false
       end
 
@@ -124,7 +131,7 @@ class Command
       return false
     end
 
-    view_history_cb = lambda do |cdktype, entry, swindow, key|
+    view_history_cb = lambda do |rndktype, entry, swindow, key|
       # Let them play...
       swindow.activate([])
 
@@ -133,7 +140,7 @@ class Command
       return false
     end
 
-    list_history_cb = lambda do |cdktype, entry, history, key|
+    list_history_cb = lambda do |rndktype, entry, history, key|
       height = if history.count < 10 then history.count + 3 else 13 end
 
       # No history, no list.
@@ -154,8 +161,8 @@ class Command
       end
 
       # Create the scrolling list of previous commands.
-      scroll_list = CDK::SCROLL.new(entry.screen, CDK::CENTER, CDK::CENTER,
-          CDK::RIGHT, height, 20, '<C></B/29>Command History',
+      scroll_list = RNDK::SCROLL.new(entry.screen, RNDK::CENTER, RNDK::CENTER,
+          RNDK::RIGHT, height, 20, '<C></B/29>Command History',
           history.command, history.count, true, Ncurses::A_REVERSE,
           true, false)
 
@@ -175,9 +182,9 @@ class Command
       return false
     end
 
-    jump_window_cb = lambda do |cdktype, entry, swindow, key|
+    jump_window_cb = lambda do |rndktype, entry, swindow, key|
       # Ask them which line they want to jump to.
-      scale = CDK::SCALE.new(entry.screen, CDK::CENTER, CDK::CENTER,
+      scale = RNDK::SCALE.new(entry.screen, RNDK::CENTER, RNDK::CENTER,
           '<C>Jump To Which Line', 'Line', Ncurses::A_NORMAL, 5,
           0, 0, swindow.list_size, 1, 2, true, false)
 
@@ -197,15 +204,15 @@ class Command
 
     command_entry.bind(:ENTRY, Ncurses::KEY_UP, history_up_cb, history)
     command_entry.bind(:ENTRY, Ncurses::KEY_DOWN, history_down_cb, history)
-    command_entry.bind(:ENTRY, CDK::KEY_TAB, view_history_cb, command_output)
-    command_entry.bind(:ENTRY, CDK.CTRL('^'), list_history_cb, history)
-    command_entry.bind(:ENTRY, CDK.CTRL('G'), jump_window_cb, command_output)
+    command_entry.bind(:ENTRY, RNDK::KEY_TAB, view_history_cb, command_output)
+    command_entry.bind(:ENTRY, RNDK.CTRL('^'), list_history_cb, history)
+    command_entry.bind(:ENTRY, RNDK.CTRL('G'), jump_window_cb, command_output)
 
     # Draw the screen.
-    cdkscreen.refresh
+    rndkscreen.refresh
 
     # Show them who wrote this and how to get help.
-    cdkscreen.popupLabel(intro_mesg, intro_mesg.size)
+    rndkscreen.popupLabel(intro_mesg, intro_mesg.size)
     command_entry.erase
 
     # Do this forever.
@@ -221,9 +228,9 @@ class Command
         # All done.
         command_entry.destroy
         command_output.destroy
-        cdkscreen.destroy
+        rndkscreen.destroy
 
-        CDK::SCREEN.endCDK
+        RNDK::SCREEN.endRNDK
 
         exit  # EXIT_SUCCESS
       elsif command == 'clear'
@@ -260,13 +267,13 @@ class Command
         history.current = history.count
 
         # Jump to the bottom of the scrolling window.
-        command_output.jumpToLine(CDK::BOTTOM)
+        command_output.jumpToLine(RNDK::BOTTOM)
 
         # Insert a line providing the command.
-        command_output.add('Command: </R>%s' % [command], CDK::BOTTOM)
+        command_output.add('Command: </R>%s' % [command], RNDK::BOTTOM)
 
         # Run the command
-        command_output.exec(command, CDK::BOTTOM)
+        command_output.exec(command, RNDK::BOTTOM)
 
         # Clean out the entry field.
         command_entry.clean

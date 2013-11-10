@@ -28,22 +28,22 @@ module RNDK
     end
 
     # This registers a RNDK object with a screen.
-    def register(cdktype, object)
+    def register(rndktype, object)
       if @object_count + 1 >= @object_limit
         @object_limit += 2
         @object_limit *= 2
         @object.concat(Array.new(@object_limit - @object.size, nil))
       end
 
-      if object.validObjType(cdktype)
+      if object.validObjType(rndktype)
         self.setScreenIndex(@object_count, object)
         @object_count += 1
       end
     end
 
     # This removes an object from the RNDK screen.
-    def self.unregister(cdktype, object)
-      if object.validObjType(cdktype) && object.screen_index >= 0
+    def self.unregister(rndktype, object)
+      if object.validObjType(rndktype) && object.screen_index >= 0
         screen = object.screen
 
         unless screen.nil?
@@ -102,38 +102,34 @@ module RNDK
     end
 
     # This 'brings' a RNDK object to the top of the stack.
-    def self.raiseRNDKObject(cdktype, object)
-      if object.validObjType(cdktype)
+    def self.raiseRNDKObject(rndktype, object)
+      if object.validObjType(rndktype)
         screen = object.screen
         screen.swapRNDKIndices(object.screen_index, screen.object_count - 1)
       end
     end
 
     # This 'lowers' an object.
-    def self.lowerRNDKObject(cdktype, object)
-      if object.validObjType(cdktype)
+    def self.lowerRNDKObject(rndktype, object)
+      if object.validObjType(rndktype)
         object.screen.swapRNDKIndices(object.screen_index, 0)
       end
     end
 
-    # This pops up a message.
-    def popupLabel(mesg, count)
-      #Create the label.
-      popup = RNDK::LABEL.new(self, CENTER, CENTER, mesg, count, true, false)
+    # Quickly pops up a `message` with `count` lines.
+    def popupLabel(message, count)
+      prev_state = Ncurses.curs_set 0
 
-      old_state = Ncurses.curs_set(0)
-      # Draw it on the screen
+      popup = RNDK::LABEL.new(self, CENTER, CENTER, message, count, true, false)
       popup.draw(true)
 
       # Wait for some input.
       Ncurses.keypad(popup.win, true)
       popup.getch([])
-
-      # Kill it.
       popup.destroy
 
       # Clean the screen.
-      Ncurses.curs_set(old_state)
+      Ncurses.curs_set prev_state
       self.erase
       self.refresh
     end

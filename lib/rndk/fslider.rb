@@ -2,7 +2,7 @@ require 'rndk/slider'
 
 module RNDK
   class FSLIDER < RNDK::SLIDER
-    def initialize(cdkscreen,
+    def initialize(rndkscreen,
                    xplace,
                    yplace,
                    title,
@@ -19,7 +19,7 @@ module RNDK
                    shadow)
 
       @digits = digits
-      super(cdkscreen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
+      super(rndkscreen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
     end
 
     # This draws the widget.

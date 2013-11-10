@@ -2,10 +2,10 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class BUTTON < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, text, callback, box, shadow)
+    def initialize(rndkscreen, xplace, yplace, text, callback, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = 0
       xpos = xplace
       ypos = yplace
@@ -38,14 +38,14 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Create the button.
-      @screen = cdkscreen
+      @screen = rndkscreen
       # ObjOf (button)->fn = &my_funcs;
-      @parent = cdkscreen.window
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @xpos = xpos
@@ -71,7 +71,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:BUTTON, self)
+      rndkscreen.register(:BUTTON, self)
     end
 
     # This was added for the builder.

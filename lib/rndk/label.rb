@@ -4,10 +4,10 @@ module RNDK
   class LABEL < RNDK::RNDKOBJS
     attr_accessor :win
 
-    def initialize(cdkscreen, xplace, yplace, mesg, rows, box, shadow)
+    def initialize(rndkscreen, xplace, yplace, mesg, rows, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = -2**30  # -INFINITY
       box_height = 0
       xpos = [xplace]
@@ -54,9 +54,9 @@ module RNDK
                    end
 
       # Rejustify the x and y positions if we need to
-      RNDK.alignxy(cdkscreen.window, xpos, ypos, box_width, box_height)
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      RNDK.alignxy(rndkscreen.window, xpos, ypos, box_width, box_height)
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos[0], xpos[0])
       @shadow_win = nil
       @xpos = xpos[0]
@@ -82,7 +82,7 @@ module RNDK
       end
 
       # Register this
-      cdkscreen.register(:LABEL, self)
+      rndkscreen.register(:LABEL, self)
     end
 
     # This was added for the builder.

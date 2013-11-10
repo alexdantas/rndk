@@ -10,12 +10,12 @@ module RNDK
 
     @@g_paste_buffer = ''
 
-    def initialize(cdkscreen, xplace, yplace, rows, cols, vrows, vcols,
+    def initialize(rndkscreen, xplace, yplace, rows, cols, vrows, vcols,
         title, rowtitles, coltitles, colwidths, colvalues, rspace, cspace,
         filler, dominant, box, box_cell, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_height = 0
       box_width = 0
       max_row_title_width = 0
@@ -118,7 +118,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -200,10 +200,10 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Keep the rest of the info.
-      @screen = cdkscreen
+      @screen = rndkscreen
       @accepts_focus = true
       @input_window = @win
-      @parent = cdkscreen.window
+      @parent = rndkscreen.window
       @vrows = vrows
       @vcols = vcols
       @box_width = box_width
@@ -277,7 +277,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:MATRIX, self)
+      rndkscreen.register(:MATRIX, self)
     end
 
     # This activates the matrix.

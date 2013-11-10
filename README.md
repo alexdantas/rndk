@@ -57,7 +57,15 @@ Or install it yourself as:
 ## Usage
 
 The `examples` directory contains lots of sample usages for every
-widget available.
+widget available. To execute them, go to the `rndk` root folder
+and run:
+
+    ruby -Ilib examples/YOUR_EXAMPLE_HERE
+
+There's also some more comples demo applications under the `demos`
+directory. Do the same:
+
+    ruby -Ilib demos/YOUR_DEMO_HERE
 
 Here's a sample that shows a colored "Hello, World!" on the screen:
 

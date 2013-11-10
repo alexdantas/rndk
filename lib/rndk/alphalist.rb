@@ -4,11 +4,11 @@ module RNDK
   class ALPHALIST < RNDK::RNDKOBJS
     attr_reader :scroll_field, :entry_field, :list
 
-    def initialize(cdkscreen, xplace, yplace, height, width, title, label,
+    def initialize(rndkscreen, xplace, yplace, height, width, title, label,
         list, list_size, filler_char, highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = width
       box_height = height
       label_len = 0
@@ -42,7 +42,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -56,8 +56,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Set some variables.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @highlight = highlight
       @filler_char = filler_char
       @box_height = box_height
@@ -76,7 +76,7 @@ module RNDK
                     then RNDK::FULL
                     else box_width - 2 - label_len
                     end
-      @entry_field = RNDK::ENTRY.new(cdkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
+      @entry_field = RNDK::ENTRY.new(rndkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, Ncurses::A_NORMAL, filler_char, :MIXED, temp_width,
           0, 512, box, false)
       if @entry_field.nil?
@@ -197,7 +197,7 @@ module RNDK
         return true
       end
 
-      pre_process_entry_field = lambda do |cdktype, object, alphalist, input|
+      pre_process_entry_field = lambda do |rndktype, object, alphalist, input|
         scrollp = alphalist.scroll_field
         entry = alphalist.entry_field
         info_len = entry.info.size
@@ -264,7 +264,7 @@ module RNDK
                    else box_width - 1
                    end
 
-      @scroll_field = RNDK::SCROLL.new(cdkscreen,
+      @scroll_field = RNDK::SCROLL.new(rndkscreen,
                                       Ncurses.getbegx(@win),
                                       Ncurses.getbegy(@entry_field.win) + temp_height,
                                       RNDK::RIGHT,
@@ -285,7 +285,7 @@ module RNDK
         self.bind(:ALPHALIST, from, :getc, to)
       end
 
-      cdkscreen.register(:ALPHALIST, self)
+      rndkscreen.register(:ALPHALIST, self)
     end
 
     # This erases the alphalist from the screen.

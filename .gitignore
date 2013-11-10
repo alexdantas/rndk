@@ -1,3 +1,9 @@
+# Files starting with 'NOPE' are a way for me
+# to ignore files that I'm still converting from
+# old CDK style to current RNDK format.
+NOPE*
+
+# "regular" files to ignore
 *.gem
 *.rbc
 .bundle

@@ -1,14 +1,22 @@
 #!/usr/bin/env ruby
+#
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
+
 require 'optparse'
 require 'fileutils'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class Vinstall
   FPUsage = '-f filename [-s source directory] [-d destination directory]' <<
       ' [-t title] [-o Output file] [q]'
 
   # Copy the file.
-  def Vinstall.copyFile(cdkscreen, src, dest)
+  def Vinstall.copyFile(rndkscreen, src, dest)
     # TODO: error handling
     FileUtils.cp(src, dest)
     return :OK
@@ -16,7 +24,7 @@ class Vinstall
 
   # This makes sure the given directory exists.  If it doesn't then it will
   # make it.
-  def Vinstall.verifyDirectory(cdkscreen, directory)
+  def Vinstall.verifyDirectory(rndkscreen, directory)
     status = 0
     buttons = [
         'Yes',
@@ -32,7 +40,7 @@ class Vinstall
       ]
 
       # Ask them if they want to create the directory.
-      if cdkscreen.popupDialog(mesg, mesg.size, buttons, buttons.size) == 0
+      if rndkscreen.popupDialog(mesg, mesg.size, buttons, buttons.size) == 0
         # TODO error handling
         if Dir.mkdir(directory, 0754) != 0
           # Create the error message.
@@ -44,7 +52,7 @@ class Vinstall
           ]
 
           # Pop up the error message.
-          cdkscreen.popupLabel(error, error.size)
+          rndkscreen.popupLabel(error, error.size)
 
           status = -1
         end
@@ -53,7 +61,7 @@ class Vinstall
         error = ['<C>Installation aborted.']
 
         # Pop up the error message.
-        cdkscreen.popupLabel(error, error.size)
+        rndkscreen.popupLabel(error, error.size)
 
         status = -1
       end
@@ -98,7 +106,7 @@ class Vinstall
 
     file_list = []
     # Open the file list file and read it in.
-    count = CDK.readFile(filename, file_list)
+    count = RNDK.readFile(filename, file_list)
     if count == 0
       $stderr.puts '%s: Input filename <%s> is empty.' % [ARGV[0], filename]
     end
@@ -107,24 +115,24 @@ class Vinstall
     file_list.each do |file|
       file.strip!
     end
-    
-    # Set up CDK
-    curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK
+    curses_win = Ncurses.initscr
+    rndkscreen = RNDK::SCREEN.new(curses_win)
+
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the title label.
     title_mesg = [
         '<C></32/B<#HL(30)>',
         if title == ''
-        then '<C></32/B>CDK Installer'
+        then '<C></32/B>RNDK Installer'
         else '<C></32/B>%.256s' % [title]
         end,
         '<C></32/B><#HL(30)>'
     ]
-    title_win = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::TOP,
+    title_win = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::TOP,
         title_mesg, 3, false, false)
 
     source_entry = nil
@@ -132,13 +140,13 @@ class Vinstall
 
     # Allow them to change the install directory.
     if source_path == ''
-      source_entry = CDK::ENTRY.new(cdkscreen, CDK::CENTER, 8, '',
+      source_entry = RNDK::ENTRY.new(rndkscreen, RNDK::CENTER, 8, '',
           'Source Directory        :', Ncurses::A_NORMAL, '.'.ord,
           :MIXED, 40, 0, 256, true, false)
     end
 
     if dest_path == ''
-      dest_entry = CDK::ENTRY.new(cdkscreen, CDK::CENTER, 11, '',
+      dest_entry = RNDK::ENTRY.new(rndkscreen, RNDK::CENTER, 11, '',
           'Destination Directory:', Ncurses::A_NORMAL, '.'.ord, :MIXED,
           40, 0, 256, true, false)
     end
@@ -146,14 +154,14 @@ class Vinstall
     # Get the source install path.
     source_dir = source_path
     unless source_entry.nil?
-      cdkscreen.draw
+      rndkscreen.draw
       source_dir = source_entry.activate([])
     end
 
     # Get the destination install path.
     dest_dir = dest_path
     unless dest_entry.nil?
-      cdkscreen.draw
+      rndkscreen.draw
       dest_dir = dest_entry.activate([])
     end
 
@@ -166,32 +174,32 @@ class Vinstall
     end
 
     # Verify that the source directory is valid.
-    if Vinstall.verifyDirectory(cdkscreen, source_dir) != 0
+    if Vinstall.verifyDirectory(rndkscreen, source_dir) != 0
       # Clean up and leave.
       title_win.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
       exit  # EXIT_FAILURE
     end
 
     # Verify that the destination directory is valid.
-    if Vinstall.verifyDirectory(cdkscreen, dest_dir) != 0
+    if Vinstall.verifyDirectory(rndkscreen, dest_dir) != 0
       title_win.destroy
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
       exit  # EXIT_FAILURE
     end
 
     # Create the histogram.
-    progress_bar = CDK::HISTOGRAM.new(cdkscreen, CDK::CENTER, 5, 3, 0,
-        CDK::HORIZONTAL, '<C></56/B>Install Progress', true, false)
+    progress_bar = RNDK::HISTOGRAM.new(rndkscreen, RNDK::CENTER, 5, 3, 0,
+        RNDK::HORIZONTAL, '<C></56/B>Install Progress', true, false)
 
     # Set the top left/right characters of the histogram.
     progress_bar.setLLchar(Ncurses::ACS_LTEE)
     progress_bar.setLRchar(Ncurses::ACS_RTEE)
 
     # Set the initial value fo the histgoram.
-    progress_bar.set(:PERCENT, CDK::TOP, Ncurses::A_BOLD, 1, count, 1,
+    progress_bar.set(:PERCENT, RNDK::TOP, Ncurses::A_BOLD, 1, count, 1,
         Ncurses.COLOR_PAIR(24) | Ncurses::A_REVERSE | ' '.ord, true)
 
     # Determine the height of the scrolling window.
@@ -201,7 +209,7 @@ class Vinstall
     end
 
     # Create the scrolling window.
-    install_output = CDK::SWINDOW.new(cdkscreen, CDK::CENTER, CDK::BOTTOM,
+    install_output = RNDK::SWINDOW.new(rndkscreen, RNDK::CENTER, RNDK::BOTTOM,
         swindow_height, 0, '<C></56/B>Install Results', 2000, true, false)
 
     # Set the top left/right characters of the scrolling window.
@@ -209,7 +217,7 @@ class Vinstall
     install_output.setURchar(Ncurses::ACS_RTEE)
 
     # Draw the screen.
-    cdkscreen.draw
+    rndkscreen.draw
 
     errors = 0
 
@@ -227,7 +235,7 @@ class Vinstall
       end
 
       # Copy the file from the source to the destiation.
-      ret = Vinstall.copyFile(cdkscreen, old_path, new_path)
+      ret = Vinstall.copyFile(rndkscreen, old_path, new_path)
       temp = ''
       if ret == :CanNotOpenSource
         temp = '</16>Error: Can not open source file "%.256s"<!16>' % [old_path]
@@ -241,11 +249,11 @@ class Vinstall
       end
 
       # Add the message to the scrolling window.
-      install_output.add(temp, CDK::BOTTOM)
+      install_output.add(temp, RNDK::BOTTOM)
       install_output.draw(install_output.box)
 
       # Update the histogram.
-      progress_bar.set(:PERCENT, CDK::TOP, Ncurses::A_BOLD, 1, count,
+      progress_bar.set(:PERCENT, RNDK::TOP, Ncurses::A_BOLD, 1, count,
           x + 1, Ncurses.COLOR_PAIR(24) | Ncurses::A_REVERSE | ' '.ord, true)
 
       # Update the screen.
@@ -273,7 +281,7 @@ class Vinstall
       ]
 
       # Popup the dialog box.
-      ret = cdkscreen.popupDialog(mesg, mesg.size, buttons, buttons.size)
+      ret = rndkscreen.popupDialog(mesg, mesg.size, buttons, buttons.size)
 
       if ret == 0
         install_output.activate([])
@@ -297,7 +305,7 @@ class Vinstall
               '<C>scrolling window to a file?',
           ]
 
-          if cdkscreen.popupDialog(mesg, 2, buttons, 2) == 1
+          if rndkscreen.popupDialog(mesg, 2, buttons, 2) == 1
             install_output.inject('s'.ord)
           end
         end
@@ -308,8 +316,8 @@ class Vinstall
     title_win.destroy
     progress_bar.destroy
     install_output.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     exit  # EXIT_SUCCESS
   end
 end

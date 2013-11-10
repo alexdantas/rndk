@@ -5,7 +5,7 @@ module RNDK
     attr_reader :current_button
     MIN_DIALOG_WIDTH = 10
 
-    def initialize(cdkscreen, xplace, yplace, mesg, rows, button_label,
+    def initialize(rndkscreen, xplace, yplace, mesg, rows, button_label,
         button_count, highlight, separator, box, shadow)
       super()
       box_width = DIALOG::MIN_DIALOG_WIDTH
@@ -58,13 +58,13 @@ module RNDK
       # Now we have to readjust the x and y positions.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the dialog box attributes.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
@@ -105,7 +105,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:DIALOG, self)
+      rndkscreen.register(:DIALOG, self)
     end
 
     # This lets the user select the button.

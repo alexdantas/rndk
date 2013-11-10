@@ -266,8 +266,8 @@ module RNDK
     end
 
     def getc
-      cdktype = self.object_type
-      test = self.bindableObject(cdktype)
+      rndktype = self.object_type
+      test = self.bindableObject(rndktype)
       result = Ncurses.wgetch @input_window
 
       if result >= 0 && !(test.nil?) && test.binding_list.include?(result) &&
@@ -308,8 +308,8 @@ module RNDK
       return key
     end
 
-    def bindableObject(cdktype)
-      if cdktype != self.object_type
+    def bindableObject(rndktype)
+      if rndktype != self.object_type
         return nil
       elsif [:FSELECT, :ALPHALIST].include?(self.object_type)
         return @entry_field

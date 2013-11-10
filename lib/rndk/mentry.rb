@@ -5,11 +5,11 @@ module RNDK
     attr_accessor :info, :current_col, :current_row, :top_row
     attr_reader :disp_type, :field_width, :rows, :field_win
 
-    def initialize(cdkscreen, xplace, yplace, title, label, field_attr,
+    def initialize(rndkscreen, xplace, yplace, title, label, field_attr,
         filler, disp_type, f_width, f_rows, logical_rows, min, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       field_width = f_width
       field_rows = f_rows
 
@@ -52,7 +52,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -86,14 +86,14 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Set up the rest of the structure.
-      @parent = cdkscreen.window
+      @parent = rndkscreen.window
       @total_width = (field_width * logical_rows) + 1
 
       # Create the info string
       @info = ''
 
       # Set up the rest of the widget information.
-      @screen = cdkscreen
+      @screen = rndkscreen
       @shadow_win = nil
       @field_attr = field_attr
       @field_width = field_width
@@ -158,7 +158,7 @@ module RNDK
       end
 
       # Register
-      cdkscreen.register(:MENTRY, self)
+      rndkscreen.register(:MENTRY, self)
     end
 
     # This actually activates the mentry widget...

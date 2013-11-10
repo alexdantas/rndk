@@ -4,11 +4,11 @@ module RNDK
   class BUTTONBOX < RNDK::RNDKOBJS
     attr_reader :current_button
 
-    def initialize(cdkscreen, x_pos, y_pos, height, width, title, rows, cols,
+    def initialize(rndkscreen, x_pos, y_pos, height, width, title, rows, cols,
         buttons, button_count, highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       col_width = 0
       current_button = 0
       @button = []
@@ -69,13 +69,13 @@ module RNDK
       # Now we have to readjust the x and y positions
       xtmp = [x_pos]
       ytmp = [y_pos]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the buttonbox box attributes.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
@@ -114,7 +114,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:BUTTONBOX, self)
+      rndkscreen.register(:BUTTONBOX, self)
     end
 
     # This activates the widget.

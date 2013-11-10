@@ -2,11 +2,11 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class ITEMLIST < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, title, label, item, count,
+    def initialize(rndkscreen, xplace, yplace, title, label, item, count,
         default_item, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       field_width = 0
 
       if !self.createList(item, count)
@@ -43,7 +43,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -77,8 +77,8 @@ module RNDK
       end
 
       # Set up the rest of the structure
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @accepts_focus = true
       @shadow = shadow
@@ -103,7 +103,7 @@ module RNDK
       end
 
       # Register this baby.
-      cdkscreen.register(:ITEMLIST, self)
+      rndkscreen.register(:ITEMLIST, self)
     end
 
     # This allows the user to play with the widget.

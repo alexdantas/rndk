@@ -2,11 +2,11 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class SCALE < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, title, label, field_attr,
+    def initialize(rndkscreen, xplace, yplace, title, label, field_attr,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       bindings = {
           'u'           => Ncurses::KEY_UP,
           'U'           => Ncurses::KEY_PPAGE,
@@ -57,7 +57,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -98,8 +98,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @box_width = box_width
       @box_height = box_height
@@ -133,7 +133,7 @@ module RNDK
         self.bind(self.object_type, from, :getc, to)
       end
 
-      cdkscreen.register(self.object_type, self)
+      rndkscreen.register(self.object_type, self)
     end
 
     # This allows the person to use the widget's data field.

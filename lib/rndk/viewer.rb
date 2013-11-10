@@ -5,11 +5,11 @@ module RNDK
     DOWN = 0
     UP = 1
 
-    def initialize(cdkscreen, xplace, yplace, height, width,
+    def initialize(rndkscreen, xplace, yplace, height, width,
         buttons, button_count, button_highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = width
       box_height = height
       button_width = 0
@@ -35,7 +35,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -70,8 +70,8 @@ module RNDK
       end
 
       # Set the rest of the variables.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @button_highlight = button_highlight
       @box_height = box_height
@@ -107,7 +107,7 @@ module RNDK
         self.bind(:VIEWER, from, :getc, to)
       end
 
-      cdkscreen.register(:VIEWER, self)
+      rndkscreen.register(:VIEWER, self)
     end
 
     # This function sets various attributes of the widget.

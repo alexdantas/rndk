@@ -7,12 +7,12 @@ module RNDK
     attr_reader :sock_attribute, :field_attribute, :filler_character
     attr_reader :dir_contents, :file_counter, :pwd, :pathname
 
-    def initialize(cdkscreen, xplace, yplace, height, width, title, label,
+    def initialize(rndkscreen, xplace, yplace, height, width, title, label,
         field_attribute, filler_char, highlight, d_attribute, f_attribute,
         l_attribute, s_attribute, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       bindings = {
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
           RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
@@ -31,7 +31,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -50,8 +50,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Set some variables.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @dir_attribute = d_attribute.clone
       @file_attribute = f_attribute.clone
       @link_attribute = l_attribute.clone
@@ -83,7 +83,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 2 - label_len
                    end
-      @entry_field = RNDK::ENTRY.new(cdkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
+      @entry_field = RNDK::ENTRY.new(rndkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, field_attribute, filler_char, :MIXED, temp_width,
           0, 512, box, false)
 
@@ -367,7 +367,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 1
                    end
-      @scroll_field = RNDK::SCROLL.new(cdkscreen,
+      @scroll_field = RNDK::SCROLL.new(rndkscreen,
           Ncurses.getbegx(@win), Ncurses.getbegy(@win) + temp_height, RNDK::RIGHT,
           box_height - temp_height, temp_width, '', @dir_contents,
           @file_counter, false, @highlight, box, false)
@@ -387,7 +387,7 @@ module RNDK
         self.bind(:FSELECT, from, :getc, to)
       end
 
-      cdkscreen.register(:FSELECT, self)
+      rndkscreen.register(:FSELECT, self)
     end
 
     # This erases the file selector from the screen.

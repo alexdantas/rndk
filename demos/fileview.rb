@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
+#
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
+
 require 'optparse'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class FileView
   def FileView.main
@@ -14,18 +22,18 @@ class FileView
         '</5><Cancel><!5>',
     ]
 
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Get the filename
     if filename == ''
       title = '<C>Pick a file.'
       label = 'File: '
-      fselect = CDK::FSELECT.new(cdkscreen, CDK::CENTER, CDK::CENTER,
+      fselect = RNDK::FSELECT.new(rndkscreen, RNDK::CENTER, RNDK::CENTER,
           20, 65, title, label, Ncurses::A_NORMAL, '_', Ncurses::A_REVERSE,
           '</5>', '</48>', '</N>', '</N>', true, false)
 
@@ -45,12 +53,12 @@ class FileView
             '',
             '<C>Press any key to continue.',
         ]
-        cdkscreen.popupLabel(mesg, 3)
+        rndkscreen.popupLabel(mesg, 3)
 
         fselect.destroy
 
-        cdkscreen.destroy
-        CDK::SCREEN.endCDK
+        rndkscreen.destroy
+        RNDK::SCREEN.endRNDK
 
         exit  # EXIT_SUCCESS
       end
@@ -59,25 +67,25 @@ class FileView
     end
 
     # Create the file viewer to view the file selected.
-    example = CDK::VIEWER.new(cdkscreen, CDK::CENTER, CDK::CENTER, 20, -2,
+    example = RNDK::VIEWER.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, 20, -2,
         button, 2, Ncurses::A_REVERSE, true, false)
 
     # Could we create the viewer widget?
     if example.nil?
       # Clean up the memory.
-      cdkscreen.destroy
+      rndkscreen.destroy
 
       # End curses...
-      CDK.endCDK
+      RNDK.endRNDK
 
       puts "Cannot create viewer. Is the window too small?"
       exit  # EXIT_FAILURE
     end
 
     # Open the file and read the contents.
-    
+
     info = []
-    lines = CDK.readFile(filename, info)
+    lines = RNDK.readFile(filename, info)
     if lines == -1
       puts "Could not open %s" % [filename]
       exit  # EXIT_FAILURE
@@ -97,20 +105,20 @@ class FileView
           '',
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     elsif example.exit_type == :NORMAL
       mesg = [
           '<C>You selected button %d' % [selected],
           '',
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, 3)
+      rndkscreen.popupLabel(mesg, 3)
     end
 
     # Clean up
     example.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
     #ExitProgram (EXIT_SUCCESS);
   end
 end

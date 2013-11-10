@@ -9,7 +9,7 @@ module RNDK
     attr_reader :current_title, :current_subtitle
     attr_reader :sublist
 
-    def initialize(cdkscreen,
+    def initialize(rndkscreen,
                    menu_list,
                    menu_items,
                    subsize,
@@ -20,18 +20,18 @@ module RNDK
       super()
 
       right_count = menu_items - 1
-      rightloc = Ncurses.getmaxx cdkscreen.window
+      rightloc = Ncurses.getmaxx rndkscreen.window
       leftloc = 0
-      xpos = Ncurses.getbegx cdkscreen.window
-      ypos = Ncurses.getbegy cdkscreen.window
-      ymax = Ncurses.getmaxy cdkscreen.window
+      xpos = Ncurses.getbegx rndkscreen.window
+      ypos = Ncurses.getbegy rndkscreen.window
+      ymax = Ncurses.getmaxy rndkscreen.window
 
       # Start making a copy of the information.
-      @screen = cdkscreen
+      @screen = rndkscreen
       @box = false
       @accepts_focus = false
       rightcount = menu_items - 1
-      @parent = cdkscreen.window
+      @parent = rndkscreen.window
       @menu_items = menu_items
       @title_attr = title_attr
       @subtitle_attr = subtitle_attr
@@ -91,13 +91,13 @@ module RNDK
         @title[x1] = RNDK.char2Chtype(menu_list[x][0], title_len, [])
         @title_len[x1] = title_len[0]
         @subsize[x1] = subsize[x] - RNDK::MENU::TITLELINES
-        @title_win[x1] = Ncurses.subwin(cdkscreen.window,
+        @title_win[x1] = Ncurses.subwin(rndkscreen.window,
                                         RNDK::MENU::TITLELINES,
                                         @title_len[x1] + 2,
                                         ypos + y1,
                                         xpos + x2)
 
-        @pull_win[x1] = Ncurses.subwin(cdkscreen.window,
+        @pull_win[x1] = Ncurses.subwin(rndkscreen.window,
                                        high,
                                        max + 2,
                                        ypos + y2,
@@ -115,7 +115,7 @@ module RNDK
       @input_window = @title_win[@current_title]
 
       # Register this baby.
-      cdkscreen.register(:MENU, self)
+      rndkscreen.register(:MENU, self)
     end
 
     # This activates the RNDK Menu

@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
+#
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
+
 require 'ostruct'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class Rolodex
   MAXGROUPS = 100
@@ -97,8 +105,8 @@ class Rolodex
       rescue
       end
     end
-    
-    return 1 
+
+    return 1
   end
 
   # This prints a group's phone numbers.
@@ -118,8 +126,8 @@ class Rolodex
     height = [group_count, 5].min + 3
 
     # Create the selection list.
-    selection_list = CDK::SELECTION.new(screen, CDK::CENTER, CDK::CENTER,
-        CDK::RIGHT, height, 40, '<C></U>Select Which Groups To Print',
+    selection_list = RNDK::SELECTION.new(screen, RNDK::CENTER, RNDK::CENTER,
+        RNDK::RIGHT, height, 40, '<C></U>Select Which Groups To Print',
         item_list, group_count, choices, choices.size, Ncurses::A_REVERSE,
         true, false)
 
@@ -138,12 +146,12 @@ class Rolodex
       if selection_list.selections[x] == 0
         # Create a title.
         mesg = ['<C></R>Printing Group [%s] to Printer' % [group_list[x].name]]
-        title = CDK::LABEL.new(screen, CDK::CENTER, CDK::TOP, mesg, mesg.size,
+        title = RNDK::LABEL.new(screen, RNDK::CENTER, RNDK::TOP, mesg, mesg.size,
             false, false)
         title.draw(false)
 
         # Get the printer name to print to.
-        entry = CDK::ENTRY.new(screen, CDK::CENTER, 8, '',
+        entry = RNDK::ENTRY.new(screen, RNDK::CENTER, 8, '',
             '</R>Printer Name: ', Ncurses::A_NORMAL, '_'.ord, :MIXED,
             20, 2, 256, true, false)
 
@@ -156,7 +164,7 @@ class Rolodex
         # Print the group
         if Rolodex.printGroup(group_list[x], '/tmp/rolodex.tmp', printer) == 0
           # The group could not be printed.
-          mesg = ["<C>Sorry the group '%s' could not be printed" % 
+          mesg = ["<C>Sorry the group '%s' could not be printed" %
               group_list[x].name]
           screen.popupLabel(screen, mesg, mesg.size)
         end
@@ -170,12 +178,12 @@ class Rolodex
       elsif selection_list.selections[x] == 1
         # Create a title.
         mesg = ['<C></R>Printing Group [%s] to File' % [group_list[x].name]]
-        title = CDK::LABEL.new(screen, CDK::CENTER, CDK::TOP, mesg, mesg.size,
+        title = RNDK::LABEL.new(screen, RNDK::CENTER, RNDK::TOP, mesg, mesg.size,
             false, false)
         title.draw(false)
 
         # Get the filename to print to.
-        entry = CDK::ENTRY.new(screen, CDK::CENTER, 8, '', '</R>Filename: ',
+        entry = RNDK::ENTRY.new(screen, RNDK::CENTER, 8, '', '</R>Filename: ',
             Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
         filename = entry.activate([])
         entry.destroy
@@ -267,24 +275,24 @@ class Rolodex
   # This function gets information about a new phone number.
   def Rolodex.addPhoneRecord(screen, phone_data)
     # Get the phone record
-    phone_data.record[phone_data.count] = 
+    phone_data.record[phone_data.count] =
       phone_data.record[phone_data.count] || OpenStruct.new
     phone_record = phone_data.record[phone_data.count]
 
     # Create a title label to display.
     title_mesg = ['<C></B/16>Add New Phone Record']
-    title = CDK::LABEL.new(screen, CDK::CENTER, CDK::TOP,
+    title = RNDK::LABEL.new(screen, RNDK::CENTER, RNDK::TOP,
         title_mesg, title_mesg.size, false, false)
     title.draw(false)
 
     types = []
-    # Create the phone line type list.  
+    # Create the phone line type list.
     Rolodex::GLineType.each do |type|
       types << '<C></U>%s' % [type]
     end
 
     # Get the phone line type.
-    item_list = CDK::ITEMLIST.new(screen, CDK::CENTER, CDK::CENTER,
+    item_list = RNDK::ITEMLIST.new(screen, RNDK::CENTER, RNDK::CENTER,
         '<C>What Type Of Line Is It?', 'Type: ', types, types.size,
         0, true, false)
     phone_record.line_type = Rolodex::GTypeReverseMap[item_list.activate([])]
@@ -315,20 +323,20 @@ class Rolodex
   # This gets a phone record with all the details
   def Rolodex.getLargePhoneRecord(screen, phone_record)
     # Define the widgets.
-    name_entry = CDK::ENTRY.new(screen, CDK::LEFT, 5, '', '</B/5>Name: ',
+    name_entry = RNDK::ENTRY.new(screen, RNDK::LEFT, 5, '', '</B/5>Name: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
-    address_entry = CDK::ENTRY.new(screen, CDK::RIGHT, 5, '', '</B/5>Address: ',
+    address_entry = RNDK::ENTRY.new(screen, RNDK::RIGHT, 5, '', '</B/5>Address: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 40, 2, 256, true, false)
-    city_entry = CDK::ENTRY.new(screen, CDK::LEFT, 8, '', '</B/5>City: ',
+    city_entry = RNDK::ENTRY.new(screen, RNDK::LEFT, 8, '', '</B/5>City: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
-    prov_entry = CDK::ENTRY.new(screen, 29, 8, '', '</B/5>Province: ',
+    prov_entry = RNDK::ENTRY.new(screen, 29, 8, '', '</B/5>Province: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 15, 2, 256, true, false)
-    postal_entry = CDK::ENTRY.new(screen, CDK::RIGHT, 8, '',
+    postal_entry = RNDK::ENTRY.new(screen, RNDK::RIGHT, 8, '',
         '</B/5>Postal Code: ', Ncurses::A_NORMAL, '_'.ord, :UMIXED,
         8, 2, 256, true, false)
-    phone_template = CDK::TEMPLATE.new(screen, CDK::LEFT, 11, '',
+    phone_template = RNDK::TEMPLATE.new(screen, RNDK::LEFT, 11, '',
         '</B/5>Number: ', '(###) ###-####', '(___) ___-____', true, false)
-    desc_entry = CDK::ENTRY.new(screen, CDK::RIGHT, 11, '',
+    desc_entry = RNDK::ENTRY.new(screen, RNDK::RIGHT, 11, '',
         '</B/5>Description: ', Ncurses::A_NORMAL, '_'.ord, :MIXED,
         20, 2, 256, true, false)
 
@@ -410,11 +418,11 @@ class Rolodex
   # This gets a small phone record.
   def Rolodex.getSmallPhoneRecord(screen, phone_record)
     # Define the widgets.
-    name_entry = CDK::ENTRY.new(screen, CDK::CENTER, 8, '', '</B/5>Name: ',
+    name_entry = RNDK::ENTRY.new(screen, RNDK::CENTER, 8, '', '</B/5>Name: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
-    phone_template = CDK::TEMPLATE.new(screen, CDK::CENTER, 11, '',
+    phone_template = RNDK::TEMPLATE.new(screen, RNDK::CENTER, 11, '',
         '</B/5>Number: ', '(###) ###-####', '(___) ___-____', true, false)
-    desc_entry = CDK::ENTRY.new(screen, CDK::CENTER, 14, '',
+    desc_entry = RNDK::ENTRY.new(screen, RNDK::CENTER, 14, '',
         '</B/5>Description: ', Ncurses::A_NORMAL, '_'.ord, :MIXED,
         20, 2, 256, true, false)
 
@@ -484,7 +492,7 @@ class Rolodex
   # This opens a new RC file.
   def Rolodex.openNewRCFile(screen, group_list, group_count)
     # Get the filename
-    file_selector = CDK::FSELECT.new(screen, CDK::CENTER, CDK::CENTER, 20, 55,
+    file_selector = RNDK::FSELECT.new(screen, RNDK::CENTER, RNDK::CENTER, 20, 55,
         '<C>Open RC File', 'Filename: ', Ncurses::A_NORMAL, '.'.ord,
         Ncurses::A_REVERSE, '</5>', '</48>', '</N>', '</N>', true, false)
 
@@ -530,7 +538,7 @@ class Rolodex
     lines = []
 
     # Open the file and start reading.
-    lines_read = CDK.readFile(filename, lines)
+    lines_read = RNDK.readFile(filename, lines)
 
     # Check the number of lines read.
     if lines_read == 0
@@ -544,7 +552,7 @@ class Rolodex
 
       # Only split lines which do not start with a #
       if lines[x].size > 0 && lines[x][0] != '#'
-        items = lines[x].split(CDK.CTRL('V').chr)
+        items = lines[x].split(RNDK.CTRL('V').chr)
 
         # Only take the ones which fit the format.
         if items.size == 3
@@ -587,8 +595,8 @@ class Rolodex
 
     # Start writing the RC file.
     group_list.each do |group|
-      fd.puts '%s%c%s%c%s' % [group.name, CDK.CTRL('V').chr,
-          group.desc, CDK.CTRL('V').chr, group.dbm]
+      fd.puts '%s%c%s%c%s' % [group.name, RNDK.CTRL('V').chr,
+          group.desc, RNDK.CTRL('V').chr, group.dbm]
     end
 
     fd.close
@@ -614,14 +622,14 @@ class Rolodex
   # groups under that name.
   def Rolodex.writeRCFileAs(screen, group_list, group_count)
     # Create the entry field.
-    new_rc_file = CDK::ENTRY.new(screen, CDK::CENTER, CDK::CENTER,
+    new_rc_file = RNDK::ENTRY.new(screen, RNDK::CENTER, RNDK::CENTER,
         '<C></R>Save As', 'Filename: ', Ncurses::A_NORMAL, '_'.ord,
         :MIXED, 20, 2, 256, true, false)
 
     # Add a pre-process function so no spaces are introduced.
-    entry_pre_process_cb = lambda do |cdk_type, object, client_data, input|
+    entry_pre_process_cb = lambda do |rndk_type, object, client_data, input|
       if input.ord == ' '.ord
-        CDK.Beep
+        RNDK.Beep
         return 0
       end
       return 1
@@ -656,7 +664,7 @@ class Rolodex
   def Rolodex.readPhoneDataFile(data_file, phone_data)
     lines = []
 
-    lines_read = CDK.readFile(data_file, lines)
+    lines_read = RNDK.readFile(data_file, lines)
     lines_found = 0
 
     # Check the number of lines read.
@@ -668,7 +676,7 @@ class Rolodex
     (0...lines_read).each do |x|
       if lines[x].size > 0 && lines[x][0] != '#'
         # Split the string.
-        items = lines[x].split(CDK.CTRL('V').chr)
+        items = lines[x].split(RNDK.CTRL('V').chr)
 
         if items.size == 8
           phone_data.record[lines_found] =
@@ -698,7 +706,7 @@ class Rolodex
           lines_found += 1
         else
           # Bad line in the file
-          CDK::SCREEN.endCDK
+          RNDK::SCREEN.endRNDK
           puts "Bad line of size %d" % items.size
           print items
           puts
@@ -732,20 +740,20 @@ class Rolodex
       # Check the phone type.
       if [:CELL, :PAGER].include?(phone_record.line_type)
         fd.puts '%s%c%d%c%s%c-%c-%c-%c-%c%s' % [
-            phone_record.name, CDK.CTRL('V').chr,
+            phone_record.name, RNDK.CTRL('V').chr,
             Rolodex::GTypeMap[phone_record.line_type],
-            CDK.CTRL('V').chr, phone_record.phone_number,
-            CDK.CTRL('V').chr, CDK.CTRL('V').chr, CDK.CTRL('V').chr,
-            CDK.CTRL('V').chr, CDK.CTRL('V').chr, phone_record.desc]
+            RNDK.CTRL('V').chr, phone_record.phone_number,
+            RNDK.CTRL('V').chr, RNDK.CTRL('V').chr, RNDK.CTRL('V').chr,
+            RNDK.CTRL('V').chr, RNDK.CTRL('V').chr, phone_record.desc]
       else
         fd.puts '%s%c%d%c%s%c%s%c%s%c%s%c%s' % [
-            phone_record.name, CDK.CTRL('V').chr,
+            phone_record.name, RNDK.CTRL('V').chr,
             Rolodex::GTypeMap[phone_record.line_type],
-            CDK.CTRL('V').chr, phone_record.phone_number,
-            CDK.CTRL('V').chr, phone_record.address, CDK.CTRL('V').chr,
-            phone_record.city, CDK.CTRL('V').chr,
-            phone_record.province, CDK.CTRL('V').chr,
-            phone_record.postal_code, CDK.CTRL('V').chr,
+            RNDK.CTRL('V').chr, phone_record.phone_number,
+            RNDK.CTRL('V').chr, phone_record.address, RNDK.CTRL('V').chr,
+            phone_record.city, RNDK.CTRL('V').chr,
+            phone_record.province, RNDK.CTRL('V').chr,
+            phone_record.postal_code, RNDK.CTRL('V').chr,
             phone_record.desc]
       end
     end
@@ -760,7 +768,7 @@ class Rolodex
         record.line_type)
       # Create the information to display.
       mesg = [
-          '<C></U>%s Phone Record' % 
+          '<C></U>%s Phone Record' %
               [Rolodex::GLineType[Rolodex::GTypeMap[record.line_type]]],
           '</B/29>Name        <!B!29>%s' % [record.name],
           '</B/29>Phone Number<!B!29>%s' % [record.phone_number],
@@ -803,7 +811,7 @@ class Rolodex
         '<C>Press </B>?<!B> to get detailed help.',
         '<C><#HL(30)>',
     ]
-    help_window = CDK::LABEL.new(screen, CDK::CENTER, CDK::BOTTOM,
+    help_window = RNDK::LABEL.new(screen, RNDK::CENTER, RNDK::BOTTOM,
         title, title.size, false, false)
     help_window.draw(false)
 
@@ -851,12 +859,12 @@ class Rolodex
     height = [phone_data.count, 5].min + 3
 
     # Create the scrolling list.
-    name_list = CDK::SCROLL.new(screen, CDK::CENTER, CDK::CENTER,
-        CDK::RIGHT, height, 50, temp, index, phone_data.count,
+    name_list = RNDK::SCROLL.new(screen, RNDK::CENTER, RNDK::CENTER,
+        RNDK::RIGHT, height, 50, temp, index, phone_data.count,
         true, Ncurses::A_REVERSE, true, false)
 
     # This allows the user to insert a new phone entry into the database.
-    insert_phone_entry_cb = lambda do |cdk_type, scrollp, phone_data, key|
+    insert_phone_entry_cb = lambda do |rndk_type, scrollp, phone_data, key|
       phone_data.record[phone_data.count] =
           phone_data.record[phone_data.count] || OpenStruct.new
       phone_record = phone_data.record[phone_data.count]
@@ -877,7 +885,7 @@ class Rolodex
     end
 
     # This allows the user to delete a phone entry from the database.
-    delete_phone_entry_cb = lambda do |cdk_type, scrollp, phone_data, key|
+    delete_phone_entry_cb = lambda do |rndk_type, scrollp, phone_data, key|
       buttons = [
           '</B/16><No>',
           '</B/24><Yes>',
@@ -897,7 +905,7 @@ class Rolodex
       # Ask the user if they really want to delete the listing.
       mesg = [
           '<C>Do you really want to delete the phone entry.',
-          '<C></B/16>%s' % [CDK.chtype2Char(scrollp.item[scrollp.current_item])]
+          '<C></B/16>%s' % [RNDK.chtype2Char(scrollp.item[scrollp.current_item])]
       ]
       if scrollp.screen.popupDialog(mesg, mesg.size, buttons, buttons.size) == 1
         front = phone_data.record[0...position] || []
@@ -915,7 +923,7 @@ class Rolodex
     end
 
     # This function provides help for the phone list editor.
-    phone_entry_help_cb = lambda do |cdk_type, scrollp, client_data, key|
+    phone_entry_help_cb = lambda do |rndk_type, scrollp, client_data, key|
       mesg = [
           '<C></R>Rolodex Phone Editor',
           '<B=i     > Inserts a new phone entry.',
@@ -974,12 +982,12 @@ class Rolodex
     end
 
     # Create the scrolling list.
-    rolo_list = CDK::SCROLL.new(screen, CDK::CENTER, CDK::CENTER, CDK::NONE,
+    rolo_list = RNDK::SCROLL.new(screen, RNDK::CENTER, RNDK::CENTER, RNDK::NONE,
         height, 50, title, mesg, mesg.size, false, Ncurses::A_REVERSE,
         true, false)
 
     # This is a callback to the group list scrolling list.
-    group_info_cb = lambda do |cdk_type, scrollp, group_list, key|
+    group_info_cb = lambda do |rndk_type, scrollp, group_list, key|
       selection = scrollp.current_item
 
       # Create the message to be displayed.
@@ -1013,7 +1021,7 @@ class Rolodex
   # This allows the user to add a rolo group to the list.
   def Rolodex.addRolodexGroup(screen, group_list, group_count)
     # Create the name widget.
-    new_name = CDK::ENTRY.new(screen, CDK::CENTER, 8,
+    new_name = RNDK::ENTRY.new(screen, RNDK::CENTER, 8,
         '<C></B/29>New Group Name', '</B/29>   Name: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
 
@@ -1045,7 +1053,7 @@ class Rolodex
     group_list[group_count].name = new_group_name
 
     # Create the description widget.
-    new_desc = CDK::ENTRY.new(screen, CDK::CENTER, 13,
+    new_desc = RNDK::ENTRY.new(screen, RNDK::CENTER, 13,
         '<C></B/29>Group Description', '</B/29>Description: ',
         Ncurses::A_NORMAL, '_'.ord, :MIXED, 20, 2, 256, true, false)
 
@@ -1087,15 +1095,15 @@ class Rolodex
   end
 
   # This function displays a little pop up window discussing this demo.
-  def Rolodex.aboutCdkRolodex(screen)
+  def Rolodex.aboutRndkRolodex(screen)
     mesg = [
-        '<C></U>About Cdk Rolodex',
+        '<C></U>About Rndk Rolodex',
         ' ',
         '</B/24>This demo was written to demonstrate the widgets',
-        '</B/24>available with the Cdk library. Not all of the',
-        '</B/24>Cdk widgets are used, but most of them have been.',
+        '</B/24>available with the Rndk library. Not all of the',
+        '</B/24>Rndk widgets are used, but most of them have been.',
         '</B/24>I hope this little demonstration helps give you an',
-        '</B/24>understanding of what the Cdk library offers.',
+        '</B/24>understanding of what the Rndk library offers.',
         ' ',
         '<C></B/24>Have fun with it.',
         ' ',
@@ -1109,12 +1117,12 @@ class Rolodex
   end
 
   def Rolodex.main
-    # Set up CDK
+    # Set up RNDK
     curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
+    rndkscreen = RNDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the menu lists.
     menulist = [
@@ -1144,30 +1152,30 @@ class Rolodex
 
     # Set up the sub-menu sizes and their locations
     sub_menu_size = [5, 4, 2, 3]
-    menu_locations = [CDK::LEFT, CDK::LEFT, CDK::LEFT, CDK::RIGHT]
+    menu_locations = [RNDK::LEFT, RNDK::LEFT, RNDK::LEFT, RNDK::RIGHT]
 
     # Create the menu.
-    rolodex_menu = CDK::MENU.new(cdkscreen, menulist, menulist.size,
-        sub_menu_size, menu_locations, CDK::TOP,
+    rolodex_menu = RNDK::MENU.new(rndkscreen, menulist, menulist.size,
+        sub_menu_size, menu_locations, RNDK::TOP,
         Ncurses::A_BOLD | Ncurses::A_UNDERLINE, Ncurses::A_REVERSE)
 
     # Create teh title.
     title = [
-        '<C></U>Cdk Rolodex',
+        '<C></U>Rndk Rolodex',
         '<C></B/24>Written By Chris Sauro (orignal by Mike Glover)',
     ]
-    rolodex_title = CDK::LABEL.new(cdkscreen, CDK::CENTER, CDK::CENTER,
+    rolodex_title = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER,
         title, title.size, false, false)
 
     # This is a callback to the menu widget. It allows the user to
     # ask for help about any sub-menu item.
-    help_cb = lambda do |cdk_type, menu, client_data, key|
+    help_cb = lambda do |rndk_type, menu, client_data, key|
       menu_list = menu.current_title
       submenu_list = menu.current_subtitle
       selection = (menu_list) * 100 + submenu_list
 
       # Create the help title.
-      name = CDK.chtype2Char(menu.sublist[menu_list][submenu_list])
+      name = RNDK.chtype2Char(menu.sublist[menu_list][submenu_list])
       name.strip!
       mesg = [
           '<C></R>Help<!R> </U>%s<!U>' % [name],
@@ -1210,8 +1218,8 @@ class Rolodex
     # Define the help key binding
     rolodex_menu.bind(:MENU, '?', help_cb, nil)
 
-    # Draw the CDK screen.
-    cdkscreen.refresh
+    # Draw the RNDK screen.
+    rndkscreen.refresh
 
     # Check the value of the HOME env var.
     home = ENV['HOME']
@@ -1250,14 +1258,14 @@ class Rolodex
           '<C></B/16>No rolodex groups were loaded.',
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, mesg.size)
+      rndkscreen.popupLabel(mesg, mesg.size)
       group_count = 0
     elsif group_count == 0
       mesg = [
           '<C></B/24>Empty rolodex RC file. No groups loaded.',
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, mesg.size)
+      rndkscreen.popupLabel(mesg, mesg.size)
     else
       temp = if group_count == 1
              then '<C></24>There was 1 group'
@@ -1268,7 +1276,7 @@ class Rolodex
           temp,
           '<C>Press any key to continue.',
       ]
-      cdkscreen.popupLabel(mesg, mesg.size)
+      rndkscreen.popupLabel(mesg, mesg.size)
     end
 
     # Loop until we are done.
@@ -1280,11 +1288,11 @@ class Rolodex
       case selection
       when 0
         # Open the rolodex RC file.
-        group_count = Rolodex.openNewRCFile(cdkscreen, group_list, group_count)
+        group_count = Rolodex.openNewRCFile(rndkscreen, group_list, group_count)
       when 1
         # Write out the RC file.
         ret = Rolodex.writeRCFile(
-            cdkscreen, @@grc_file, group_list, group_count)
+            rndkscreen, @@grc_file, group_list, group_count)
 
         # Reset the saved flag if the rc file saved ok.
         if ret != 0
@@ -1292,7 +1300,7 @@ class Rolodex
         end
       when 2
         # Save as.
-        ret = Rolodex.writeRCFileAs(cdkscreen, group_list, group_count)
+        ret = Rolodex.writeRCFileAs(rndkscreen, group_list, group_count)
 
         # Reset the saved flag if the rc file saved ok.
         if ret != 0
@@ -1302,20 +1310,20 @@ class Rolodex
         # Has anything changed?
         if @@g_group_modified
           # Write out the RC file.
-          Rolodex.writeRCFile(cdkscreen, @@grc_file, group_list, group_count)
+          Rolodex.writeRCFile(rndkscreen, @@grc_file, group_list, group_count)
         end
 
-        # Remove the CDK widget pointers.
+        # Remove the RNDK widget pointers.
         rolodex_menu.destroy
         rolodex_title.destroy
-        cdkscreen.destroy
+        rndkscreen.destroy
 
-        CDK::SCREEN.endCDK
+        RNDK::SCREEN.endRNDK
 
         exit  # EXIT_SUCCESS
       when 100
         # Add a new group to the list.
-        group_count = Rolodex.addRolodexGroup(cdkscreen,
+        group_count = Rolodex.addRolodexGroup(rndkscreen,
             group_list, group_count)
       when 101
         # If there are no groups, ask them if they want to create one.
@@ -1330,13 +1338,13 @@ class Rolodex
           ]
 
           # Add the group if they said yes.
-          if cdkscreen.popupDialog(mesg, 2, buttons, 2) == 0
+          if rndkscreen.popupDialog(mesg, 2, buttons, 2) == 0
             group_count = Rolodex.addRolodexGroup(
-                cdkscreen, group_list, group_count)
+                rndkscreen, group_list, group_count)
           end
         else
           # Get the number of the group to open.
-          group = Rolodex.pickRolodexGroup(cdkscreen,
+          group = Rolodex.pickRolodexGroup(rndkscreen,
               '<C></B/29>Open Rolodex Group', group_list, group_count)
           # Make sure a group was picked.
           if group >= 0
@@ -1344,20 +1352,20 @@ class Rolodex
             @@g_current_group = group_list[group].name.clone
 
             # Try to open the DBM file and read the contents.
-            Rolodex.useRolodexGroup(cdkscreen, group_list[group].name,
+            Rolodex.useRolodexGroup(rndkscreen, group_list[group].name,
                 group_list[group].desc, group_list[group].dbm)
           end
         end
       when 102
         # Delete the group chosen.
-        group_count = Rolodex.deleteRolodexGroup(cdkscreen,
+        group_count = Rolodex.deleteRolodexGroup(rndkscreen,
             group_list, group_count)
       when 200
         # Print Phone Number Group.
-        Rolodex.printGroupNumbers(cdkscreen, group_list, group_count)
+        Rolodex.printGroupNumbers(rndkscreen, group_list, group_count)
       when 300
         # About Rolodex.
-        Rolodex.aboutCdkRolodex(cdkscreen)
+        Rolodex.aboutRndkRolodex(rndkscreen)
       when 301
         Rolodex.displayRolodexStats(rolodex_menu.screen, group_count)
       end

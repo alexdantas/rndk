@@ -55,11 +55,11 @@ module RNDK
       @marker[RNDK::CALENDAR.CALENDAR_INDEX(d, m, y)]
     end
 
-    def initialize(cdkscreen, xplace, yplace, title, day, month, year,
+    def initialize(rndkscreen, xplace, yplace, title, day, month, year,
         day_attrib, month_attrib, year_attrib, highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = 24
       box_height = 11
       dayname = 'Su Mo Tu We Th Fr Sa '
@@ -84,7 +84,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -107,8 +107,8 @@ module RNDK
       @day_name = dayname
 
       # Set the rest of the widget values.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @xpos = xpos
       @ypos = ypos
@@ -168,7 +168,7 @@ module RNDK
         self.bind(:CALENDAR, from, :getc, to)
       end
 
-      cdkscreen.register(:CALENDAR, self)
+      rndkscreen.register(:CALENDAR, self)
     end
 
     # This function lets the user play with this widget.
@@ -221,32 +221,26 @@ module RNDK
       if pp_return != 0
         # Check a predefined binding
         if self.checkBind(:CALENDAR, input)
-          self.checkEarlyExit
+
+          ## FIXME What the heck? Missing method?
+          #self.checkEarlyExit
+
           complete = true
         else
           case input
-          when Ncurses::KEY_UP
-            self.decrementCalendarDay(7)
-          when Ncurses::KEY_DOWN
-            self.incrementCalendarDay(7)
-          when Ncurses::KEY_LEFT
-            self.decrementCalendarDay(1)
-          when Ncurses::KEY_RIGHT
-            self.incrementCalendarDay(1)
-          when Ncurses::KEY_NPAGE
-            self.incrementCalendarMonth(1)
-          when Ncurses::KEY_PPAGE
-            self.decrementCalendarMonth(1)
-          when 'N'.ord
-            self.incrementCalendarMonth(6)
-          when 'P'.ord
-            self.decrementCalendarMonth(6)
-          when '-'.ord
-            self.decrementCalendarYear(1)
-          when '+'.ord
-            self.incrementCalendarYear(1)
-          when Ncurses::KEY_HOME
-            self.setDate(-1, -1, -1)
+          when Ncurses::KEY_UP    then self.decrementCalendarDay 7
+          when Ncurses::KEY_DOWN  then self.incrementCalendarDay 7
+          when Ncurses::KEY_LEFT  then self.decrementCalendarDay 1
+          when Ncurses::KEY_RIGHT then self.incrementCalendarDay 1
+          when Ncurses::KEY_NPAGE then self.incrementCalendarMonth 1
+          when Ncurses::KEY_PPAGE then self.decrementCalendarMonth 1
+          when 'N'.ord then self.incrementCalendarMonth 6
+          when 'P'.ord then self.decrementCalendarMonth 6
+          when '-'.ord then self.decrementCalendarYear 1
+          when '+'.ord then self.incrementCalendarYear 1
+
+          when Ncurses::KEY_HOME then self.setDate(-1, -1, -1)
+
           when RNDK::KEY_ESC
             self.setExitType(input)
             complete = true

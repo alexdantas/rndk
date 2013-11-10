@@ -2,7 +2,7 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class GRAPH < RNDK::RNDKOBJS
-    def initialize(cdkscreen,
+    def initialize(rndkscreen,
                    xplace,
                    yplace,
                    height,
@@ -11,8 +11,8 @@ module RNDK
                    xtitle,
                    ytitle)
       super()
-      parent_width = Ncurses.getmaxx cdkscreen.window
-      parent_height = Ncurses.getmaxy cdkscreen.window
+      parent_width = Ncurses.getmaxx rndkscreen.window
+      parent_height = Ncurses.getmaxy rndkscreen.window
 
       self.setBox(false)
 
@@ -26,13 +26,13 @@ module RNDK
       # Rejustify the x and y positions if we need to
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Create the widget pointer
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @box_height = box_height
       @box_width = box_width
@@ -84,7 +84,7 @@ module RNDK
       @graph_char = 0
       @values = []
 
-      cdkscreen.register(:GRAPH, self)
+      rndkscreen.register(:GRAPH, self)
     end
 
     # This was added for the builder.

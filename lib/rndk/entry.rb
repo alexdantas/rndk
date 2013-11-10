@@ -6,7 +6,7 @@ module RNDK
     attr_reader :win, :box_height, :box_width, :max, :field_width
     attr_reader :min, :max
 
-    def initialize(cdkscreen,
+    def initialize(rndkscreen,
                    xplace,
                    yplace,
                    title,
@@ -20,8 +20,8 @@ module RNDK
                    box,
                    shadow)
       super()
-      parent_width = Ncurses.getmaxx cdkscreen.window
-      parent_height = Ncurses.getmaxy cdkscreen.window
+      parent_width = Ncurses.getmaxx rndkscreen.window
+      parent_height = Ncurses.getmaxy rndkscreen.window
       field_width = f_width
       box_width = 0
       xpos = xplace
@@ -63,12 +63,12 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Make the label window.
-      @win = Ncurses.subwin(cdkscreen.window, box_height, box_width, ypos, xpos)
+      @win = Ncurses.subwin(rndkscreen.window, box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
@@ -100,8 +100,8 @@ module RNDK
       @info_width = max + 3
 
       # Set up the rest of the structure.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @field_attr = field_attr
       @field_width = field_width
@@ -146,11 +146,11 @@ module RNDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses.subwin(cdkscreen.window, box_height, box_width,
+        @shadow_win = Ncurses.subwin(rndkscreen.window, box_height, box_width,
             ypos + 1, xpos + 1)
       end
 
-      cdkscreen.register(:ENTRY, self)
+      rndkscreen.register(:ENTRY, self)
     end
 
     # This means you want to use the given entry field. It takes input

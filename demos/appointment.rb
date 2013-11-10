@@ -1,7 +1,19 @@
 #!/usr/bin/env ruby
-require 'optparse'
+#
+# Shows a book where you can create appointments of different
+# kinds, save and restore them on a file.
+#
+# The keybindings are:
+#
+# * 'm' create appointment at selected day
+# * 'r' remove appointment at selected day
+# * '?' displays appointment for selected day
+# * 'enter' or 'tab' quits
+#
+# It automatically creates file `/tmp/appointments.dat` on the
+# current directory
 require 'ostruct'
-require_relative '../lib/cdk'
+require 'rndk'
 
 class Appointment
   MAX_MARKERS = 2000
@@ -26,7 +38,7 @@ class Appointment
     lines = []
 
     # Read the appointment file.
-    lines_read = CDK.readFile(filename, lines)
+    lines_read = RNDK.readFile(filename, lines)
     if lines_read == -1
       app_info.count = 0
       return
@@ -34,7 +46,7 @@ class Appointment
 
     # Split each line up and create an appointment.
     (0...lines_read).each do |x|
-      temp = lines[x].split(CDK.CTRL('V').chr)
+      temp = lines[x].split(RNDK.CTRL('V').chr)
       segments =  temp.size
 
       # A valid line has 5 elements:
@@ -65,17 +77,17 @@ class Appointment
     app_info.appointment.each do |appointment|
       if appointment.description != ''
         fd.puts '%d%c%d%c%d%c%d%c%s' % [
-            appointment.day, CDK.CTRL('V').chr,
-            appointment.month, CDK.CTRL('V').chr,
-            appointment.year, CDK.CTRL('V').chr,
+            appointment.day, RNDK.CTRL('V').chr,
+            appointment.month, RNDK.CTRL('V').chr,
+            appointment.year, RNDK.CTRL('V').chr,
             Appointment::AppointmentType.index(appointment.type),
-            CDK.CTRL('V').chr, appointment.description]
+            RNDK.CTRL('V').chr, appointment.description]
       end
     end
     fd.close
   end
 
-  # This program demonstrates the Cdk calendar widget.
+  # This program demonstrates the Rndk calendar widget.
   def Appointment.main
 
     # Get the current dates and set the default values for
@@ -85,37 +97,12 @@ class Appointment
     month = date_info.mon
     year = date_info.year
 
-    title = "<C></U>CDK Appointment Book\n<C><#HL(30)>\n"
+    title = "<C></U>RNDK Appointment Book\n<C><#HL(30)>\n"
 
     filename = ''
 
-    # Check the command line for options
-    opts = OptionParser.getopts('d:m:y:t:f:')
-    if opts['d']
-      day = opts['d'].to_i
-    end
-    if opts['m']
-      month = opts['m'].to_i
-    end
-    if opts['y']
-      year = opts['y'].to_i
-    end
-    if opts['t']
-      title = opts['t']
-    end
-    if opts['f']
-      filename = opts['f']
-    end
-
     # Create the appointment book filename.
-    if filename == ''
-      home = ENV['HOME']
-      if home.nil?
-        filename = '.appointment'
-      else
-        filename = '%s/.appointment' % [home]
-      end
-    end
+    filename = "/tmp/appointments.dat"
 
     appointment_info = OpenStruct.new
     appointment_info.count = 0
@@ -123,26 +110,29 @@ class Appointment
 
     # Read the appointment book information.
     readAppointmentFile(filename, appointment_info)
-    
-    # Set up CDK
-    curses_win = Ncurses.initscr
-    cdkscreen = CDK::SCREEN.new(curses_win)
 
-    # Set up CDK colors
-    CDK::Draw.initCDKColor
+    # Set up RNDK
+    curses_win = Ncurses.initscr
+    rndkscreen = RNDK::SCREEN.new(curses_win)
+
+    # Set up RNDK colors
+    RNDK::Draw.initRNDKColor
 
     # Create the calendar widget.
-    calendar = CDK::CALENDAR.new(cdkscreen, CDK::CENTER, CDK::CENTER,
-        title, day, month, year, Ncurses::A_NORMAL, Ncurses::A_NORMAL,
-        Ncurses::A_NORMAL, Ncurses::A_REVERSE, true, false)
+    calendar = RNDK::CALENDAR.new(rndkscreen,
+                                  RNDK::CENTER,
+                                  RNDK::CENTER,
+                                  title, day, month, year,
+                                  Ncurses::A_NORMAL, Ncurses::A_NORMAL, Ncurses::A_NORMAL, Ncurses::A_REVERSE,
+                                  true, false)
 
     # Is the widget nil?
     if calendar.nil?
-      cdkscreen.destroy
-      CDK::SCREEN.endCDK
+      rndkscreen.destroy
+      RNDK::SCREEN.endRNDK
 
       puts "Cannot create the calendar. Is the window too small?"
-      exit  # EXIT_FAILURE
+      exit 1
     end
 
     # This adds a marker to the calendar.
@@ -155,8 +145,8 @@ class Appointment
       ]
 
       # Create the itemlist widget.
-      itemlist = CDK::ITEMLIST.new(calendar.screen,
-          CDK::CENTER, CDK::CENTER, '', 'Select Appointment Type: ',
+      itemlist = RNDK::ITEMLIST.new(calendar.screen,
+          RNDK::CENTER, RNDK::CENTER, '', 'Select Appointment Type: ',
           items, items.size, 0, true, false)
 
       # Get the appointment type from the user.
@@ -175,7 +165,7 @@ class Appointment
       marker = Appointment::GPAppointmentAttributes[selection]
 
       # Create the entry field for the description.
-      entry = CDK::ENTRY.new(calendar.screen, CDK::CENTER, CDK::CENTER,
+      entry = RNDK::ENTRY.new(calendar.screen, RNDK::CENTER, RNDK::CENTER,
           '<C>Enter a description of the appointment.',
           'Description: ', Ncurses::A_NORMAL, '.'.ord, :MIXED, 40, 1, 512,
           true, false)
@@ -277,15 +267,13 @@ class Appointment
 
       # If we didn't find the marker, create a different message.
       if found == 0
-        mesg << '<C>There is no appointment for %02d/%02d/%d' % [
-            calendar.day, calendar.month, calendar.year]
+        mesg << '<C>There is no appointment for %02d/%02d/%d' % [calendar.day, calendar.month, calendar.year]
         mesg << '<C><#HL(30)>'
         mesg << '<C>Press space to continue.'
       end
 
       # Create the label widget
-      label = CDK::LABEL.new(calendar.screen, CDK::CENTER, CDK::CENTER,
-          mesg, mesg.size, true, false)
+      label = RNDK::LABEL.new(calendar.screen, RNDK::CENTER, RNDK::CENTER, mesg, mesg.size, true, false)
       label.draw(label.box)
       label.wait(' ')
       label.destroy
@@ -295,27 +283,34 @@ class Appointment
       return false
     end
 
-    # This allows the user to accelerate to a given date.
-    accelerate_to_date_cb = lambda do |object_type, object, client_data, key|
-      return false
+    # Shows a help popup with keybindings.
+    show_help = lambda do |object_type, calendar, info, key|
+      msg = ["Keybindings:",
+             " 'm' create appointment at selected day",
+             " 'r' remove appointment at selected day",
+             " '?' displays appointment for selected day",
+             " 'enter' or 'tab' quits"]
+
+      rndkscreen.popupLabel(msg, msg.size)
     end
 
+    # Now we bind actions to the calendar.
     # Create a key binding to mark days on the calendar.
     calendar.bind(:CALENDAR, 'm', create_calendar_mark_cb, appointment_info)
     calendar.bind(:CALENDAR, 'M', create_calendar_mark_cb, appointment_info)
     calendar.bind(:CALENDAR, 'r', remove_calendar_mark_cb, appointment_info)
     calendar.bind(:CALENDAR, 'R', remove_calendar_mark_cb, appointment_info)
     calendar.bind(:CALENDAR, '?', display_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'j', accelerate_to_date_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'J', accelerate_to_date_cb, appointment_info)
+    calendar.bind(:CALENDAR, 'h', show_help, nil)
 
     # Set all the appointments read from the file.
     appointment_info.appointment.each do |appointment|
-      marker = Appointment::GPAppointmentAttributes[
-          Appointment::AppointmentType.index(appointment.type)]
+      marker = Appointment::GPAppointmentAttributes[Appointment::AppointmentType.index(appointment.type)]
 
-      calendar.setMarker(appointment.day, appointment.month,
-          appointment.year, marker)
+      calendar.setMarker(appointment.day,
+                         appointment.month,
+                         appointment.year,
+                         marker)
     end
 
     # Draw the calendar widget.
@@ -329,10 +324,21 @@ class Appointment
 
     # Clean up.
     calendar.destroy
-    cdkscreen.destroy
-    CDK::SCREEN.endCDK
-    exit  # EXIT_SUCCESS
+    rndkscreen.destroy
+    RNDK::SCREEN.endRNDK
   end
 end
 
-Appointment.main
+
+begin
+  Appointment.main
+
+# In case something goes wrong
+rescue Exception => e
+  RNDK::SCREEN.endRNDK
+
+  puts e
+  puts e.inspect
+  puts e.backtrace
+end
+

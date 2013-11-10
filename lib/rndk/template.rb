@@ -2,11 +2,11 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class TEMPLATE < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, title, label, plate,
+    def initialize(rndkscreen, xplace, yplace, title, label, plate,
         overlay, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = 0
       box_height = if box then 3 else 1 end
       plate_len = 0
@@ -61,7 +61,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -95,8 +95,8 @@ module RNDK
       @plate = plate.clone
 
       # Set up the rest of the structure.
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @shadow_win = nil
       @field_width = field_width
       @box_height = box_height
@@ -187,7 +187,7 @@ module RNDK
             ypos + 1, xpos + 1)
       end
 
-      cdkscreen.register(:TEMPLATE, self)
+      rndkscreen.register(:TEMPLATE, self)
     end
 
     # This actually manages the tempalte widget

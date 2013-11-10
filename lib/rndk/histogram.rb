@@ -2,11 +2,11 @@ require 'rndk/rndk_objs'
 
 module RNDK
   class HISTOGRAM < RNDK::RNDKOBJS
-    def initialize(cdkscreen, xplace, yplace, height, width, orient,
+    def initialize(rndkscreen, xplace, yplace, height, width, orient,
         title, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(cdkscreen.window)
-      parent_height = Ncurses.getmaxy(cdkscreen.window)
+      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_height = Ncurses.getmaxy(rndkscreen.window)
 
       self.setBox(box)
 
@@ -34,13 +34,13 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(cdkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the histogram data
-      @screen = cdkscreen
-      @parent = cdkscreen.window
+      @screen = rndkscreen
+      @parent = rndkscreen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @box_width = box_width
@@ -84,7 +84,7 @@ module RNDK
                                      xpos + 1)
       end
 
-      cdkscreen.register(:HISTOGRAM, self)
+      rndkscreen.register(:HISTOGRAM, self)
     end
 
     # This was added for the builder

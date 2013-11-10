@@ -1,4 +1,11 @@
 #!/usr/bin/env ruby
+# NOTE: This example/demo might be weird/bad-formatted/ugly.
+#       I'm currently refactoring all demos/examples from the
+#       original 'tawny-cdk' repository and THIS FILE wasn't
+#       touched yet.
+#       I suggest you go look for files without this notice.
+#
+
 require_relative 'example'
 
 class LabelExample < Example
