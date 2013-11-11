@@ -9,10 +9,18 @@
 #     curses_win = Ncurses.initscr
 #     rndkscreen = RNDK::Screen.new(curses_win)
 #     message = ["awesome quick label!"]
-#     rndkscreen.popupLabel message
+#     rndkscreen.popup_label message
 #
+
+# Since I'm including a lot of widgets here, maybe I
+# should make the user require 'quick_widgets'
+# explicitly?
 require 'rndk/label'
 require 'rndk/dialog'
+require 'rndk/viewer'
+require 'rndk/fselect'
+require 'rndk/entry'
+require 'rndk/scroll'
 
 module RNDK
   class Screen
@@ -37,7 +45,7 @@ module RNDK
     # waits until the user hits a character.
     #
     # @note: `message` must be an array of strings.
-    def popupLabel message
+    def popup_label message
       return if message.class != Array or message.empty?
 
       self.cleanly do
@@ -57,7 +65,7 @@ module RNDK
     # the background of the dialog.
     #
     # @note: `message` must be an array of strings.
-    def popupLabelAttrib(message, attrib)
+    def popup_label_attrib(message, attrib)
       return if message.class != Array or message.empty?
 
       self.cleanly do
@@ -80,10 +88,11 @@ module RNDK
     #          were given.
     #
     # @note: `message` and `buttons` must be Arrays of Strings.
-    def popupDialog(message, buttons)
+    def popup_dialog(message, buttons)
       return nil if message.class != Array or message.empty?
       return nil if buttons.class != Array or buttons.empty?
 
+      choice = 0
       self.cleanly do
         popup = RNDK::DIALOG.new(self,
                                  RNDK::CENTER,
@@ -101,14 +110,16 @@ module RNDK
       choice
     end
 
-    # Display a string set `info` in a Viewer Widget.
+    # Display a long string set `info` in a Viewer Widget.
     #
     # `title` and `buttons` are applied to the Widget.
-    # This allows the user to view information.
+    #
+    # `hide_control_chars` tells if we want to hide those
+    # ugly `^J`, `^M` chars.
     #
     # @return The index of the selected button.
     # @note `info` and `buttons` must be Arrays of Strings.
-    def view_info(title, info, buttons, interpret)
+    def view_info(title, info, buttons, hide_control_chars=true)
       return nil if info.class != Array or info.empty?
       return nil if buttons.class != Array or buttons.empty?
 
@@ -131,7 +142,7 @@ module RNDK
                  info,
                  info.size,
                  Ncurses::A_REVERSE,
-                 interpret,
+                 hide_control_chars,
                  true,
                  true)
 
@@ -163,7 +174,7 @@ module RNDK
       result = 0
 
       # Open the file and read the contents.
-      lines = RNDK.readFile(filename, info)
+      lines = RNDK.read_file(filename, info)
 
       # If we couldn't read the file, return an error.
       if lines == -1
@@ -177,6 +188,139 @@ module RNDK
       result
     end
 
+    # Displays a file-selection dialog with `title`.
+    #
+    # @return The selected filename, or `nil` if none was selected.
+    #
+    # TODO FIXME This widget is VERY buggy.
+    #
+    def select_file title
+
+      fselect = RNDK::FSELECT.new(self,
+                                  RNDK::CENTER,
+                                  RNDK::CENTER,
+                                  -4,
+                                  -20,
+                                  title,
+                                  'File: ',
+                                  Ncurses::A_NORMAL,
+                                  '_',
+                                  Ncurses::A_REVERSE,
+                                  '</5>',
+                                  '</48>',
+                                  '</N>',
+                                  '</N>',
+                                  true,
+                                  false)
+
+      filename = fselect.activate([])
+
+      # Check the way the user exited the selector.
+      if fselect.exit_type != :NORMAL
+        fselect.destroy
+        self.refresh
+        return nil
+      end
+
+      # Otherwise...
+      fselect.destroy
+      self.refresh
+      filename
+    end
+
+    # Display a scrollable `list` of strings in a Dialog, allowing
+    # the user to select one.
+    #
+    # @return The index in the list of the value selected.
+    #
+    # If `numbers` is true, the displayed list items will be numbered.
+    # @note `list` must be Arrays of Strings.
+    def get_list_index(title, list, numbers)
+      return nil if list.class != Array or list.empty?
+
+      selected = -1
+      height = 10
+      width = -1
+      len = 0
+
+      # Determine the height of the list.
+      if list.size < 10
+        height = list.size + if title.size == 0 then 2 else 3 end
+      end
+
+      # Determine the width of the list.
+      list.each { |item| width = [width, item.size + 10].max }
+
+      width = [width, title.size].max
+      width += 5
+
+      scrollp = RNDK::SCROLL.new(self,
+                                 RNDK::CENTER,
+                                 RNDK::CENTER,
+                                 RNDK::RIGHT,
+                                 height,
+                                 width,
+                                 title,
+                                 list,
+                                 list.size,
+                                 numbers,
+                                 Ncurses::A_REVERSE,
+                                 true,
+                                 false)
+      if scrollp.nil?
+        self.refresh
+        return -1
+      end
+
+      selected = scrollp.activate([])
+
+      # Check how they exited.
+      if scrollp.exit_type != :NORMAL
+        selected = -1
+      end
+
+      scrollp.destroy
+      self.refresh
+
+      selected
+    end
+
+    # Pops up an Entry Widget and returns the value supplied
+    # by the user.
+    #
+    # `title`, `label` and `initial_value` are passed to the Widget.
+    def get_string(title, label, initial_value="")
+
+      widget = RNDK::ENTRY.new(self,
+                               RNDK::CENTER,
+                               RNDK::CENTER,
+                               title,
+                               label,
+                               Ncurses::A_NORMAL,
+                               '.',
+                               :MIXED,
+                               40,
+                               0,
+                               5000,
+                               true,
+                               false)
+
+      widget.setValue(initial_value)
+
+      value = widget.activate([])
+
+      # Make sure they exited normally.
+      if widget.exit_type != :NORMAL
+        widget.destroy
+        return nil
+      end
+
+      # Return a copy of the string typed in.
+      value = widget.getValue.clone
+      widget.destroy
+
+      value
+    end
   end
 end
 

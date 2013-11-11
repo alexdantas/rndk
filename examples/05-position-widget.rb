@@ -79,7 +79,7 @@ begin
             "",
             "<C>Press any key to continue."
            ]
-    rndkscreen.popupLabel mesg
+    rndkscreen.popup_label mesg
 
   elsif entry.exit_type == :NORMAL
     mesg = [
@@ -88,12 +88,9 @@ begin
             "",
             "<C>Press any key to continue."
            ]
-    rndkscreen.popupLabel mesg
+    rndkscreen.popup_label mesg
   end
 
-  # Clean up
-  entry.destroy
-  rndkscreen.destroy
   RNDK::Screen.end_rndk
 
 # Just in case something bad happens.

@@ -312,7 +312,7 @@ module RNDK
             # mesg[0] = copyChar (errorMessage ("<C>Cannot delete file: %s"));
             # mesg[1] = copyChar (" ");
             # mesg[2] = copyChar("<C>Press any key to continue.");
-            # popupLabel(ScreenOf (fselect), (RNDK_CSTRING2) mesg, 3);
+            # popup_label(ScreenOf (fselect), (RNDK_CSTRING2) mesg, 3);
             # freeCharList (mesg, 3);
           end
         end
@@ -569,7 +569,7 @@ module RNDK
           ]
 
           # Pop up a message.
-          @screen.popupLabel(mesg, 4)
+          @screen.popup_label(mesg, 4)
 
           # Get out of here.
           self.erase

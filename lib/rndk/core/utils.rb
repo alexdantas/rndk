@@ -117,5 +117,28 @@ module RNDK
     end
   end
 
+  # Reads a file and concatenate it's lines into `array`.
+  #
+  # @note The lines don't end with '\n'.
+  def RNDK.read_file(filename, array)
+    begin
+      fd = File.new(filename, "r")
+    rescue
+      return nil
+    end
+
+    lines = fd.readlines.map do |line|
+      if line.size > 0 && line[-1] == "\n"
+        line[0...-1]
+      else
+        line
+      end
+    end
+
+    array.concat lines
+    fd.close
+    array.size
+  end
+
 end
 

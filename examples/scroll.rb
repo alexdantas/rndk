@@ -98,7 +98,7 @@ begin
            "<C>%.*s" % [236, the_item],  # FIXME magic number
            "<C>Press any key to continue."]
   end
-  rndkscreen.popupLabel msg
+  rndkscreen.popup_label msg
 
   # Exit
   RNDK::Screen.end_rndk

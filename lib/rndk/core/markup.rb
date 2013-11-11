@@ -386,6 +386,10 @@ module RNDK
     end
   end
 
+  def RNDK.CharOf chtype
+    (chtype.ord & 255).chr
+  end
+
   # This returns a string from a chtype array
   # Formatting codes are omitted.
   def RNDK.chtype2Char(string)

@@ -98,91 +98,6 @@ module RNDK
     $stdout.flush
   end
 
-  # This sets a blank string to be len of the given characer.
-  def RNDK.cleanChar(s, len, character)
-    s << character * len
-  end
-
-  def RNDK.cleanChtype(s, len, character)
-    s.concat(character * len)
-  end
-
-  # This takes an x and y position and realigns the values iff they sent in
-  # values like CENTER, LEFT, RIGHT
-  #
-  # window is an Ncurses::WINDOW object
-  # xpos, ypos is an array with exactly one value, an integer
-  # box_width, box_height is an integer
-  def RNDK.alignxy (window, xpos, ypos, box_width, box_height)
-    first = Ncurses.getbegx window
-    last = Ncurses.getmaxx window
-    if (gap = (last - box_width)) < 0
-      gap = 0
-    end
-    last = first + gap
-
-    case xpos[0]
-    when LEFT
-      xpos[0] = first
-    when RIGHT
-      xpos[0] = first + gap
-    when CENTER
-      xpos[0] = first + (gap / 2)
-    else
-      if xpos[0] > last
-        xpos[0] = last
-      elsif xpos[0] < first
-        xpos[0] = first
-      end
-    end
-
-    first = Ncurses.getbegy window
-    last = Ncurses.getmaxy window
-    if (gap = (last - box_height)) < 0
-      gap = 0
-    end
-    last = first + gap
-
-    case ypos[0]
-    when TOP
-      ypos[0] = first
-    when BOTTOM
-      ypos[0] = first + gap
-    when CENTER
-      ypos[0] = first + (gap / 2)
-    else
-      if ypos[0] > last
-        ypos[0] = last
-      elsif ypos[0] < first
-        ypos[0] = first
-      end
-    end
-  end
-
-  # This reads a file and sticks it into the list provided.
-  def RNDK.readFile(filename, array)
-    begin
-      fd = File.new(filename, "r")
-    rescue
-      return -1
-    end
-
-    lines = fd.readlines.map do |line|
-      if line.size > 0 && line[-1] == "\n"
-        line[0...-1]
-      else
-        line
-      end
-    end
-    array.concat(lines)
-    fd.close
-    array.size
-  end
-
-  def RNDK.CharOf(chtype)
-    (chtype.ord & 255).chr
-  end
-
   # This safely erases a given window
   def RNDK.eraseCursesWindow (window)
     return if window.nil?
@@ -237,96 +152,69 @@ module RNDK
     264 + n
   end
 
-  def RNDK.getString(screen, title, label, init_value)
-    # Create the widget.
-    widget = RNDK::ENTRY.new(screen, RNDK::CENTER, RNDK::CENTER, title, label,
-        Ncurses::A_NORMAL, '.', :MIXED, 40, 0, 5000, true, false)
-
-    # Set the default value.
-    widget.setValue(init_value)
-
-    # Get the string.
-    value = widget.activate([])
-
-    # Make sure they exited normally.
-    if widget.exit_type != :NORMAL
-      widget.destroy
-      return nil
-    end
-
-    # Return a copy of the string typed in.
-    value = entry.getValue.clone
-    widget.destroy
-    return value
+  # This sets a blank string to be len of the given characer.
+  def RNDK.cleanChar(s, len, character)
+    s << character * len
   end
 
-  # This allows a person to select a file.
-  def RNDK.selectFile(screen, title)
-    # Create the file selector.
-    fselect = RNDK::FSELECT.new(screen, RNDK::CENTER, RNDK::CENTER, -4, -20,
-        title, 'File: ', Ncurses::A_NORMAL, '_', Ncurses::A_REVERSE,
-        '</5>', '</48>', '</N>', '</N>', true, false)
-
-    # Let the user play.
-    filename = fselect.activate([])
-
-    # Check the way the user exited the selector.
-    if fselect.exit_type != :NORMAL
-      fselect.destroy
-      screen.refresh
-      return nil
-    end
-
-    # Otherwise...
-    fselect.destroy
-    screen.refresh
-    return filename
+  def RNDK.cleanChtype(s, len, character)
+    s.concat(character * len)
   end
 
-  # This returns a selected value in a list
-  def RNDK.getListindex(screen, title, list, list_size, numbers)
-    selected = -1
-    height = 10
-    width = -1
-    len = 0
+  # Aligns a box on the given `window` with the width and height given.
+  #
+  # x and y position values are like `RNDK::CENTER`, `RNDK::LEFT`,
+  # `RNDK::RIGHT`.
+  #
+  # xpos, ypos is an array with exactly one value, an integer
+  # box_width, box_height is an integer.
+  #
+  def RNDK.alignxy (window, xpos, ypos, box_width, box_height)
+    first = Ncurses.getbegx window
+    last = Ncurses.getmaxx window
+    if (gap = (last - box_width)) < 0
+      gap = 0
+    end
+    last = first + gap
 
-    # Determine the height of the list.
-    if list_size < 10
-      height = list_size + if title.size == 0 then 2 else 3 end
+    case xpos[0]
+    when LEFT
+      xpos[0] = first
+    when RIGHT
+      xpos[0] = first + gap
+    when CENTER
+      xpos[0] = first + (gap / 2)
+    else
+      if xpos[0] > last
+        xpos[0] = last
+      elsif xpos[0] < first
+        xpos[0] = first
+      end
     end
 
-    # Determine the width of the list.
-    list.each do |item|
-      width = [width, item.size + 10].max
+    first = Ncurses.getbegy window
+    last = Ncurses.getmaxy window
+    if (gap = (last - box_height)) < 0
+      gap = 0
     end
+    last = first + gap
 
-    width = [width, title.size].max
-    width += 5
-
-    # Create the scrolling list.
-    scrollp = RNDK::SCROLL.new(screen, RNDK::CENTER, RNDK::CENTER, RNDK::RIGHT,
-        height, width, title, list, list_size, numbers, Ncurses::A_REVERSE,
-        true, false)
-
-    # Check if we made the lsit.
-    if scrollp.nil?
-      screen.refresh
-      return -1
+    case ypos[0]
+    when TOP
+      ypos[0] = first
+    when BOTTOM
+      ypos[0] = first + gap
+    when CENTER
+      ypos[0] = first + (gap / 2)
+    else
+      if ypos[0] > last
+        ypos[0] = last
+      elsif ypos[0] < first
+        ypos[0] = first
+      end
     end
-
-    # Let the user play.
-    selected = scrollp.activate([])
-
-    # Check how they exited.
-    if scrollp.exit_type != :NORMAL
-      selected = -1
-    end
-
-    # Clean up.
-    scrollp.destroy
-    screen.refresh
-    return selected
   end
+
 end
 
 # Why is this here?

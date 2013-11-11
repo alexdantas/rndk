@@ -191,7 +191,7 @@ module RNDK
           filename = ''
           if RNDK.checkForLink(list[x], filename) == 1
             file_contents = []
-            file_len = RNDK.readFile(filename, file_contents)
+            file_len = RNDK.read_file(filename, file_contents)
 
             if file_len >= 0
               viewer_size += (file_len - 1)
@@ -226,7 +226,7 @@ module RNDK
             file_len = 0
 
             # Open the file and put it into the viewer
-            file_len = RNDK.readFile(filename, file_contents)
+            file_len = RNDK.read_file(filename, file_contents)
             if file_len == -1
               fopen_fmt = if Ncurses.has_colors?
                           then '<C></16>Link Failed: Could not open the file %s'

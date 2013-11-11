@@ -569,7 +569,7 @@ module RNDK
           ' ',
           '<C> Press any key to continue.',
       ]
-      @screen.popupLabel(mesg, mesg.size)
+      @screen.popup_label(mesg, mesg.size)
     end
 
     # This function allows the user to dump the information from the
@@ -593,7 +593,7 @@ module RNDK
             ' ',
             '<C>Press any key to continue.'
         ]
-        @screen.popupLabel(mesg, 4)
+        @screen.popup_label(mesg, 4)
 
         # Clean up and exit.
         entry.destroy
@@ -639,7 +639,7 @@ module RNDK
             ' ',
             '<C>Press any key to continue.',
         ]
-        @screen.popupLabel(mesg, 3)
+        @screen.popup_label(mesg, 3)
 
         # Clean up and exit
         fselect.destroy

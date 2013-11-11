@@ -293,7 +293,7 @@ class Appointment
              " '?' displays appointment for selected day",
              " 'enter' or 'tab' quits"]
 
-      rndkscreen.popupLabel msg
+      rndkscreen.popup_label msg
     end
 
     # Now we bind actions to the calendar.

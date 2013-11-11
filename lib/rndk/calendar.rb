@@ -588,7 +588,7 @@ module RNDK
                 'Can not go past the year 1900'
             ]
             RNDK.beep
-            @screen.popupLabel(mesg, 2)
+            @screen.popup_label(mesg, 2)
             return
           end
           month_length = RNDK::CALENDAR.getMonthLength(@year - 1, 12)
@@ -640,7 +640,7 @@ module RNDK
               'Can not go past the year 1900',
           ]
           RNDK.beep
-          @screen.popupLabel(mesg, 2)
+          @screen.popup_label(mesg, 2)
           return
         else
           @month = 13 - adjust
@@ -694,7 +694,7 @@ module RNDK
             'Can not go past the year 1900',
         ]
         RNDK.beep
-        @screen.popupLabel(mesg, 2)
+        @screen.popup_label(mesg, 2)
         return
       end
 
