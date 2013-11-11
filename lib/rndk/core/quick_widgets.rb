@@ -49,9 +49,7 @@ module RNDK
       return if message.class != Array or message.empty?
 
       self.cleanly do
-        count = message.size
-
-        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, count, true, false)
+        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, true, false)
         popup.draw(true)
 
         # Wait for some input.
@@ -69,7 +67,7 @@ module RNDK
       return if message.class != Array or message.empty?
 
       self.cleanly do
-        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, message.size, true, false)
+        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, true, false)
         popup.setBackgroundAttrib attrib
         popup.draw(true)
 

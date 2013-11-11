@@ -59,7 +59,6 @@ begin
                           RNDK::CENTER, # x
                           1,            # y
                           msg,
-                          msg.size,
                           true,         # has box?
                           true)         # has shadow?
 

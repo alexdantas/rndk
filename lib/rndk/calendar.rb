@@ -396,7 +396,8 @@ module RNDK
     # Draws the Calendar Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw box
+    def draw(box=false)
+
       header_len = @day_name.size
       col_len = (6 + header_len) / 7
 

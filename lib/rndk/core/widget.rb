@@ -301,47 +301,12 @@ module RNDK
       result
     end
 
-    def getc
-      rndktype = self.object_type
-      test = self.bindableObject(rndktype)
-      result = Ncurses.wgetch @input_window
-
-      if result >= 0 && !(test.nil?) && test.binding_list.include?(result) &&
-          test.binding_list[result][0] == :getc
-        result = test.binding_list[result][1]
-      elsif test.nil? || !(test.binding_list.include?(result)) ||
-          test.binding_list[result][0].nil?
-        case result
-        when "\r".ord, "\n".ord
-          result = Ncurses::KEY_ENTER
-        when "\t".ord
-          result = RNDK::KEY_TAB
-        when RNDK::DELETE
-          result = Ncurses::KEY_DC
-        when "\b".ord
-          result = Ncurses::KEY_BACKSPACE
-        when RNDK::BEGOFLINE
-          result = Ncurses::KEY_HOME
-        when RNDK::ENDOFLINE
-          result = Ncurses::KEY_END
-        when RNDK::FORCHAR
-          result = Ncurses::KEY_RIGHT
-        when RNDK::BACKCHAR
-          result = Ncurses::KEY_LEFT
-        when RNDK::NEXT
-          result = RNDK::KEY_TAB
-        when RNDK::PREV
-          result = Ncurses::KEY_BTAB
-        end
-      end
-
-      return result
-    end
-
-    def getch(function_key)
+    # FIXME TODO What does `function_key` does?
+    def getch(function_key=[])
       key = self.getc
       function_key << (key >= Ncurses::KEY_MIN && key <= Ncurses::KEY_MAX)
-      return key
+
+      key
     end
 
     def bindableObject(rndktype)
@@ -535,6 +500,43 @@ module RNDK
           RNDK.beep
         end
       end
+    end
+
+    protected
+
+    # Gets a raw character from internal Ncurses window
+    # and returns the result, capped to sane values.
+    def getc
+      rndktype = self.object_type
+      test   = self.bindableObject rndktype
+      result = Ncurses.wgetch @input_window
+
+      if (result >= 0) and
+          (not test.nil?) and
+          (test.binding_list.include? result) and
+          (test.binding_list[result][0] == :getc)
+
+        result = test.binding_list[result][1]
+
+      elsif (test.nil?) or
+          (not test.binding_list.include? result) or
+          (test.binding_list[result][0].nil?)
+
+        case result
+        when "\r".ord, "\n".ord then result = Ncurses::KEY_ENTER
+        when "\t".ord           then result = RNDK::KEY_TAB
+        when RNDK::DELETE       then result = Ncurses::KEY_DC
+        when "\b".ord           then result = Ncurses::KEY_BACKSPACE
+        when RNDK::BEGOFLINE    then result = Ncurses::KEY_HOME
+        when RNDK::ENDOFLINE    then result = Ncurses::KEY_END
+        when RNDK::FORCHAR      then result = Ncurses::KEY_RIGHT
+        when RNDK::BACKCHAR     then result = Ncurses::KEY_LEFT
+        when RNDK::NEXT         then result = RNDK::KEY_TAB
+        when RNDK::PREV         then result = Ncurses::KEY_BTAB
+        end
+      end
+
+      return result
     end
 
   end

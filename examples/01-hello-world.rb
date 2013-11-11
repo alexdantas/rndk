@@ -28,7 +28,6 @@ begin
                           RNDK::CENTER, # x
                           RNDK::CENTER, # y
                           mesg,         # message
-                          4,            # lines count
                           true,         # box?
                           true)         # shadow?
 

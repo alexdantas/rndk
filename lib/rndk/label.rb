@@ -2,26 +2,41 @@ require 'rndk'
 
 module RNDK
 
+  # Pop-up Label window.
+  #
   class LABEL < RNDK::Widget
 
     # Raw Ncurses window.
     attr_accessor :win
 
-    def initialize(rndkscreen, xplace, yplace, mesg, rows, box, shadow)
-      super()
+    # Creates a Label Widget.
+    #
+    # * `xplace` is the x position - can be an integer or `RNDK::LEFT`,
+    #   `RNDK::RIGHT`, `RNDK::CENTER`.
+    # * `yplace` is the y position - can be an integer or `RNDK::TOP`,
+    #   `RNDK::BOTTOM`, `RNDK::CENTER`.
+    # * `message` is an Array of Strings with all the lines you'd want
+    #   to show. RNDK markup applies (see RNDK#Markup).
+    # * `box` if the Widget is drawn with a box outside it.
+    # * `shadow` turns on/off the shadow around the Widget.
+    #
+    # If the Widget cannot be created, returns `nil`.
+    def initialize(rndkscreen, xplace, yplace, mesg, box, shadow)
+      return nil if mesg.class != Array or mesg.empty?
 
-      parent_width  = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      super()
+      rows = mesg.size
+
+      parent_width  = Ncurses.getmaxx rndkscreen.window
+      parent_height = Ncurses.getmaxy rndkscreen.window
       box_width  = -2**30  # -INFINITY
       box_height = 0
       xpos = [xplace]
       ypos = [yplace]
       x = 0
 
-      return nil if rows <= 0
-
       self.set_box box
-      box_height = rows + 2 * @border_size
+      box_height = rows + 2*@border_size
 
       @info = []
       @info_len = []
@@ -43,7 +58,7 @@ module RNDK
 
       # Create the string alignments.
       (0...rows).each do |x|
-        @info_pos[x] = RNDK.justifyString(box_width - 2 * @border_size,
+        @info_pos[x] = RNDK.justifyString(box_width - 2*@border_size,
                                           @info_len[x],
                                           @info_pos[x])
       end
@@ -93,20 +108,25 @@ module RNDK
       rndkscreen.register(:LABEL, self)
     end
 
-    # This was added for the builder.
-    def activate(actions)
-      self.draw(@box)
+    # Obsolete entrypoint which calls Label#draw.
+    def activate(actions=[])
+      self.draw @box
     end
 
-    # This sets multiple attributes of the widget
-    def set(mesg, lines, box)
-      self.setMessage(mesg, lines)
-      self.set_box(box)
+    # Sets multiple attributes of the Widget.
+    #
+    # See Label#initialize.
+    def set(mesg, box)
+      self.set_message mesg
+      self.set_box box
     end
 
-    # This sets the information within the label.
-    def setMessage(info, info_size)
+    # Sets the contents of the Label Widget.
+    # @note `info` is an Array of Strings.
+    def set_message info
+      return if info.class != Array or info.empty?
 
+      info_size = info.size
       # Clean out the old message.
       (0...@rows).each do |x|
         @info[x]     = ''
@@ -132,10 +152,11 @@ module RNDK
 
       # Redraw the label widget.
       self.erase
-      self.draw(@box)
+      self.draw @box
     end
 
-    def getMessage(size)
+    # Returns current contents of the Widget.
+    def get_message(size)
       size << @rows
       return @info
     end
@@ -148,13 +169,15 @@ module RNDK
       super(@win)
     end
 
-    # This sets the background attribute of the widget.
-    def set_bg_attrib(attrib)
+    # Sets the background attribute/color of the widget.
+    def set_bg_attrib attrib
       Ncurses.wbkgd(@win, attrib)
     end
 
-    # This draws the label widget.
-    def draw(box)
+    # Draws the Label Widget on the Screen.
+    #
+    # If `box` is `true`, the Widget is drawn with a box.
+    def draw(box=false)
 
       # Is there a shadow?
       Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
@@ -178,38 +201,36 @@ module RNDK
 
     # This erases the label widget
     def erase
-      RNDK.eraseCursesWindow(@win)
-      RNDK.eraseCursesWindow(@shadow_win)
+      RNDK.eraseCursesWindow @win
+      RNDK.eraseCursesWindow @shadow_win
     end
 
-    # This moves the label field to the given location
-    # Inherited
-    # def move(xplace, yplace, relative, refresh_flag)
-    # end
-
-    # This destroys the label object pointer.
+    # Removes the Widget from the Screen, deleting it's
+    # internal windows.
     def destroy
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.deleteCursesWindow @shadow_win
+      RNDK.deleteCursesWindow @win
 
-      self.clean_bindings(:LABEL)
+      self.clean_bindings :LABEL
 
       RNDK::Screen.unregister(:LABEL, self)
     end
 
-    # This pauses until a user hits a key...
-    def wait(key)
-      function_key = []
+    # Waits for the user to press a key.
+    #
+    # If no key is provided, waits for a
+    # single keypress of any key.
+    def wait(key=0)
 
       if key.ord == 0
-        code = self.getch(function_key)
+        code = self.getch
+        return code
+      end
 
-      else
-        # Only exit when a specific key is hit
-        while true
-          code = self.getch(function_key)
-          break if code == key.ord
-        end
+      # Only exit when a specific key is hit
+      loop do
+        code = self.getch
+        break if code == key.ord
       end
       code
     end

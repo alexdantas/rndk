@@ -106,12 +106,12 @@ module RNDK
 
     # This sets multiple attributes of the widget.
     def set(mesg, box)
-      self.setMessage(mesg)
+      self.set_message(mesg)
       self.set_box(box)
     end
 
     # This sets the information within the button.
-    def setMessage(info)
+    def set_message(info)
       info_len = []
       info_pos = []
       @info = RNDK.char2Chtype(info, info_len, info_pos)
@@ -124,7 +124,7 @@ module RNDK
       self.draw(box)
     end
 
-    def getMessage
+    def get_message
       return @info
     end
 

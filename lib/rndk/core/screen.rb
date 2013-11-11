@@ -28,6 +28,16 @@ module RNDK
     EXITOK     = 1
     EXITCANCEL = 2
 
+    # Returns the whole terminal screen width.
+    def self.width
+      Ncurses.COLS
+    end
+
+    # Returns the whole terminal screen height.
+    def self.height
+      Ncurses.LINES
+    end
+
     # Takes a Ncurses `WINDOW*` pointer and creates a CDKScreen.
     #
     # This also starts Ncurses, if it wasn't started before or
