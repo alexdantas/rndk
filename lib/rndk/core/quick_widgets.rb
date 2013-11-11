@@ -101,6 +101,82 @@ module RNDK
       choice
     end
 
+    # Display a string set `info` in a Viewer Widget.
+    #
+    # `title` and `buttons` are applied to the Widget.
+    # This allows the user to view information.
+    #
+    # @return The index of the selected button.
+    # @note `info` and `buttons` must be Arrays of Strings.
+    def view_info(title, info, buttons, interpret)
+      return nil if info.class != Array or info.empty?
+      return nil if buttons.class != Array or buttons.empty?
+
+      selected = -1
+
+      # Create the file viewer to view the file selected.
+      viewer = RNDK::VIEWER.new(self,
+                                RNDK::CENTER,
+                                RNDK::CENTER,
+                                -6,
+                                -16,
+                                buttons,
+                                buttons.size,
+                                Ncurses::A_REVERSE,
+                                true,
+                                true)
+
+      # Set up the viewer title, and the contents of the widget.
+      viewer.set(title,
+                 info,
+                 info.size,
+                 Ncurses::A_REVERSE,
+                 interpret,
+                 true,
+                 true)
+
+      selected = viewer.activate([])
+
+      # Make sure they exited normally.
+      if viewer.exit_type != :NORMAL
+        viewer.destroy
+        return -1
+      end
+
+      # Clean up and return the button index selected
+      viewer.destroy
+      selected
+    end
+
+    # Reads `filename`'s contents and display it on a Viewer Widget.
+    #
+    # `title` and `buttons` are applied to the Widget.
+    #
+    # The viewer shows the contents of the file supplied by the
+    # `filename` value.
+    #
+    # It returns the index of the button selected, or -1 if the file
+    # does not exist or if the widget was exited early.
+    def view_file(title, filename, buttons)
+
+      info = []
+      result = 0
+
+      # Open the file and read the contents.
+      lines = RNDK.readFile(filename, info)
+
+      # If we couldn't read the file, return an error.
+      if lines == -1
+        result = lines
+      else
+        result = self.view_info(title,
+                                info,
+                                buttons,
+                                true)
+      end
+      result
+    end
+
   end
 end
 
