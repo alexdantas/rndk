@@ -1,6 +1,6 @@
 # Ruby Ncurses Development Kit (RNDK)
 
-This project aims to be a powerful, well-documented and easy-to-use
+`rndk` aims to be a powerful, well-documented and easy-to-use
 Ncurses Development Kit in Ruby. Besides abstracting away Ncurses'
 details, it provides some widgets for rapid console app development.
 

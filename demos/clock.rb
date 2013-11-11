@@ -4,7 +4,7 @@
 # current system time.
 # Press any key to exit.
 
-require 'rndk'
+require 'rndk/label'
 
 begin
   # Set up RNDK

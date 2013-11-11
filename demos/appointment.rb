@@ -13,7 +13,9 @@
 # It automatically creates file `/tmp/appointments.dat` on the
 # current directory
 require 'ostruct'
-require 'rndk'
+require 'rndk/calendar'
+require 'rndk/itemlist'
+require 'rndk/entry'
 
 class Appointment
   MAX_MARKERS = 2000
@@ -97,7 +99,7 @@ class Appointment
     month = date_info.mon
     year = date_info.year
 
-    title = "<C></U>RNDK Appointment Book\n<C><#HL(30)>\n"
+    title = "<C></U>RNDK Appointment Book\nPress 'h' for help\n<C><#HL(30)>\n"
 
     filename = ''
 
@@ -291,7 +293,7 @@ class Appointment
              " '?' displays appointment for selected day",
              " 'enter' or 'tab' quits"]
 
-      rndkscreen.popupLabel(msg, msg.size)
+      rndkscreen.popupLabel msg
     end
 
     # Now we bind actions to the calendar.
