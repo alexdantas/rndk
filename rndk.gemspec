@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Ruby Ncurses Development Kit"
   spec.description   = <<END_OF_DESCRIPTION
-A powerful, well-documented and easy-to-use
+`rndk` aims to be a powerful, well-documented and easy-to-use
 Ncurses Development Kit in Ruby. Besides abstracting away Ncurses'
 details, it provides some widgets for rapid console app development.
 

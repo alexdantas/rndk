@@ -1,5 +1,7 @@
 require 'rndk'
+
 module RNDK
+
   class SCROLLER < RNDK::Widget
     def initialize
       super()
