@@ -10,7 +10,7 @@ module RNDK
       xpos = xplace
       ypos = yplace
 
-      self.setBox(box)
+      self.set_box(box)
       box_height = 1 + 2 * @border_size
 
       # Translate the string to a chtype array.
@@ -100,14 +100,14 @@ module RNDK
       end
 
       # Set the exit type and exit
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
     # This sets multiple attributes of the widget.
     def set(mesg, box)
       self.setMessage(mesg)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This sets the information within the button.
@@ -129,7 +129,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -171,7 +171,7 @@ module RNDK
 
     # This erases the button widget.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end
@@ -307,7 +307,7 @@ module RNDK
       RNDK.deleteCursesWindow(@shadow_win)
       RNDK.deleteCursesWindow(@win)
 
-      self.cleanBindings(:BUTTON)
+      self.clean_bindings(:BUTTON)
 
       RNDK::Screen.unregister(:BUTTON, self)
     end
@@ -317,7 +317,7 @@ module RNDK
       ret = -1
       complete = false
 
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Check a predefined binding.
       if self.checkBind(:BUTTON, input)
@@ -325,16 +325,16 @@ module RNDK
       else
         case input
         when RNDK::KEY_ESC
-          self.setExitType(input)
+          self.set_exit_type(input)
           complete = true
         when Ncurses::ERR
-          self.setExitType(input)
+          self.set_exit_type(input)
           complete = true
         when ' '.ord, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
           unless @callback.nil?
             @callback.call(self)
           end
-          self.setExitType(Ncurses::KEY_ENTER)
+          self.set_exit_type(Ncurses::KEY_ENTER)
           ret = 0
           complete = true
         when RNDK::REFRESH
@@ -346,7 +346,7 @@ module RNDK
       end
 
       unless complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret

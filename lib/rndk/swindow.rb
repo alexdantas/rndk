@@ -22,7 +22,7 @@ module RNDK
         '$'           => Ncurses::KEY_END,
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value, the height will be
       # ROWS-height, otherwise the height will be the given height.
@@ -107,7 +107,7 @@ module RNDK
     # This sets the lines and the box attribute of the scrolling window.
     def set(list, lines, box)
       self.setContents(list, lines)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     def setupLine(list, x)
@@ -325,7 +325,7 @@ module RNDK
       end
 
       # Set the exit type and return.
-      self.setExitType(0)
+      self.set_exit_type(0)
     end
 
     # This injects a single character into the widget.
@@ -335,7 +335,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the window....
       self.draw(@box)
@@ -411,14 +411,14 @@ module RNDK
           when 's'.ord, 'S'.ord
             self.saveInformation
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = 1
             complete = true
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -434,7 +434,7 @@ module RNDK
 
       if !complete
         self.drawList(@box)
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @return_data = ret
@@ -498,7 +498,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
     end
@@ -522,7 +522,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:SWINDOW)
+      self.clean_bindings(:SWINDOW)
 
       # Unregister this object.
       RNDK::Screen.unregister(:SWINDOW, self)
@@ -530,7 +530,7 @@ module RNDK
 
     # This function erases the scrolling window widget.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end

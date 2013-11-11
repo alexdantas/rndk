@@ -60,6 +60,32 @@ module RNDK
     def erase
     end
 
+    # Moves the Widget to the given position.
+    #
+    # * `xplace` and `yplace` are the new position of the Widget.
+    #
+    # * `xplace` may be an integer or one of the pre-defined
+    #   values `RNDK::TOP`, `RNDK::BOTTOM`, and `RNDK::CENTER`.
+    #
+    # * `yplace` may be an integer or one of the pre-defined
+    #   values `RNDK::LEFT`, `RNDK::RIGHT`, and `RNDK::CENTER`.
+    #
+    # * `relative` states whether the `xplace`/`yplace` pair is a
+    #   relative move over it's current position or an absolute move
+    #   over the Screen's top.
+    #
+    # For example, if `xplace = 1` and `yplace = 2` and `relative = true`,
+    # the Widget would move one row down and two columns right.
+    #
+    # If the value of relative was `false` then the widget would move to
+    # the position `(1,2)`.
+    #
+    # Do not use the values `TOP`, `BOTTOM`, `LEFT`, `RIGHT`, or `CENTER`
+    # when `relative = true` - weird things may happen.
+    #
+    # * `refresh_flag` is a boolean value which states whether the
+    #   Widget will get refreshed after the move.
+    #
     def move(xplace, yplace, relative, refresh_flag)
       self.move_specific(xplace, yplace, relative, refresh_flag, [@win, @shadow_win], [])
     end
@@ -106,10 +132,14 @@ module RNDK
       end
     end
 
-    def inject(a)
+    # Makes the Widget react to `char` just as if the user
+    # had pressed it.
+    #
+    # Nice to simulate batch actions on a Widget.
+    def inject char
     end
 
-    def setBox(box)
+    def set_box(box)
       @box = box
       @border_size = if @box then 1 else 0 end
     end
@@ -244,23 +274,26 @@ module RNDK
       @post_process_data = data
     end
 
-    # Set the object's exit-type based on the input.
-    # The .exitType field should have been part of the Widget struct, but it
-    # is used too pervasively in older applications to move (yet).
-    def setExitType(ch)
-      case ch
-      when Ncurses::ERR
-        @exit_type = :ERROR
-      when RNDK::KEY_ESC
-        @exit_type = :ESCAPE_HIT
+    # Set the Widget#exit_type based on the input `char`.
+    #
+    # According to default keybindings, if `char` is:
+    #
+    # RETURN or TAB:: Sets `:NORMAL`.
+    # ESCAPE::        Sets `:ESCAPE_HIT`.
+    # Otherwise::     Unless treated specifically by the
+    #                 Widget, sets `:EARLY_EXIT`.
+    #
+    def set_exit_type char
+      case char
+      when Ncurses::ERR  then @exit_type = :ERROR
+      when RNDK::KEY_ESC then @exit_type = :ESCAPE_HIT
+      when 0             then @exit_type = :EARLY_EXIT
       when RNDK::KEY_TAB, Ncurses::KEY_ENTER, RNDK::KEY_RETURN
         @exit_type = :NORMAL
-      when 0
-        @exit_type = :EARLY_EXIT
       end
     end
 
-    def validRNDKObject
+    def valid_widget?
       result = false
       if RNDK::ALL_OBJECTS.include?(self)
         result = self.validObjType(self.object_type)
@@ -337,7 +370,7 @@ module RNDK
       end
     end
 
-    def cleanBindings(type)
+    def clean_bindings(type)
       obj = self.bindableObject(type)
       if !(obj.nil?) && !(obj.binding_list.nil?)
         obj.binding_list.clear
@@ -374,8 +407,11 @@ module RNDK
       return result
     end
 
-    # Allows the user to move the Widget around the screen
-    # via the cursor/keypad keys.
+    # Allows the user to move the Widget around
+    # the screen via the cursor/keypad keys.
+    #
+    # `win` is the main window of the Widget - from which
+    # subwins derive.
     #
     # The following key bindings can be used to move the
     # Widget around the screen:
@@ -402,7 +438,7 @@ module RNDK
     # Escape::      Returns the widget to its original position.
     # Return::      Exits the function and leaves the Widget where it was.
     #
-    def position(win)
+    def position win
       parent = @screen.window
       orig_x = Ncurses.getbegx win
       orig_y = Ncurses.getbegy win

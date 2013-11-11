@@ -6,7 +6,7 @@
 #
 # rndk/core/draw::      Common draw functions between Widgets.
 # rndk/core/draw::      Color initialization and handling.
-# rndk/core/display::
+# rndk/core/display::   (??)
 # rndk/core/traverse::
 # rndk/core/widget::    Common functionality shared between widgets.
 # rndk/core/screen::
@@ -216,35 +216,4 @@ module RNDK
   end
 
 end
-
-# Why is this here?
-#
-# require 'rndk/alphalist'
-# require 'rndk/button'
-# require 'rndk/buttonbox'
-# require 'rndk/calendar'
-# require 'rndk/dialog'
-# require 'rndk/dscale'
-# require 'rndk/entry'
-# require 'rndk/fscale'
-# require 'rndk/fslider'
-# require 'rndk/fselect'
-# require 'rndk/graph'
-# require 'rndk/histogram'
-# require 'rndk/itemlist'
-# require 'rndk/label'
-# require 'rndk/marquee'
-# require 'rndk/matrix'
-# require 'rndk/mentry'
-# require 'rndk/menu'
-# require 'rndk/radio'
-# require 'rndk/scale'
-# require 'rndk/scroll'
-# require 'rndk/selection'
-# require 'rndk/slider'
-# require 'rndk/swindow'
-# require 'rndk/template'
-# require 'rndk/uscale'
-# require 'rndk/uslider'
-# require 'rndk/viewer'
 

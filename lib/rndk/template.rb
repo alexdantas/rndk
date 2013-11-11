@@ -15,7 +15,7 @@ module RNDK
         return nil
       end
 
-      self.setBox(box)
+      self.set_box(box)
 
       field_width = plate.size + 2 * @border_size
 
@@ -215,7 +215,7 @@ module RNDK
       end
 
       # Set the exit type and return.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return ret
     end
 
@@ -225,7 +225,7 @@ module RNDK
       complete = false
       ret = -1
 
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Move the cursor.
       self.drawField
@@ -278,15 +278,15 @@ module RNDK
             if @info.size < @min
               RNDK.beep
             else
-              self.setExitType(input)
+              self.set_exit_type(input)
               ret = @info
               complete = true
             end
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -303,7 +303,7 @@ module RNDK
       end
 
       if !complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @return_data = ret
@@ -450,7 +450,7 @@ module RNDK
     end
 
     # Set the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
@@ -467,14 +467,14 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:TEMPLATE)
+      self.clean_bindings(:TEMPLATE)
 
       RNDK::Screen.unregister(:TEMPLATE, self)
     end
 
     # Erase the widget.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@field_win)
         RNDK.eraseCursesWindow(@label_win)
         RNDK.eraseCursesWindow(@shadow_win)
@@ -485,7 +485,7 @@ module RNDK
     # Set the value given to the template
     def set(new_value, box)
       self.setValue(new_value)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # Set the value given to the template.

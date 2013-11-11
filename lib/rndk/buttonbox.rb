@@ -21,7 +21,7 @@ module RNDK
         return nil
       end
 
-      self.setBox(box)
+      self.set_box(box)
 
       # Set some default values for the widget.
       @row_adjust = 0
@@ -143,7 +143,7 @@ module RNDK
       end
 
       # Set the exit type and exit
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -156,7 +156,7 @@ module RNDK
       complete = false
 
       # Set the exit type
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       unless @pre_process_func.nil?
         pp_return = @pre_process_func.call(:BUTTONBOX, self,
@@ -198,13 +198,13 @@ module RNDK
             @screen.erase
             @screen.refresh
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @current_button
             complete = true
           end
@@ -219,7 +219,7 @@ module RNDK
 
       unless complete
         self.drawButtons
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -228,12 +228,12 @@ module RNDK
 
     # This sets multiple attributes of the widget.
     def set(highlight, box)
-      self.setHighlight(highlight)
-      self.setBox(box)
+      self.set_highlight(highlight)
+      self.set_box(box)
     end
 
     # This sets the highlight attribute for the buttonboxes
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 
@@ -242,7 +242,7 @@ module RNDK
     end
 
     # This sets th background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -308,7 +308,7 @@ module RNDK
 
     # This erases the buttonbox box from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow @win
         RNDK.eraseCursesWindow @shadow_win
       end
@@ -321,7 +321,7 @@ module RNDK
       RNDK.deleteCursesWindow @shadow_win
       RNDK.deleteCursesWindow @win
 
-      self.cleanBindings(:BUTTONBOX)
+      self.clean_bindings(:BUTTONBOX)
 
       RNDK::Screen.unregister(:BUTTONBOX, self)
     end

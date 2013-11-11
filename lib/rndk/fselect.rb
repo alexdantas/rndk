@@ -18,7 +18,7 @@ module RNDK
           RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value the height will be ROWS-height,
       # otherwise the height will be the given height
@@ -392,7 +392,7 @@ module RNDK
 
     # This erases the file selector from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         @scroll_field.erase
         @entry_field.erase
         RNDK.eraseCursesWindow(@win)
@@ -479,7 +479,7 @@ module RNDK
       end
 
       # Set the exit type and exit.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return 0
     end
 
@@ -524,7 +524,7 @@ module RNDK
       end
 
       if !complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -545,7 +545,7 @@ module RNDK
 
       # Set the attributes of the entry field/scrolling list.
       self.setFillerChar(filler)
-      self.setHighlight(highlight)
+      self.set_highlight(highlight)
 
       # Only do the directory stuff if the directory is not nil.
       if !(directory.nil?) && directory.size > 0
@@ -699,9 +699,9 @@ module RNDK
     end
 
     # This sets the highlight bar of the scrolling list.
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
-      @scroll_field.setHighlight(highlight)
+      @scroll_field.set_highlight(highlight)
     end
 
     def getHighlight
@@ -835,14 +835,14 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
-      @entry_field.setBKattr(attrib)
-      @scroll_field.setBKattr(attrib)
+    def set_bg_attrib(attrib)
+      @entry_field.set_bg_attrib(attrib)
+      @scroll_field.set_bg_attrib(attrib)
     end
 
     # This destroys the file selector.
     def destroy
-      self.cleanBindings(:FSELECT)
+      self.clean_bindings(:FSELECT)
 
       # Destroy the other RNDK objects
       @scroll_field.destroy

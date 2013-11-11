@@ -30,7 +30,7 @@ module RNDK
       @choice = []
       @choicelen = []
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value, the height will be ROWS-height,
       # otherwise the height will be the given height.
@@ -178,7 +178,7 @@ module RNDK
       end
 
       # Set the exit type and return.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return 0
     end
 
@@ -189,7 +189,7 @@ module RNDK
       complete = false
 
       # Set the exit type
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the widget list.
       self.drawList(@box)
@@ -238,13 +238,13 @@ module RNDK
               RNDK.beep
             end
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::KEY_ENTER, RNDK::KEY_TAB, RNDK::KEY_RETURN
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = 1
             complete = true
           when RNDK::REFRESH
@@ -261,7 +261,7 @@ module RNDK
 
       unless complete
         self.drawList(@box)
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -355,7 +355,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       unless @scrollbar_win.nil?
         Ncurses.wbkgd(@scrollbar_win, attrib)
@@ -377,7 +377,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean up the key bindings
-      self.cleanBindings(:SELECTION)
+      self.clean_bindings(:SELECTION)
 
       # Unregister this object.
       RNDK::Screen.unregister(:SELECTION, self)
@@ -385,7 +385,7 @@ module RNDK
 
     # This function erases the selection list from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end
@@ -394,8 +394,8 @@ module RNDK
     # This function sets a couple of the selection list attributes
     def set(highlight, choices, box)
       self.setChoices(choices)
-      self.setHighlight(highlight)
-      self.setBox(box)
+      self.set_highlight(highlight)
+      self.set_box(box)
     end
 
     # This sets the selection list items.
@@ -444,7 +444,7 @@ module RNDK
     end
 
     # This sets the highlight bar.
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 

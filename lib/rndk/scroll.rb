@@ -24,7 +24,7 @@ module RNDK
         '>'           => Ncurses::KEY_END
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value, the height will be ROWS-height,
       # otherwise the height will be the given height
@@ -178,7 +178,7 @@ module RNDK
       end
 
       # Set the exit type for the widget and return
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -189,7 +189,7 @@ module RNDK
       complete = false
 
       # Set the exit type for the widget.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the scrolling list
       self.drawList(@box)
@@ -229,16 +229,16 @@ module RNDK
           when '|'
             @left_char = 0
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
             @screen.refresh
           when RNDK::KEY_TAB, Ncurses::KEY_ENTER, RNDK::KEY_RETURN
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @current_item
             complete = true
           end
@@ -251,7 +251,7 @@ module RNDK
 
       if !complete
         self.drawList(@box)
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       self.fixCursorPosition
@@ -371,7 +371,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@list_win, attrib)
       unless @scrollbar_win.nil?
@@ -390,7 +390,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:SCROLL)
+      self.clean_bindings(:SCROLL)
 
       # Unregister this object
       RNDK::Screen.unregister(:SCROLL, self)
@@ -476,8 +476,8 @@ module RNDK
     # This sets certain attributes of the scrolling list.
     def set(list, list_size, numbers, highlight, box)
       self.setItems(list, list_size, numbers)
-      self.setHighlight(highlight)
-      self.setBox(box)
+      self.set_highlight(highlight)
+      self.set_box(box)
     end
 
     # This sets the scrolling list items
@@ -505,7 +505,7 @@ module RNDK
     end
 
     # This sets the highlight of the scrolling list.
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 

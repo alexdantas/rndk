@@ -22,7 +22,7 @@ module RNDK
         return nil
       end
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value, the height will be ROWS-height,
       # otherwise the height will be the given height.
@@ -290,7 +290,7 @@ module RNDK
 
     # This erases the alphalist from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         @scroll_field.erase
         @entry_field.erase
 
@@ -392,8 +392,8 @@ module RNDK
     def set(list, list_size, filler_char, highlight, box)
       self.setContents(list, list_size)
       self.setFillerChar(filler_char)
-      self.setHighlight(highlight)
-      self.setBox(box)
+      self.set_highlight(highlight)
+      self.set_box(box)
     end
 
     # This function sets the information inside the alphalist.
@@ -444,7 +444,7 @@ module RNDK
     end
 
     # This sets the highlgith bar attributes
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 
@@ -485,9 +485,9 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
-      @entry_field.setBKattr(attrib)
-      @scroll_field.setBKattr(attrib)
+    def set_bg_attrib(attrib)
+      @entry_field.set_bg_attrib(attrib)
+      @scroll_field.set_bg_attrib(attrib)
     end
 
     def destroyInfo
@@ -500,7 +500,7 @@ module RNDK
       self.destroyInfo
 
       # Clean the key bindings.
-      self.cleanBindings(:ALPHALIST)
+      self.clean_bindings(:ALPHALIST)
 
       @entry_field.destroy
       @scroll_field.destroy

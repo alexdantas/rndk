@@ -21,7 +21,7 @@ module RNDK
         '>'           => Ncurses::KEY_END,
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the height is a negative value, height will be ROWS-height,
       # otherwise the height will be the given height.
@@ -159,7 +159,7 @@ module RNDK
       end
 
       # Set the exit type and return
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -170,7 +170,7 @@ module RNDK
       complete = false
 
       # Set the exit type
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the widget list
       self.drawList(@box)
@@ -212,14 +212,14 @@ module RNDK
           when ' '.ord
             @selected_item = @current_item
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = -1
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @selected_item
             complete = true
           when RNDK::REFRESH
@@ -236,7 +236,7 @@ module RNDK
 
       if !complete
         self.drawList(@box)
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       self.fixCursorPosition
@@ -339,7 +339,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@scrollbar_win, attrib) unless @scrollbar_win.nil?
     end
@@ -359,7 +359,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean up the key bindings.
-      self.cleanBindings(:RADIO)
+      self.clean_bindings(:RADIO)
 
       # Unregister this object.
       RNDK::Screen.unregister(:RADIO, self)
@@ -367,7 +367,7 @@ module RNDK
 
     # This function erases the radio widget
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end
@@ -375,9 +375,9 @@ module RNDK
 
     # This sets various attributes of the radio list.
     def set(highlight, choice_char, box)
-      self.setHighlight(highlight)
+      self.set_highlight(highlight)
       self.setChoiceCHaracter(choice_char)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This sets the radio list items.
@@ -410,7 +410,7 @@ module RNDK
     end
 
     # This sets the highlight bar of the radio list.
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 

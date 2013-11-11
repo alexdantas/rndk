@@ -20,7 +20,7 @@ module RNDK
 
       return nil if rows <= 0
 
-      self.setBox box
+      self.set_box box
       box_height = rows + 2 * @border_size
 
       @info = []
@@ -101,7 +101,7 @@ module RNDK
     # This sets multiple attributes of the widget
     def set(mesg, lines, box)
       self.setMessage(mesg, lines)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This sets the information within the label.
@@ -149,7 +149,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -192,7 +192,7 @@ module RNDK
       RNDK.deleteCursesWindow(@shadow_win)
       RNDK.deleteCursesWindow(@win)
 
-      self.cleanBindings(:LABEL)
+      self.clean_bindings(:LABEL)
 
       RNDK::Screen.unregister(:LABEL, self)
     end

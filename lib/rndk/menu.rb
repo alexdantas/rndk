@@ -154,7 +154,7 @@ module RNDK
       end
 
       # Set the exit type and return.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -242,7 +242,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
@@ -269,18 +269,18 @@ module RNDK
             self.withinSubmenu(1)
           when Ncurses::KEY_ENTER, RNDK::KEY_RETURN
             self.cleanUpMenu
-            self.setExitType(input)
+            self.set_exit_type(input)
             @last_selection = @current_title * 100 + @current_subtitle
             ret = @last_selection
             complete = true
           when RNDK::KEY_ESC
             self.cleanUpMenu
-            self.setExitType(input)
+            self.set_exit_type(input)
             @last_selection = -1
             ret = @last_selection
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             self.erase
@@ -295,7 +295,7 @@ module RNDK
       end
 
       if !complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -376,7 +376,7 @@ module RNDK
     end
 
     # Set the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       (0...@menu_items).each do |x|
         @title_win[x].wbkgd(attrib)
         @pull_win[x].wbkgd(attrib)
@@ -392,7 +392,7 @@ module RNDK
       end
 
       # Clean the key bindings.
-      self.cleanBindings(:MENU)
+      self.clean_bindings(:MENU)
 
       # Unregister the object
       RNDK::Screen.unregister(:MENU, self)
@@ -400,7 +400,7 @@ module RNDK
 
     # Erase the menu widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         (0...@menu_items).each do |x|
           Ncurses.werase   @title_win[x]
           Ncurses.wrefresh @title_win[x]

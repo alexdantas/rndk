@@ -12,7 +12,7 @@ module RNDK
       @width = width
       @shadow = shadow
 
-      self.setBox(box)
+      self.set_box(box)
       if @win.nil?
         self.destroy
         # return (0);
@@ -37,7 +37,7 @@ module RNDK
       end
 
       # Keep the box info, setting BorderOf()
-      self.setBox(box)
+      self.set_box(box)
 
       padding = if mesg[-1] == ' ' then 0 else 1 end
 
@@ -162,7 +162,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:MARQUEE)
+      self.clean_bindings(:MARQUEE)
 
       # Unregister this object.
       RNDK::Screen.unregister(:MARQUEE, self)
@@ -170,14 +170,14 @@ module RNDK
 
     # This erases the widget.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end
     end
 
     # This sets the widgets box attribute.
-    def setBox(box)
+    def set_box(box)
       xpos = if @win.nil? then 0 else Ncurses.getbegx(@win) end
       ypos = if @win.nil? then 0 else Ncurses.getbegy(@win) end
 
@@ -195,7 +195,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 

@@ -121,7 +121,7 @@ class Appointment
     RNDK::Draw.initRNDKColor
 
     # Create the calendar widget.
-    calendar = RNDK::CALENDAR.new(rndkscreen,
+    calendar = RNDK::Calendar.new(rndkscreen,
                                   RNDK::CENTER,
                                   RNDK::CENTER,
                                   title, day, month, year,
@@ -298,12 +298,12 @@ class Appointment
 
     # Now we bind actions to the calendar.
     # Create a key binding to mark days on the calendar.
-    calendar.bind(:CALENDAR, 'm', create_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'M', create_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'r', remove_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'R', remove_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, '?', display_calendar_mark_cb, appointment_info)
-    calendar.bind(:CALENDAR, 'h', show_help, nil)
+    calendar.bind(:calendar, 'm', create_calendar_mark_cb, appointment_info)
+    calendar.bind(:calendar, 'M', create_calendar_mark_cb, appointment_info)
+    calendar.bind(:calendar, 'r', remove_calendar_mark_cb, appointment_info)
+    calendar.bind(:calendar, 'R', remove_calendar_mark_cb, appointment_info)
+    calendar.bind(:calendar, '?', display_calendar_mark_cb, appointment_info)
+    calendar.bind(:calendar, 'h', show_help, nil)
 
     # Set all the appointments read from the file.
     appointment_info.appointment.each do |appointment|

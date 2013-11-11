@@ -14,7 +14,7 @@ module RNDK
       parent_width = Ncurses.getmaxx rndkscreen.window
       parent_height = Ncurses.getmaxy rndkscreen.window
 
-      self.setBox(false)
+      self.set_box(false)
 
       box_height = RNDK.setWidgetDimension(parent_height, height, 3)
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
@@ -236,7 +236,7 @@ module RNDK
     end
 
     # Set the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -378,13 +378,13 @@ module RNDK
 
     def destroy
       self.cleanTitle
-      self.cleanBindings(:GRAPH)
+      self.clean_bindings(:GRAPH)
       RNDK::Screen.unregister(:GRAPH, self)
       RNDK.deleteCursesWindow(@win)
     end
 
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
       end
     end

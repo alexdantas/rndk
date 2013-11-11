@@ -1,7 +1,12 @@
+
 module RNDK
+
+  # ...I still don't know what this module does...
+  #
   module Display
+
     # Given a string, returns the equivalent display type
-    def Display.char2DisplayType(string)
+    def Display.char_to_display_type string
       table = {
         "CHAR"     => :CHAR,
         "HCHAR"    => :HCHAR,
@@ -29,7 +34,7 @@ module RNDK
     end
 
     # Tell if a display type is "hidden"
-    def Display.isHiddenDisplayType(type)
+    def Display.is_hidden_display_type type
       case type
       when :HCHAR, :HINT, :HMIXED, :LHCHAR, :LHMIXED, :UHCHAR, :UHMIXED
         true
@@ -39,9 +44,10 @@ module RNDK
       end
     end
 
-    # Given a character input, check if it is allowed by the display type
-    # and return the character to apply to the display, or ERR if not
-    def Display.filterByDisplayType(type, input)
+    # Given a character input, check if it is allowed by the
+    # display type and return the character to apply to the display,
+    # or ERR if not.
+    def Display.filter_by_display_type(type, input)
       result = input
       if !RNDK.isChar(input)
         result = Ncurses::ERR
@@ -57,7 +63,8 @@ module RNDK
         result = result.chr.downcase.ord
       end
 
-      return result
+      result
     end
+
   end
 end

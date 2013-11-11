@@ -13,7 +13,7 @@ module RNDK
       field_width = f_width
       field_rows = f_rows
 
-      self.setBox(box)
+      self.set_box(box)
 
       # If the field_width is a negative value, the field_width will be
       # COLS-field_width, otherwise the field_width will be the given width.
@@ -117,7 +117,7 @@ module RNDK
       # creating a new function and calling that one the mentry activation.
       mentry_callback = lambda do |mentry, character|
         cursor_pos = mentry.getCursorPos
-        newchar = Display.filterByDisplayType(mentry.disp_type, character)
+        newchar = Display.filter_by_display_type(mentry.disp_type, character)
 
         if newchar == Ncurses::ERR
           RNDK.beep
@@ -188,7 +188,7 @@ module RNDK
       end
 
       # Set the exit type and exit.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return 0
     end
 
@@ -241,7 +241,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Refresh the field.
       self.drawField
@@ -388,15 +388,15 @@ module RNDK
             if @info.size < @min + 1
               RNDK.beep
             else
-              self.setExitType(input)
+              self.set_exit_type(input)
               ret = @info
               complete = true
             end
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -424,7 +424,7 @@ module RNDK
       end
 
       if !complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -451,7 +451,7 @@ module RNDK
       (0...@rows).each do |x|
         (0...@field_width).each do |y|
           if currchar < lastpos
-            if Display.isHiddenDisplayType(@disp_type)
+            if Display.is_hidden_display_type(@disp_type)
               Ncurses.mvwaddch(@field_win, x, y, @filler)
             else
               Ncurses.mvwaddch(@field_win, x, y, @info[currchar].ord | @field_attr)
@@ -492,7 +492,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
@@ -500,7 +500,7 @@ module RNDK
 
     # This function erases the multiple line entry field from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@field_win)
         RNDK.eraseCursesWindow(@label_win)
         RNDK.eraseCursesWindow(@win)
@@ -519,7 +519,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:MENTRY)
+      self.clean_bindings(:MENTRY)
 
       # Unregister this object.
       RNDK::Screen.unregister(:MENTRY, self)
@@ -529,7 +529,7 @@ module RNDK
     def set(value, min, box)
       self.setValue(value)
       self.setMin(min)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This removes the old information in the entry field and keeps the

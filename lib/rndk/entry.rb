@@ -28,7 +28,7 @@ module RNDK
       xpos = xplace
       ypos = yplace
 
-      self.setBox(box)
+      self.set_box(box)
       box_height = @border_size * 2 + 1
 
       # If the field_width is a negative value, the field_width will be
@@ -120,7 +120,7 @@ module RNDK
       @box_height = box_height
       @disp_type = disp_type
       @callbackfn = lambda do |entry, character|
-        plainchar = Display.filterByDisplayType(entry, character)
+        plainchar = Display.filter_by_display_type(entry, character)
 
         if plainchar == Ncurses::ERR || entry.info.size >= entry.max
           RNDK.beep
@@ -215,7 +215,7 @@ module RNDK
       complete = false
 
       # Set the exit type
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Refresh the widget field.
       self.drawField
@@ -308,7 +308,7 @@ module RNDK
               end
             end
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::ERASE
             if @info.size != 0
@@ -338,14 +338,14 @@ module RNDK
             end
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             if @info.size >= @min
-              self.setExitType(input)
+              self.set_exit_type(input)
               ret = @info
               complete = true
             else
               RNDK.beep
             end
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -361,7 +361,7 @@ module RNDK
       end
 
       unless complete
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -431,7 +431,7 @@ module RNDK
       # If there is information in the field then draw it in.
       if !(@info.nil?) && @info.size > 0
         # Redraw the field.
-        if Display.isHiddenDisplayType(@disp_type)
+        if Display.is_hidden_display_type(@disp_type)
           (@left_char...@info.size).each do |x|
             Ncurses.mvwaddch(@field_win, 0, x - @left_char, @hidden)
           end
@@ -448,7 +448,7 @@ module RNDK
 
     # This erases an entry widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@field_win)
         RNDK.eraseCursesWindow(@label_win)
         RNDK.eraseCursesWindow(@win)
@@ -465,7 +465,7 @@ module RNDK
       RNDK.deleteCursesWindow(@shadow_win)
       RNDK.deleteCursesWindow(@win)
 
-      self.cleanBindings(:ENTRY)
+      self.clean_bindings(:ENTRY)
 
       RNDK::Screen.unregister(:ENTRY, self)
     end
@@ -533,7 +533,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       unless @label_win.nil?
@@ -542,7 +542,7 @@ module RNDK
     end
 
     # This sets the attribute of the entry field.
-    def setHighlight(highlight, cursor)
+    def set_highlight(highlight, cursor)
       Ncurses.wbkgd(@field_win, highlight)
       @field_attr = highlight
       Ncurses.curs_set(cursor)

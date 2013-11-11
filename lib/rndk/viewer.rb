@@ -27,7 +27,7 @@ module RNDK
           '$'           => Ncurses::KEY_END,
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       box_height = RNDK.setWidgetDimension(parent_height, height, 0)
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
@@ -114,9 +114,9 @@ module RNDK
     def set(title, list, list_size, button_highlight,
         attr_interp, show_line_info, box)
       self.setTitle(title)
-      self.setHighlight(button_highlight)
+      self.set_highlight(button_highlight)
       self.setInfoLine(show_line_info)
-      self.setBox(box)
+      self.set_box(box)
       return self.setInfo(list, list_size, attr_interp)
     end
 
@@ -281,7 +281,7 @@ module RNDK
     end
 
     # This function sets the highlight type of the buttons.
-    def setHighlight(button_highlight)
+    def set_highlight(button_highlight)
       @button_highlight = button_highlight
     end
 
@@ -485,13 +485,13 @@ module RNDK
             self.popUpLabel(file_info)
             refresh = true
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             return -1
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             return -1
           when Ncurses::KEY_ENTER, RNDK::KEY_RETURN
-            self.setExitType(input)
+            self.set_exit_type(input)
             return @current_button
           when RNDK::REFRESH
             @screen.erase
@@ -681,7 +681,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -702,7 +702,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:VIEWER)
+      self.clean_bindings(:VIEWER)
 
       # Unregister this object.
       RNDK::Screen.unregister(:VIEWER, self)
@@ -710,7 +710,7 @@ module RNDK
 
     # This function erases the viewer widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end

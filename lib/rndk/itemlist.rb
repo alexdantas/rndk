@@ -14,7 +14,7 @@ module RNDK
         return nil
       end
 
-      self.setBox(box)
+      self.set_box(box)
       box_height = (@border_size * 2) + 1
 
       # Set some basic values of the item list
@@ -137,7 +137,7 @@ module RNDK
       end
 
       # Set the exit type and exit.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return ret
     end
 
@@ -148,7 +148,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the widget field
       self.drawField(true)
@@ -185,13 +185,13 @@ module RNDK
           when '$'.ord
             @current_item = @list_size - 1
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @current_item
             complete = true
           when RNDK::REFRESH
@@ -210,7 +210,7 @@ module RNDK
 
       if !complete
         self.drawField(true)
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -251,7 +251,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
@@ -285,7 +285,7 @@ module RNDK
 
     # This function removes the widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@field_win)
         RNDK.eraseCursesWindow(@label_win)
         RNDK.eraseCursesWindow(@win)
@@ -310,7 +310,7 @@ module RNDK
       RNDK.deleteCursesWindow(@win)
 
       # Clean the key bindings.
-      self.cleanBindings(:ITEMLIST)
+      self.clean_bindings(:ITEMLIST)
 
       RNDK::Screen.unregister(:ITEMLIST, self)
     end
@@ -318,7 +318,7 @@ module RNDK
     # This sets multiple attributes of the widget.
     def set(list, count, current, box)
       self.setValues(list, count, current)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This function sets the contents of the list

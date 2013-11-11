@@ -27,7 +27,7 @@ begin
   #
   # On the calendar, if we supply 0 as the
   # day/month/year it'll use the current day/month/year.
-  cal = RNDK::CALENDAR.new(screen,
+  cal = RNDK::Calendar.new(screen,
                            RNDK::CENTER,             # x
                            RNDK::CENTER,             # y
                            "Colored calendar",       # title

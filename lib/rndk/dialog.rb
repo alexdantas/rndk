@@ -27,7 +27,7 @@ module RNDK
         return nil
       end
 
-      self.setBox(box)
+      self.set_box(box)
       box_height = if separator then 1 else 0 end
       box_height += rows + 2 * @border_size + 1
 
@@ -146,7 +146,7 @@ module RNDK
       end
 
       # Set the exit type and exit
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -159,7 +159,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
@@ -192,12 +192,12 @@ module RNDK
             @screen.erase
             @screen.refresh
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
           when Ncurses::KEY_ENTER, RNDK::KEY_RETURN
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @current_button
             complete = true
           end
@@ -213,7 +213,7 @@ module RNDK
       unless complete
         self.drawButtons
         Ncurses.wrefresh @win
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -261,7 +261,7 @@ module RNDK
       RNDK.deleteCursesWindow(@shadow_win)
 
       # Clean the key bindings
-      self.cleanBindings(:DIALOG)
+      self.clean_bindings(:DIALOG)
 
       # Unregister this object
       RNDK::Screen.unregister(:DIALOG, self)
@@ -269,7 +269,7 @@ module RNDK
 
     # This function erases the dialog widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow(@win)
         RNDK.eraseCursesWindow(@shadow_win)
       end
@@ -277,13 +277,13 @@ module RNDK
 
     # This sets attributes of the dialog box.
     def set(highlight, separator, box)
-      self.setHighlight(highlight)
+      self.set_highlight(highlight)
       self.setSeparator(separator)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This sets the highlight attribute for the buttons.
-    def setHighlight(highlight)
+    def set_highlight(highlight)
       @highlight = highlight
     end
 
@@ -301,7 +301,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 

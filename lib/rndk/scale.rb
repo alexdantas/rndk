@@ -18,7 +18,7 @@ module RNDK
           '$'           => Ncurses::KEY_END,
       }
 
-      self.setBox(box)
+      self.set_box(box)
 
       box_height = @border_size * 2 + 1
       box_width = field_width + 2 * @border_size
@@ -164,7 +164,7 @@ module RNDK
       end
 
       # Set the exit type and return.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return ret
     end
 
@@ -295,7 +295,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Draw the field.
       self.drawField
@@ -331,14 +331,14 @@ module RNDK
           when Ncurses::KEY_END
             @current = @high
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = @current
             complete = true
           when RNDK::KEY_ESC
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -377,7 +377,7 @@ module RNDK
 
       if !complete
         self.drawField
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -441,7 +441,7 @@ module RNDK
     end
 
     # This sets the background attribute of teh widget.
-    def setBKattr attrib
+    def set_bg_attrib attrib
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
@@ -459,7 +459,7 @@ module RNDK
       RNDK.deleteCursesWindow @win
 
       # Clean the key bindings.
-      self.cleanBindings(self.object_type)
+      self.clean_bindings(self.object_type)
 
       # Unregister this object
       RNDK::Screen.unregister(self.object_type, self)
@@ -467,7 +467,7 @@ module RNDK
 
     # This function erases the widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         RNDK.eraseCursesWindow @label_win
         RNDK.eraseCursesWindow @field_win
         RNDK.eraseCursesWindow @win
@@ -479,7 +479,7 @@ module RNDK
     def set(low, high, value, box)
       self.setLowHigh(low, high)
       self.setValue(value)
-      self.setBox(box)
+      self.set_box(box)
     end
 
     # This sets the widget's value

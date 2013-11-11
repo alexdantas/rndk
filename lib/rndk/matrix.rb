@@ -31,7 +31,7 @@ module RNDK
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
       }
 
-      self.setBox(box)
+      self.set_box(box)
       borderw = if @box then 1 else 0 end
 
       # Make sure that the number of rows/cols/vrows/vcols is not zero.
@@ -228,7 +228,7 @@ module RNDK
       @shadow_win = nil
       @callbackfn = lambda do |matrix, input|
         disptype = matrix.colvanlues[matrix.col]
-        plainchar = Display.filterByDisplayType(disptype, input)
+        plainchar = Display.filter_by_display_type(disptype, input)
         charcount = matrix.info[matrix.row][matrix.col].size
 
         if plainchar == Ncurses::ERR
@@ -241,7 +241,7 @@ module RNDK
                         1,
                         matrix.info[matrix.row][matrix.col].size + 1)
           Ncurses.waddch(matrix.CurMatrixCell,
-                         if Display.isHiddenDisplayType(disptype)
+                         if Display.is_hidden_display_type(disptype)
                          then matrix.filler
                          else plainchar
                          end)
@@ -307,7 +307,7 @@ module RNDK
       end
 
       # Set the exit type and exit.
-      self.setExitType(0)
+      self.set_exit_type(0)
       return -1
     end
 
@@ -321,7 +321,7 @@ module RNDK
       complete = false
 
       # Set the exit type.
-      self.setExitType(0)
+      self.set_exit_type(0)
 
       # Move the cursor to the correct position within the cell.
       if @colwidths[@ccol] == 1
@@ -542,11 +542,11 @@ module RNDK
               self.drawOldCell
             end
             Ncurses.wrefresh self.CurMatrixCell
-            self.setExitType(input)
+            self.set_exit_type(input)
             ret = 1
             complete = true
           when Ncurses::ERR
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::KEY_ESC
             if !@box_cell
@@ -556,7 +556,7 @@ module RNDK
               self.drawOldCell
             end
             Ncurses.wrefresh self.CurMatrixCell
-            self.setExitType(input)
+            self.set_exit_type(input)
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -612,7 +612,7 @@ module RNDK
         @oldvcol = @col
 
         # Set the exit type and exit.
-        self.setExitType(0)
+        self.set_exit_type(0)
       end
 
       @result_data = ret
@@ -635,7 +635,7 @@ module RNDK
 
       # If the column is only one char.
       (1..@colwidths[@ccol]).each do |x|
-        ch = if x <= infolen && !Display.isHiddenDisplayType(disptype)
+        ch = if x <= infolen && !Display.is_hidden_display_type(disptype)
              then RNDK.CharOf(@info[@row][@col][x - 1])
              else @filler
              end
@@ -677,7 +677,7 @@ module RNDK
 
       # Draw in the cell info.
       (1..@colwidths[col]).each do |x|
-        ch = if x <= infolen && !Display.isHiddenDisplayType(disptype)
+        ch = if x <= infolen && !Display.is_hidden_display_type(disptype)
              then RNDK.CharOf(@info[vrow][vcol][x-1]).ord | highlight
              else @filler
              end
@@ -892,7 +892,7 @@ module RNDK
       RNDK.deleteCursesWindow @win
 
       # Clean the key bindings.
-      self.cleanBindings(:MATRIX)
+      self.clean_bindings(:MATRIX)
 
       # Unregister this object.
       RNDK::Screen.unregister(:MATRIX, self)
@@ -900,7 +900,7 @@ module RNDK
 
     # This function erases the matrix widget from the screen.
     def erase
-      if self.validRNDKObject
+      if self.valid_widget?
         # Clear the matrix cells.
         RNDK.eraseCursesWindow @cell[0][0]
 
@@ -1159,7 +1159,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def setBKattr(attrib)
+    def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
 
       # TODO what the hell?
