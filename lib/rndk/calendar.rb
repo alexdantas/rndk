@@ -55,29 +55,55 @@ module RNDK
       @marker[RNDK::CALENDAR.CALENDAR_INDEX(d, m, y)]
     end
 
-    def initialize(rndkscreen, xplace, yplace, title, day, month, year,
-        day_attrib, month_attrib, year_attrib, highlight, box, shadow)
+    #
+    #
+    # @note If `day`, `month` or `year` are zero, it'll use the
+    #       current date for it.
+    #       If all of them are 0, will use the complete date
+    #       of today.
+    def initialize(rndkscreen,
+                   xplace,
+                   yplace,
+                   title,
+                   day,
+                   month,
+                   year,
+                   day_attrib,
+                   month_attrib,
+                   year_attrib,
+                   highlight,
+                   box,
+                   shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
+
+      # If the user didn't supply enough arguments,
+      # we'll set the current date as default
+      date_info = Time.now.gmtime
+      day   = date_info.day   if day   == 0
+      month = date_info.month if month == 0
+      year  = date_info.year  if year  == 0
+
+      parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
       box_width = 24
       box_height = 11
       dayname = 'Su Mo Tu We Th Fr Sa '
       bindings = {
-          'T'           => Ncurses::KEY_HOME,
-          't'           => Ncurses::KEY_HOME,
-          'n'           => Ncurses::KEY_NPAGE,
+          'T'            => Ncurses::KEY_HOME,
+          't'            => Ncurses::KEY_HOME,
+          'n'            => Ncurses::KEY_NPAGE,
           RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          'p'           => Ncurses::KEY_PPAGE,
+          'p'            => Ncurses::KEY_PPAGE,
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
       }
 
-      self.setBox(box)
+      self.setBox box
 
       box_width = self.setTitle(title, box_width)
       box_height += @title_lines
 
-      # Make sure we didn't extend beyond the dimensions of the window.
+      # Make sure we didn't extend beyond the dimensions
+      # of the window.
       box_width = [box_width, parent_width].min
       box_height = [box_height, parent_height].min
 

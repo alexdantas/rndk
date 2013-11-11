@@ -10,7 +10,7 @@ begin
   rndkscreen = RNDK::Screen.new
 
   # Set up RNDK colors
-  RNDK::Draw.initRNDKColor
+  RNDK::Color.init
 
   # Set the labels' content.
   # (RNDK supports a "markup" string, with colors

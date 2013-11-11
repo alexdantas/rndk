@@ -4,10 +4,10 @@
 # ## Usage
 #
 # They're all methods to the RNDK::Screen class.
+#
 # For example:
 #
-#     curses_win = Ncurses.initscr
-#     rndkscreen = RNDK::Screen.new(curses_win)
+#     rndkscreen = RNDK::Screen.new
 #     message = ["awesome quick label!"]
 #     rndkscreen.popup_label message
 #
@@ -84,8 +84,8 @@ module RNDK
     # Shows a centered pop-up Dialog box with `message` label and
     # each button label on `buttons`.
     #
-    # @returns The user choice or `nil` if wrong parameters
-    #          were given.
+    # @return The user choice or `nil` if wrong parameters
+    #         were given.
     #
     # @note: `message` and `buttons` must be Arrays of Strings.
     def popup_dialog(message, buttons)
@@ -233,7 +233,9 @@ module RNDK
     #
     # @return The index in the list of the value selected.
     #
-    # If `numbers` is true, the displayed list items will be numbered.
+    # If `numbers` is true, the displayed list items will
+    # be numbered.
+    #
     # @note `list` must be Arrays of Strings.
     def get_list_index(title, list, numbers)
       return nil if list.class != Array or list.empty?

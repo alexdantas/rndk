@@ -1,9 +1,28 @@
-# Welcome to the Ruby Ncurses Development Kit!
-
+# The main RNDK module - contains everything we need.
+#
+# There's a lot of functionality inside RNDK. Besides
+# each Widget having it's own file, some methods were
+# splitted on several files:
+#
+# rndk/core/draw::      Common draw functions between Widgets.
+# rndk/core/draw::      Color initialization and handling.
+# rndk/core/display::
+# rndk/core/traverse::
+# rndk/core/widget::    Common functionality shared between widgets.
+# rndk/core/screen::
+# rndk/core/markup::    Functions to decode RNDK's markup language.
+# rndk/core/utils::     Utility functions, not urgent or anything.
+#
+# ## Developer Notes
+#
+# * Any questions on what a `Ncurses.*` function do, check it's man
+#   page with `man lowercase_function_name`.
+#
 require 'ffi-ncurses'
 require 'scanf'
 
 require 'rndk/core/draw'
+require 'rndk/core/color'
 require 'rndk/core/display'
 require 'rndk/core/traverse'
 require 'rndk/core/widget'
@@ -15,25 +34,6 @@ require 'rndk/core/utils'
 # You can use it too!
 Ncurses = FFI::NCurses
 
-# The main RNDK module - contains everything we need.
-#
-# There's a lot of functionality inside RNDK. Besides
-# each Widget having it's own file, some methods were
-# splitted on several files:
-#
-# * rndk/core/draw::
-# * rndk/core/display::
-# * rndk/core/traverse::
-# * rndk/core/widget::    Common functionality shared between widgets.
-# * rndk/core/screen::
-# * rndk/core/markup::    Functions to decode RNDK's markup language.
-# * rndk/core/utils::     Utility functions, not urgent or anything.
-#
-# ## Developer Notes
-#
-# * Any questions on what a `Ncurses.*` function do, check it's man
-#   page with `man lowercase_function_name`.
-#
 module RNDK
 
   # Some nice global constants.

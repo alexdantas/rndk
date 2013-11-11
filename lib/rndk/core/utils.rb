@@ -1,6 +1,4 @@
-# Utility functions.
-#
-#
+# Utility functions - misc things.
 
 module RNDK
 
@@ -74,10 +72,11 @@ module RNDK
     return f_pos != 0
   end
 
-  # Returns the filename portion of the given pathname, i.e. after the last
-  # slash
-  # For now this function is just a wrapper for File.basename kept for ease of
-  # porting and will be completely replaced in the future
+  # Returns the filename portion of the given pathname, i.e.
+  # after the last slash.
+  #
+  # For now this function is just a wrapper for `File.basename`,
+  # being kept for portability.
   def RNDK.baseName (pathname)
     File.basename(pathname)
   end

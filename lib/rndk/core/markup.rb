@@ -1,4 +1,4 @@
-# Handles the RNDK's String markup.
+# # RNDK String Markup
 #
 # RNDK has special formatting commands which can be included
 # in any String which add highlights, justification, or even
@@ -150,12 +150,12 @@
 
 module RNDK
 
-  # Takes a String full of format markers and translates them into a
-  # chtype array.
+  # Takes a String full of format markers and translates it
+  # into a chtype array.
   #
-  # This is better suited to curses because curses uses chtype almost
-  # exclusively
-  def RNDK.char2Chtype (string, to, align)
+  # This is better suited to curses because curses uses
+  # chtype almost exclusively
+  def RNDK.char2Chtype(string, to, align)
     to << 0
     align << LEFT
     result = []
@@ -356,7 +356,7 @@ module RNDK
   end
 
   # Compare a regular string to a chtype string
-  def RNDK.cmpStrChstr (str, chstr)
+  def RNDK.cmpStrChstr(str, chstr)
     i = 0
     r = 0
 

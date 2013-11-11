@@ -40,7 +40,7 @@ begin
   rndkscreen = RNDK::Screen.new(curses_win)
 
   # Set up RNDK colors
-  RNDK::Draw.initRNDKColor
+  RNDK::Color.init
 
   # Create the entry field widget.
   entry = RNDK::ENTRY.new(rndkscreen,

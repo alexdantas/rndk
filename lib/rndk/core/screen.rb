@@ -1,3 +1,4 @@
+require 'rndk/core/quick_widgets'
 
 module RNDK
 
@@ -8,10 +9,10 @@ module RNDK
   #
   # The only methods you should worry about are:
   #
-  # * #initialize
-  # * #end_rndk
-  # * #draw or #refresh
-  # * #erase
+  # * Screen#initialize
+  # * Screen#end_rndk
+  # * Screen#draw or #refresh
+  # * Screen#erase
   #
   # ## Developer Notes
   #
@@ -264,6 +265,4 @@ module RNDK
 
   end
 end
-
-require 'rndk/core/quick_widgets'
 
