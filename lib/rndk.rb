@@ -111,7 +111,7 @@ module RNDK
   end
 
   def RNDK.is_char? character
-    return false if characer.nil?
+    return false if character.nil?
 
     (character >= 0) and (character < Ncurses::KEY_MIN)
   end
@@ -121,7 +121,7 @@ module RNDK
     264 + n
   end
 
-  # This sets a blank string to be len of the given characer.
+  # This sets a blank string to be len of the given character.
   def RNDK.cleanChar(s, len, character)
     s << character * len
   end

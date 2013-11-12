@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 #
+# Note: This is not for beginners! Check out the examples/
+#       before adventuring into the demos/ realm!
+#
 # Shows a colored clock on the screen according to
 # current system time.
 # Press any key to exit.
@@ -8,20 +11,19 @@ require 'rndk/label'
 
 begin
   # Set up RNDK
-  curses_win = Ncurses.initscr
-  rndkscreen = RNDK::Screen.new curses_win
-  RNDK::Draw.initRNDKColor
+  rndkscreen = RNDK::Screen.new
+  RNDK::Color.init
 
   # Initial time string
   mesg = ['</1/B>HH:MM:SS']
 
   # Declare the labels.
-  label = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, mesg, 1, true, true)
+  label = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, mesg, true, true)
 
   # Woops, something bad happened
   if label.nil?
     rndkscreen.destroy
-    RNDK.end_rndk
+    RNDK::Screen.end_rndk
 
     puts "Cannot create the label. Is the window too small?"
     exit 1
@@ -33,7 +35,11 @@ begin
   # Will wait 50ms before getting input
   Ncurses.wtimeout(label.screen.window, 50)
 
-  begin
+  loop do
+    # Will go on until the user presses something
+    char = Ncurses.wgetch label.screen.window
+    break unless (char == Ncurses::ERR)
+
     current_time = Time.now.getlocal
 
     # Formatting time string.
@@ -41,16 +47,21 @@ begin
     mesg = [str]
 
     # Set the label contents
-    label.set(mesg, 1, label.box)
+    label.set(mesg, label.box)
 
     # Draw the label and sleep
     label.draw(label.box)
     Ncurses.napms(500)
-  end while (Ncurses.wgetch(label.screen.window)) == Ncurses::ERR
+  end
 
-  # Clean up
-  label.destroy
-  rndkscreen.destroy
   RNDK::Screen.end_rndk
+
+# In case something goes wrong
+rescue Exception => e
+  RNDK::Screen.end_rndk
+
+  puts e
+  puts e.inspect
+  puts e.backtrace
 end
 

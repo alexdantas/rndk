@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 #
+# Note: This is not for beginners! Check out the examples/
+#       before adventuring into the demos/ realm!
+#
 # Shows a book where you can create appointments of different
 # kinds, save and restore them on a file.
 #
@@ -40,8 +43,8 @@ class Appointment
     lines = []
 
     # Read the appointment file.
-    lines_read = RNDK.readFile(filename, lines)
-    if lines_read == -1
+    lines_read = RNDK.read_file(filename, lines)
+    if lines_read == nil
       app_info.count = 0
       return
     end
@@ -114,11 +117,10 @@ class Appointment
     readAppointmentFile(filename, appointment_info)
 
     # Set up RNDK
-    curses_win = Ncurses.initscr
-    rndkscreen = RNDK::Screen.new(curses_win)
+    rndkscreen = RNDK::Screen.new
 
     # Set up RNDK colors
-    RNDK::Draw.initRNDKColor
+    RNDK::Color.init
 
     # Create the calendar widget.
     calendar = RNDK::Calendar.new(rndkscreen,
@@ -130,7 +132,6 @@ class Appointment
 
     # Is the widget nil?
     if calendar.nil?
-      rndkscreen.destroy
       RNDK::Screen.end_rndk
 
       puts "Cannot create the calendar. Is the window too small?"
@@ -148,8 +149,15 @@ class Appointment
 
       # Create the itemlist widget.
       itemlist = RNDK::ITEMLIST.new(calendar.screen,
-          RNDK::CENTER, RNDK::CENTER, '', 'Select Appointment Type: ',
-          items, items.size, 0, true, false)
+                                    RNDK::CENTER,
+                                    RNDK::CENTER,
+                                    '',
+                                    'Select Appointment Type: ',
+                                    items,
+                                    items.size,
+                                    0,
+                                    true,
+                                    false)
 
       # Get the appointment type from the user.
       selection = itemlist.activate([])
@@ -167,10 +175,19 @@ class Appointment
       marker = Appointment::GPAppointmentAttributes[selection]
 
       # Create the entry field for the description.
-      entry = RNDK::ENTRY.new(calendar.screen, RNDK::CENTER, RNDK::CENTER,
-          '<C>Enter a description of the appointment.',
-          'Description: ', Ncurses::A_NORMAL, '.'.ord, :MIXED, 40, 1, 512,
-          true, false)
+      entry = RNDK::ENTRY.new(calendar.screen,
+                              RNDK::CENTER,
+                              RNDK::CENTER,
+                              '<C>Enter a description of the appointment.',
+                              'Description: ',
+                              Ncurses::A_NORMAL,
+                              '.'.ord,
+                              :MIXED,
+                              40,
+                              1,
+                              512,
+                              true,
+                              false)
 
       # Get the description.
       description = entry.activate([])
@@ -275,7 +292,7 @@ class Appointment
       end
 
       # Create the label widget
-      label = RNDK::LABEL.new(calendar.screen, RNDK::CENTER, RNDK::CENTER, mesg, mesg.size, true, false)
+      label = RNDK::LABEL.new(calendar.screen, RNDK::CENTER, RNDK::CENTER, mesg, true, false)
       label.draw(label.box)
       label.wait(' ')
       label.destroy
@@ -316,17 +333,15 @@ class Appointment
     end
 
     # Draw the calendar widget.
-    calendar.draw(calendar.box)
+    calendar.draw calendar.box
 
     # Let the user play with the widget.
-    calendar.activate([])
+    calendar.activate
 
     # Save the appointment information.
     Appointment.saveAppointmentFile(filename, appointment_info)
 
     # Clean up.
-    calendar.destroy
-    rndkscreen.destroy
     RNDK::Screen.end_rndk
   end
 end
