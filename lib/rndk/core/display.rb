@@ -49,20 +49,24 @@ module RNDK
     # or ERR if not.
     def Display.filter_by_display_type(type, input)
       result = input
-      if !RNDK.isChar(input)
+      if not RNDK.is_char? input
         result = Ncurses::ERR
-      elsif [:INT, :HINT].include?(type) && !RNDK.digit?(result.chr)
+
+      elsif ([:INT, :HINT].include? type) and (not RNDK.digit? result.chr)
         result = Ncurses::ERR
-      elsif [:CHAR, :UCHAR, :LCHAR, :UHCHAR, :LHCHAR].include?(type) && RNDK.digit?(result.chr)
+
+      elsif ([:CHAR, :UCHAR, :LCHAR, :UHCHAR, :LHCHAR].include? type) and (RNDK.digit? result.chr)
         result = Ncurses::ERR
+
       elsif type == :VIEWONLY
         result = ERR
-      elsif [:UCHAR, :UHCHAR, :UMIXED, :UHMIXED].include?(type) && RNDK.alpha?(result.chr)
+
+      elsif ([:UCHAR, :UHCHAR, :UMIXED, :UHMIXED].include? type) and (RNDK.is_alpha? result.chr)
         result = result.chr.upcase.ord
-      elsif [:LCHAR, :LHCHAR, :LMIXED, :LHMIXED].include?(type) && RNDK.alpha?(result.chr)
+
+      elsif ([:LCHAR, :LHCHAR, :LMIXED, :LHMIXED].include? type) and (RNDK.is_alpha? result.chr)
         result = result.chr.downcase.ord
       end
-
       result
     end
 

@@ -47,7 +47,7 @@ module RNDK
       box_width = field_width + @label_len + 2 * @border_size
 
       old_width = box_width
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
       horizontal_adjust = (box_width - old_width) / 2
 
       box_height += @title_lines
@@ -152,7 +152,7 @@ module RNDK
             else
               failed = true
             end
-          elsif RNDK.isChar(input) && @plate_pos < @plate.size
+          elsif RNDK.is_char?(input) && @plate_pos < @plate.size
             test[mark] = input.chr
             change = true
             amount = 1
@@ -461,10 +461,10 @@ module RNDK
       self.cleanTitle
 
       # Delete the windows
-      RNDK.deleteCursesWindow(@field_win)
-      RNDK.deleteCursesWindow(@label_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@field_win)
+      RNDK.window_delete(@label_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:TEMPLATE)
@@ -475,10 +475,10 @@ module RNDK
     # Erase the widget.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@field_win)
-        RNDK.eraseCursesWindow(@label_win)
-        RNDK.eraseCursesWindow(@shadow_win)
-        RNDK.eraseCursesWindow(@win)
+        RNDK.window_erase(@field_win)
+        RNDK.window_erase(@label_win)
+        RNDK.window_erase(@shadow_win)
+        RNDK.window_erase(@win)
       end
     end
 

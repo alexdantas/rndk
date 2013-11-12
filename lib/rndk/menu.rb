@@ -349,7 +349,7 @@ module RNDK
 
     # Erase a menu item subwindow
     def eraseSubwin
-      RNDK.eraseCursesWindow(@pull_win[@current_title])
+      RNDK.window_erase(@pull_win[@current_title])
 
       # Redraw the sub-menu title.
       self.drawTitle(@current_title)
@@ -387,8 +387,8 @@ module RNDK
     def destroy
       # Clean up the windows
       (0...@menu_items).each do |x|
-        RNDK.deleteCursesWindow(@title_win[x])
-        RNDK.deleteCursesWindow(@pull_win[x])
+        RNDK.window_delete(@title_win[x])
+        RNDK.window_delete(@pull_win[x])
       end
 
       # Clean the key bindings.
@@ -412,7 +412,7 @@ module RNDK
 
     def set(menu_item, submenu_item, title_highlight, subtitle_highlight)
       self.setCurrentItem(menu_item, submenu_item)
-      self.setTitleHighlight(title_highlight)
+      self.set_titleHighlight(title_highlight)
       self.setSubTitleHighlight(subtitle_highlight)
     end
 
@@ -429,7 +429,7 @@ module RNDK
     end
 
     # Set the attribute of the menu titles.
-    def setTitleHighlight(highlight)
+    def set_titleHighlight(highlight)
       @title_attr = highlight
     end
 

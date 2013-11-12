@@ -206,7 +206,7 @@ module RNDK
 
         if alphalist.isBind(:ALPHALIST, input)
           result = 1  # Don't try to use this key in editing
-        elsif (RNDK.isChar(input) &&
+        elsif (RNDK.is_char?(input) &&
             input.chr.match(/^[[:alnum:][:punct:]]$/)) ||
             [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include?(input)
           index = 0
@@ -294,8 +294,8 @@ module RNDK
         @scroll_field.erase
         @entry_field.erase
 
-        RNDK.eraseCursesWindow(@shadow_win)
-        RNDK.eraseCursesWindow(@win)
+        RNDK.window_erase(@shadow_win)
+        RNDK.window_erase(@win)
       end
     end
 
@@ -506,8 +506,8 @@ module RNDK
       @scroll_field.destroy
 
       # Free up the window pointers.
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Unregister the object.
       RNDK::Screen.unregister(:ALPHALIST, self)

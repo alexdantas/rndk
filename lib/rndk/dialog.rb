@@ -257,8 +257,8 @@ module RNDK
     # This function destroys the dialog widget.
     def destroy
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@win)
-      RNDK.deleteCursesWindow(@shadow_win)
+      RNDK.window_delete(@win)
+      RNDK.window_delete(@shadow_win)
 
       # Clean the key bindings
       self.clean_bindings(:DIALOG)
@@ -270,8 +270,8 @@ module RNDK
     # This function erases the dialog widget from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

@@ -34,7 +34,7 @@ module RNDK
       # otherwise the width will be the given width
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
 
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
 
       # Set the box height.
       if @title_lines > box_height
@@ -384,10 +384,10 @@ module RNDK
       self.cleanTitle
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@scrollbar_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@list_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@scrollbar_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@list_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:SCROLL)
@@ -398,8 +398,8 @@ module RNDK
 
     # This function erases the scrolling list from the screen.
     def erase
-      RNDK.eraseCursesWindow(@win)
-      RNDK.eraseCursesWindow(@shadow_win)
+      RNDK.window_erase(@win)
+      RNDK.window_erase(@shadow_win)
     end
 
     def allocListArrays(old_size, new_size)

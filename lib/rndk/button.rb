@@ -172,8 +172,8 @@ module RNDK
     # This erases the button widget.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 
@@ -203,11 +203,11 @@ module RNDK
       ydiff = current_y - ypos
 
       # Move the window to the new location.
-      RNDK.moveCursesWindow(@win, -xdiff, -ydiff)
-      RNDK.moveCursesWindow(@shadow_win, -xdiff, -ydiff)
+      RNDK.window_move(@win, -xdiff, -ydiff)
+      RNDK.window_move(@shadow_win, -xdiff, -ydiff)
 
       # Thouch the windows so they 'move'.
-      RNDK::Screen.refresh_window(@screen.window)
+      RNDK.window_refresh(@screen.window)
 
       # Redraw the window, if they asked for it.
       if refresh_flag
@@ -304,8 +304,8 @@ module RNDK
 
     # This destroys the button object pointer.
     def destroy
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       self.clean_bindings(:BUTTON)
 

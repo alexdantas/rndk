@@ -158,8 +158,8 @@ module RNDK
     # This destroys the widget.
     def destroy
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:MARQUEE)
@@ -171,8 +171,8 @@ module RNDK
     # This erases the widget.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

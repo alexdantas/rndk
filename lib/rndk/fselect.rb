@@ -395,7 +395,7 @@ module RNDK
       if self.valid_widget?
         @scroll_field.erase
         @entry_field.erase
-        RNDK.eraseCursesWindow(@win)
+        RNDK.window_erase(@win)
       end
     end
 
@@ -849,8 +849,8 @@ module RNDK
       @entry_field.destroy
 
       # Free up the windows
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       # Unregister the object.

@@ -38,7 +38,7 @@ module RNDK
       box_width = @label_len + field_width + 2
 
       old_width = box_width
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
       horizontal_adjust = (box_width - old_width) / 2
 
       box_height += @title_lines
@@ -501,10 +501,10 @@ module RNDK
     # This function erases the multiple line entry field from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@field_win)
-        RNDK.eraseCursesWindow(@label_win)
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@field_win)
+        RNDK.window_erase(@label_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 
@@ -513,10 +513,10 @@ module RNDK
       self.cleanTitle
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@field_win)
-      RNDK.deleteCursesWindow(@label_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@field_win)
+      RNDK.window_delete(@label_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:MENTRY)

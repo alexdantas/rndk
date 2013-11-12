@@ -184,16 +184,6 @@ module RNDK
       end
     end
 
-    # Refresh a raw Ncurses window.
-    #
-    # FIXME(original): this should be rewritten to use the panel library, so
-    # it would not be necessary to touch the window to ensure that it covers
-    # other windows.
-    def self.refresh_window win
-      Ncurses.touchwin win
-      Ncurses.wrefresh win
-    end
-
     # Redraws all Widgets inside this Screen.
     def draw
       self.refresh
@@ -204,7 +194,7 @@ module RNDK
       focused = -1
       visible = -1
 
-      RNDK::Screen.refresh_window(@window)
+      RNDK.window_refresh(@window)
 
       # We erase all the invisible objects, then only draw it all back, so
       # that the objects can overlap, and the visible ones will always be

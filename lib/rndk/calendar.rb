@@ -160,7 +160,7 @@ module RNDK
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
       }
 
-      box_width = self.setTitle(title, box_width)
+      box_width   = self.set_title(title, box_width)
       box_height += @title_lines
 
       # Make sure we didn't extend beyond the dimensions
@@ -573,10 +573,10 @@ module RNDK
     def erase
       return unless self.valid_widget?
 
-      RNDK.eraseCursesWindow @label_win
-      RNDK.eraseCursesWindow @field_win
-      RNDK.eraseCursesWindow @win
-      RNDK.eraseCursesWindow @shadow_win
+      RNDK.window_erase @label_win
+      RNDK.window_erase @field_win
+      RNDK.window_erase @win
+      RNDK.window_erase @shadow_win
     end
 
     # Destroys all windows inside the Widget and
@@ -584,10 +584,10 @@ module RNDK
     def destroy
       self.cleanTitle
 
-      RNDK.deleteCursesWindow @label_win
-      RNDK.deleteCursesWindow @field_win
-      RNDK.deleteCursesWindow @shadow_win
-      RNDK.deleteCursesWindow @win
+      RNDK.window_delete @label_win
+      RNDK.window_delete @field_win
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
 
       self.clean_bindings :calendar
 

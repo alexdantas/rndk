@@ -108,7 +108,7 @@ module RNDK
       end
       max_width -= (col_space - 1)
       box_width = [max_width, box_width].max
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
 
       # Make sure the dimensions of the window didn't extend
       # beyond the dimensions of the parent window
@@ -878,18 +878,18 @@ module RNDK
       self.cleanTitle
 
       # Clear the matrix windows.
-      RNDK.deleteCursesWindow(@cell[0][0])
-      (1..@vrows).each { |x| RNDK.deleteCursesWindow @cell[x][0] }
-      (1..@vcols).each { |x| RNDK.deleteCursesWindow @cell[0][x] }
+      RNDK.window_delete(@cell[0][0])
+      (1..@vrows).each { |x| RNDK.window_delete @cell[x][0] }
+      (1..@vcols).each { |x| RNDK.window_delete @cell[0][x] }
 
       (1..@vrows).each do |x|
         (1..@vcols).each do |y|
-          RNDK.deleteCursesWindow @cell[x][y]
+          RNDK.window_delete @cell[x][y]
         end
       end
 
-      RNDK.deleteCursesWindow @shadow_win
-      RNDK.deleteCursesWindow @win
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
 
       # Clean the key bindings.
       self.clean_bindings(:MATRIX)
@@ -902,19 +902,19 @@ module RNDK
     def erase
       if self.valid_widget?
         # Clear the matrix cells.
-        RNDK.eraseCursesWindow @cell[0][0]
+        RNDK.window_erase @cell[0][0]
 
-        (1..@vrows).each { |x| RNDK.eraseCursesWindow @cell[x][0] }
-        (1..@vcols).each { |x| RNDK.eraseCursesWindow @cell[0][x] }
+        (1..@vrows).each { |x| RNDK.window_erase @cell[x][0] }
+        (1..@vcols).each { |x| RNDK.window_erase @cell[0][x] }
 
         (1..@vrows).each do |x|
           (1..@vcols).each do |y|
-            RNDK.eraseCursesWindow @cell[x][y]
+            RNDK.window_erase @cell[x][y]
           end
         end
 
-        RNDK.eraseCursesWindow @shadow_win
-        RNDK.eraseCursesWindow @win
+        RNDK.window_erase @shadow_win
+        RNDK.window_erase @win
       end
     end
 

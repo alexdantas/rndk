@@ -91,8 +91,8 @@ module RNDK
     end
 
     def move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
-      current_x = Ncurses.getbegx(@win)
-      current_y = Ncurses.getbegy(@win)
+      current_x = Ncurses.getbegx @win
+      current_y = Ncurses.getbegy @win
       xpos = xplace
       ypos = yplace
 
@@ -116,7 +116,7 @@ module RNDK
 
       # Move the window to the new location.
       windows.each do |window|
-        RNDK.moveCursesWindow(window, -xdiff, -ydiff)
+        RNDK.window_move(window, -xdiff, -ydiff)
       end
 
       subwidgets.each do |subwidget|
@@ -124,7 +124,7 @@ module RNDK
       end
 
       # Touch the windows so they 'move'
-      RNDK::Screen.refresh_window(@screen.window)
+      RNDK.window_refresh @screen.window
 
       # Redraw the window, if they asked for it
       if refresh_flag
@@ -199,7 +199,7 @@ module RNDK
     end
 
     # This sets the background color of the widget.
-    def setBackgroundColor(color)
+    def set_bg_color color
       return if color.nil? || color == ''
 
       junk1 = []
@@ -209,43 +209,46 @@ module RNDK
       holder = RNDK.char2Chtype(color, junk1, junk2)
 
       # Set the widget's background color
+
+      ## FIXME BUG WTF
+      ## What does this function do?
+      ## Couldn't find anything on it
       self.SetBackAttrObj(holder[0])
     end
 
     # Set the widget's title.
-    def setTitle (title, box_width)
-      if !title.nil?
-        temp = title.split("\n")
-        @title_lines = temp.size
+    def set_title (title, box_width)
+      return if title.nil?
 
-        if box_width >= 0
-          max_width = 0
-          temp.each do |line|
-            len = []
-            align = []
-            holder = RNDK.char2Chtype(line, len, align)
-            max_width = [len[0], max_width].max
-          end
-          box_width = [box_width, max_width + 2 * @border_size].max
-        else
-          box_width = -(box_width - 1)
-        end
+      temp = title.split "\n"
+      @title_lines = temp.size
 
-        # For each line in the title convert from string to chtype array
-        title_width = box_width - (2 * @border_size)
-        @title = []
-        @title_pos = []
-        @title_len = []
-        (0...@title_lines).each do |x|
-          len_x = []
-          pos_x = []
-          @title << RNDK.char2Chtype(temp[x], len_x, pos_x)
-          @title_len.concat(len_x)
-          @title_pos << RNDK.justifyString(title_width, len_x[0], pos_x[0])
+      if box_width >= 0
+        max_width = 0
+        temp.each do |line|
+          len = []
+          align = []
+          holder = RNDK.char2Chtype(line, len, align)
+          max_width = [len[0], max_width].max
         end
+        box_width = [box_width, max_width + 2 * @border_size].max
+      else
+        box_width = -(box_width - 1)
       end
 
-      return box_width
+      # For each line in the title convert from string to chtype array
+      title_width = box_width - (2 * @border_size)
+      @title = []
+      @title_pos = []
+      @title_len = []
+      (0...@title_lines).each do |x|
+        len_x = []
+        pos_x = []
+        @title << RNDK.char2Chtype(temp[x], len_x, pos_x)
+        @title_len.concat(len_x)
+        @title_pos << RNDK.justifyString(title_width, len_x[0], pos_x[0])
+      end
+      box_width
     end
 
     # Draw the widget's title

@@ -201,15 +201,15 @@ module RNDK
 
     # This erases the label widget
     def erase
-      RNDK.eraseCursesWindow @win
-      RNDK.eraseCursesWindow @shadow_win
+      RNDK.window_erase @win
+      RNDK.window_erase @shadow_win
     end
 
     # Removes the Widget from the Screen, deleting it's
     # internal windows.
     def destroy
-      RNDK.deleteCursesWindow @shadow_win
-      RNDK.deleteCursesWindow @win
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
 
       self.clean_bindings :LABEL
 

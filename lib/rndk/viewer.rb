@@ -113,7 +113,7 @@ module RNDK
     # This function sets various attributes of the widget.
     def set(title, list, list_size, button_highlight,
         attr_interp, show_line_info, box)
-      self.setTitle(title)
+      self.set_title(title)
       self.set_highlight(button_highlight)
       self.setInfoLine(show_line_info)
       self.set_box(box)
@@ -122,7 +122,7 @@ module RNDK
 
     # This sets the title of the viewer. (A nil title is allowed.
     # It just means that the viewer will not have a title when drawn.)
-    def setTitle(title)
+    def set_title(title)
       super(title, -(@box_width + 1))
       @title_adj = @title_lines
 
@@ -698,8 +698,8 @@ module RNDK
       self.cleanTitle
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:VIEWER)
@@ -711,8 +711,8 @@ module RNDK
     # This function erases the viewer widget from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

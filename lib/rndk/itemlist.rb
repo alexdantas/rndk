@@ -32,7 +32,7 @@ module RNDK
       # Set the box width. Allow an extra char in field width for cursor
       field_width = self.maximumFieldWidth + 1
       box_width = field_width + @label_len + 2 * @border_size
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
       box_height += @title_lines
 
       # Make sure we didn't extend beyond the dimensions of the window
@@ -286,10 +286,10 @@ module RNDK
     # This function removes the widget from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@field_win)
-        RNDK.eraseCursesWindow(@label_win)
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@field_win)
+        RNDK.window_erase(@label_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 
@@ -304,10 +304,10 @@ module RNDK
       self.destroyInfo
 
       # Delete the windows
-      RNDK.deleteCursesWindow(@field_win)
-      RNDK.deleteCursesWindow(@label_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@field_win)
+      RNDK.window_delete(@label_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:ITEMLIST)

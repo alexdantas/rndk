@@ -35,7 +35,7 @@ module RNDK
       # COLS-width, otherwise the width will be the given width.
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
 
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
 
       # Translate the buttons string to a chtype array
       (0...button_count).each do |x|
@@ -309,8 +309,8 @@ module RNDK
     # This erases the buttonbox box from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow @win
-        RNDK.eraseCursesWindow @shadow_win
+        RNDK.window_erase @win
+        RNDK.window_erase @shadow_win
       end
     end
 
@@ -318,8 +318,8 @@ module RNDK
     def destroy
       self.cleanTitle
 
-      RNDK.deleteCursesWindow @shadow_win
-      RNDK.deleteCursesWindow @win
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
 
       self.clean_bindings(:BUTTONBOX)
 

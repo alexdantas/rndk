@@ -18,7 +18,7 @@ module RNDK
 
       box_height = RNDK.setWidgetDimension(parent_height, height, 3)
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
       box_height += @title_lines
       box_width = [parent_width, box_width].min
       box_height = [parent_height, box_height].min
@@ -266,11 +266,11 @@ module RNDK
       ydiff = current_y - ypos
 
       # Move the window to the new location.
-      RNDK.moveCursesWindow(@win, -xdiff, -ydiff)
-      RNDK.moveCursesWindow(@shadow_win, -xdiff, -ydiff)
+      RNDK.window_move(@win, -xdiff, -ydiff)
+      RNDK.window_move(@shadow_win, -xdiff, -ydiff)
 
       # Touch the windows so they 'move'.
-      RNDK::Screen.refresh_window(@screen.window)
+      RNDK.window_refresh(@screen.window)
 
       # Reraw the windowk if they asked for it
       if refresh_flag
@@ -380,12 +380,12 @@ module RNDK
       self.cleanTitle
       self.clean_bindings(:GRAPH)
       RNDK::Screen.unregister(:GRAPH, self)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@win)
     end
 
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
+        RNDK.window_erase(@win)
       end
     end
 

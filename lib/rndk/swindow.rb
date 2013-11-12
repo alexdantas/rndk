@@ -31,7 +31,7 @@ module RNDK
       # If the width is a negative value, the width will be
       # COLS-width, otherwise the widget will be the given width.
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
 
       # Set the box height.
       box_height += @title_lines + 1
@@ -517,9 +517,9 @@ module RNDK
       self.cleanTitle
 
       # Delete the windows.
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@field_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@field_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:SWINDOW)
@@ -531,8 +531,8 @@ module RNDK
     # This function erases the scrolling window widget.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

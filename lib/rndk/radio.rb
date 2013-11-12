@@ -31,7 +31,7 @@ module RNDK
       # otherwise the width will be the given width.
       box_width = RNDK.setWidgetDimension(parent_width, width, 5)
 
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
 
       # Set the box height.
       if @title_lines > box_height
@@ -354,9 +354,9 @@ module RNDK
       self.destroyInfo
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@scrollbar_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@scrollbar_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean up the key bindings.
       self.clean_bindings(:RADIO)
@@ -368,8 +368,8 @@ module RNDK
     # This function erases the radio widget
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

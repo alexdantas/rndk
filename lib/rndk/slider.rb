@@ -42,7 +42,7 @@ module RNDK
       end
 
       old_width = box_width
-      box_width = self.setTitle(title, box_width)
+      box_width = self.set_title(title, box_width)
       horizontal_adjust = (box_width - old_width) / 2
 
       box_height += @title_lines
@@ -256,7 +256,7 @@ module RNDK
       Ncurses.wmove(@field_win, 0, base)
       Ncurses.winnstr(@field_win, temp, need)
       temp << ' '
-      if RNDK.isChar(input)  # Replace the char at the cursor
+      if RNDK.is_char?(input)  # Replace the char at the cursor
         temp[col] = input.chr
       elsif input == Ncurses::KEY_BACKSPACE
         # delete the char before the cursor
@@ -456,10 +456,10 @@ module RNDK
       @label = []
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@field_win)
-      RNDK.deleteCursesWindow(@label_win)
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@field_win)
+      RNDK.window_delete(@label_win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:SLIDER)
@@ -471,10 +471,10 @@ module RNDK
     # This function erases the widget from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@label_win)
-        RNDK.eraseCursesWindow(@field_win)
-        RNDK.eraseCursesWindow(@lwin)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@label_win)
+        RNDK.window_erase(@field_win)
+        RNDK.window_erase(@lwin)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

@@ -16,7 +16,7 @@ module RNDK
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
       old_width = box_width
 
-      box_width = self.setTitle(title, -(box_width + 1))
+      box_width = self.set_title(title, -(box_width + 1))
 
       # Increment the height by number of lines in in the title
       box_height += @title_lines
@@ -387,8 +387,8 @@ module RNDK
       self.cleanTitle
 
       # Clean up the windows.
-      RNDK.deleteCursesWindow(@shadow_win)
-      RNDK.deleteCursesWindow(@win)
+      RNDK.window_delete(@shadow_win)
+      RNDK.window_delete(@win)
 
       # Clean the key bindings.
       self.clean_bindings(:HISTOGRAM)
@@ -400,8 +400,8 @@ module RNDK
     # Erase the widget from the screen.
     def erase
       if self.valid_widget?
-        RNDK.eraseCursesWindow(@win)
-        RNDK.eraseCursesWindow(@shadow_win)
+        RNDK.window_erase(@win)
+        RNDK.window_erase(@shadow_win)
       end
     end
 

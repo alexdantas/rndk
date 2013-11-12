@@ -89,7 +89,7 @@ module RNDK
   ALL_SCREENS = []
   ALL_OBJECTS = []
 
-  # This beeps then flushes the stdout stream.
+  # Beeps then flushes the stdout stream.
   #
   # Normally it emits an audible bell - if that's not
   # possible it flashes the screen.
@@ -98,53 +98,22 @@ module RNDK
     $stdout.flush
   end
 
-  # This safely erases a given window
-  def RNDK.eraseCursesWindow (window)
-    return if window.nil?
-
-    Ncurses.werase window
-    Ncurses.wrefresh window
-  end
-
-  # This safely deletes a given window.
-  def RNDK.deleteCursesWindow (window)
-    return if window.nil?
-
-    RNDK.eraseCursesWindow(window)
-    Ncurses.delwin window
-  end
-
-  # This moves a given window (if we're able to set the window's beginning).
-  # We do not use mvwin(), because it does not (usually) move subwindows.
-  def RNDK.moveCursesWindow (window, xdiff, ydiff)
-    return if window.nil?
-
-    xpos = []
-    ypos = []
-    Ncurses.getbegyx(window, ypos, xpos)
-    if Ncurses.mvwin(window, ypos[0], xpos[0]) != Ncurses::ERR
-      xpos[0] += xdiff
-      ypos[0] += ydiff
-      Ncurses.werase window
-      Ncurses.mvwin(window, ypos[0], xpos[0])
-    else
-      RNDK.beep
-    end
-  end
-
   def RNDK.digit? character
-    false if character.nil?
-    !(character.match(/^[[:digit:]]$/).nil?)
+    return false if character.nil?
+
+    not character.match(/^[[:digit:]]$/).nil?
   end
 
-  def RNDK.alpha? character
-    false if character.nil?
-    !(character.match(/^[[:alpha:]]$/).nil?)
+  def RNDK.is_alpha? character
+    return false if character.nil?
+
+    not character.match(/^[[:alpha:]]$/).nil?
   end
 
-  def RNDK.isChar c
-    false if c.nil?
-    c >= 0 && c < Ncurses::KEY_MIN
+  def RNDK.is_char? character
+    return false if characer.nil?
+
+    (character >= 0) and (character < Ncurses::KEY_MIN)
   end
 
   # Returns the function keys - F1, F2 ... F12 ...
@@ -161,57 +130,103 @@ module RNDK
     s.concat(character * len)
   end
 
+  # Functions that handle raw Ncurses windows.
+  # TODO perhaps change them when I create my dedicated
+  #      Window class.
+
+  # Safely erases a raw Ncurses window.
+  def RNDK.window_erase window
+    return if window.nil?
+
+    Ncurses.werase window
+    Ncurses.wrefresh window
+  end
+
+  # Safely deletes a raw Ncurses window.
+  def RNDK.window_delete window
+    return if window.nil?
+
+    RNDK.window_erase window
+    Ncurses.delwin window
+  end
+
+  # Safely moves a raw Ncurses window.
+  #
+  # ## Developer Note:
+  #
+  # Moves a given window if we're able to set the window's beginning.
+  # We do not use mvwin(), because it does not (usually) move subwindows.
+  def RNDK.window_move(window, xdiff, ydiff)
+    return if window.nil?
+
+    xpos = []
+    ypos = []
+    Ncurses.getbegyx(window, ypos, xpos)
+    if Ncurses.mvwin(window, ypos[0], xpos[0]) != Ncurses::ERR
+      xpos[0] += xdiff
+      ypos[0] += ydiff
+      Ncurses.werase window
+      Ncurses.mvwin(window, ypos[0], xpos[0])
+    else
+      RNDK.beep
+    end
+  end
+
+  # Refreshes a raw Ncurses window.
+  #
+  # ## Developer Notes
+  #
+  # FIXME(original): this should be rewritten to use the panel library, so
+  # it would not be necessary to touch the window to ensure that it covers
+  # other windows.
+  def RNDK.window_refresh win
+    Ncurses.touchwin win
+    Ncurses.wrefresh win
+  end
+
   # Aligns a box on the given `window` with the width and height given.
   #
   # x and y position values are like `RNDK::CENTER`, `RNDK::LEFT`,
   # `RNDK::RIGHT`.
   #
-  # xpos, ypos is an array with exactly one value, an integer
-  # box_width, box_height is an integer.
+  # `xpos`, `ypos` is an Array with exactly one value, an integer.
+  #
+  # `box_width`, `box_height` is an integer.
   #
   def RNDK.alignxy (window, xpos, ypos, box_width, box_height)
+
+    # Handling xpos
     first = Ncurses.getbegx window
-    last = Ncurses.getmaxx window
-    if (gap = (last - box_width)) < 0
-      gap = 0
-    end
+    last  = Ncurses.getmaxx window
+
+    gap = 0 if (gap = (last - box_width)) < 0
+
     last = first + gap
 
     case xpos[0]
-    when LEFT
-      xpos[0] = first
-    when RIGHT
-      xpos[0] = first + gap
-    when CENTER
-      xpos[0] = first + (gap / 2)
+    when LEFT   then xpos[0] = first
+    when RIGHT  then xpos[0] = first +  gap
+    when CENTER then xpos[0] = first + (gap / 2)
     else
-      if xpos[0] > last
-        xpos[0] = last
-      elsif xpos[0] < first
-        xpos[0] = first
-      end
+      xpos[0] = last  if xpos[0] > last
+      xpos[0] = first if xpos[0] < first
     end
 
+    # Handling ypos
     first = Ncurses.getbegy window
-    last = Ncurses.getmaxy window
-    if (gap = (last - box_height)) < 0
-      gap = 0
-    end
+    last  = Ncurses.getmaxy window
+
+    gap = 0 if (gap = (last - box_height)) < 0
+
     last = first + gap
 
     case ypos[0]
-    when TOP
-      ypos[0] = first
-    when BOTTOM
-      ypos[0] = first + gap
-    when CENTER
-      ypos[0] = first + (gap / 2)
+    when TOP    then ypos[0] = first
+    when BOTTOM then ypos[0] = first +  gap
+    when CENTER then ypos[0] = first + (gap / 2)
     else
-      if ypos[0] > last
-        ypos[0] = last
-      elsif ypos[0] < first
-        ypos[0] = first
-      end
+      ypos[0] = last  if ypos[0] > last
+      ypos[0] = first if ypos[0] < first
     end
   end
 
