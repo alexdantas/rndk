@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class DIALOG < RNDK::Widget
+  class DIALOG < Widget
     attr_reader :current_button
     MIN_DIALOG_WIDTH = 10
 
@@ -219,11 +219,6 @@ module RNDK
       @result_data = ret
       return ret
     end
-
-    # This moves the dialog field to the given location.
-    # Inherited
-    # def move(xplace, yplace, relative, refresh_flag)
-    # end
 
     # This function draws the dialog widget.
     def draw(box)

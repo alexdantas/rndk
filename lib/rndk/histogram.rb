@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class HISTOGRAM < RNDK::Widget
+  class HISTOGRAM < Widget
     def initialize(rndkscreen, xplace, yplace, height, width, orient,
         title, box, shadow)
       super()

@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class ITEMLIST < RNDK::Widget
+  class ITEMLIST < Widget
     def initialize(rndkscreen, xplace, yplace, title, label, item, count,
         default_item, box, shadow)
       super()

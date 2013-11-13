@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class TEMPLATE < RNDK::Widget
+  class TEMPLATE < Widget
     def initialize(rndkscreen, xplace, yplace, title, label, plate,
         overlay, box, shadow)
       super()

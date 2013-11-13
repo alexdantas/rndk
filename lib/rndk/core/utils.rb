@@ -7,17 +7,17 @@ module RNDK
     value.to_str.size
   end
 
-  # Opens the current directory and reads the contents.
-  def RNDK.getDirectoryContents(directory, list)
-    counter = 0
+  # Returns all files from `directory` as
+  # an Array of Strings.
+  def RNDK.get_directory_contents directory
+    list = []
 
     Dir.foreach(directory) do |filename|
-      next if filename == '.'
+      next if filename == '.' or filename == '..'
       list << filename
     end
 
-    list.sort!
-    return list.size
+    list.sort
   end
 
   # This looks for a subset of a word in the given list

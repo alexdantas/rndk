@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class GRAPH < RNDK::Widget
+  class GRAPH < Widget
     def initialize(rndkscreen,
                    xplace,
                    yplace,

@@ -4,9 +4,10 @@
 # Also, how to use RNDK's color markup on strings.
 #
 # Colors on text are achieved by foreground/background
-# color pairs. Run the example now.
+# color pairs.
+# Stop reading, run the example now.
 #
-# As you just say, they go from 1 to 80, going on the
+# As you just saw, they go from 1 to 80, going on the
 # following order in sets of 8 and from background to
 # foreground:
 #
@@ -39,6 +40,7 @@ begin
   # * To start a color, do `</XX>`, where XX is a color pair
   #   from 1 to 80.
   # * To stop it, do `<!XX>`, where XX is the same as above.
+  # * To center the text, do `<C>`.
 
   msg = []
   msg << "</1>Pair01<!1> </2>Pair02<!2> </3>Pair03<!3> </4>Pair04<!4> </5>Pair05<!5> </6>Pair06<!6> </7>Pair07<!7> </8>Pair08<!8>"
@@ -55,10 +57,10 @@ begin
   msg << "<C>All RNDK color pairs (press 'q' to quit)"
 
   # Show label with that huge message.
-  label = RNDK::LABEL.new(screen,
+  label = RNDK::Label.new(screen,
                           RNDK::CENTER, # x
                           1,            # y
-                          msg,
+                          msg,          # message
                           true,         # has box?
                           true)         # has shadow?
 

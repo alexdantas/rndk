@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class SCALE < RNDK::Widget
+  class SCALE < Widget
     def initialize(rndkscreen, xplace, yplace, title, label, field_attr,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()

@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class MATRIX < RNDK::Widget
+  class MATRIX < Widget
     attr_accessor :info
     attr_reader :colvalues, :row, :col, :colwidths, :filler
     attr_reader :crow, :ccol

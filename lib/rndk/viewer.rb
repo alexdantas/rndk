@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class VIEWER < RNDK::Widget
+  class VIEWER < Widget
     DOWN = 0
     UP = 1
 
@@ -520,7 +520,7 @@ module RNDK
       end
 
       # Pop up the entry field.
-      get_pattern = RNDK::ENTRY.new(screen, RNDK::CENTER, RNDK::CENTER,
+      get_pattern = RNDK::Entry.new(screen, RNDK::CENTER, RNDK::CENTER,
           '', label, Ncurses.COLOR_PAIR(5) | Ncurses::A_BOLD,
           '.' | Ncurses.COLOR_PAIR(5) | Ncurses::A_BOLD,
           :MIXED, 10, 0, 256, true, false)
@@ -613,7 +613,7 @@ module RNDK
     # This pops a little message up on the screen.
     def popUpLabel(mesg)
       # Set up variables.
-      label = RNDK::LABEL.new(@screen, RNDK::CENTER, RNDK::CENTER,
+      label = RNDK::Label.new(@screen, RNDK::CENTER, RNDK::CENTER,
           mesg, mesg.size, true, false)
 
       # Draw the label and wait.

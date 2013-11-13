@@ -4,7 +4,7 @@ module RNDK
 
   # Pop-up Label window.
   #
-  class LABEL < RNDK::Widget
+  class Label < Widget
 
     # Raw Ncurses window.
     attr_accessor :win
@@ -105,7 +105,7 @@ module RNDK
       end
 
       # Register this
-      rndkscreen.register(:LABEL, self)
+      rndkscreen.register(:label, self)
     end
 
     # Obsolete entrypoint which calls Label#draw.
@@ -162,7 +162,7 @@ module RNDK
     end
 
     def object_type
-      :LABEL
+      :label
     end
 
     def position
@@ -211,9 +211,9 @@ module RNDK
       RNDK.window_delete @shadow_win
       RNDK.window_delete @win
 
-      self.clean_bindings :LABEL
+      self.clean_bindings :label
 
-      RNDK::Screen.unregister(:LABEL, self)
+      RNDK::Screen.unregister(:label, self)
     end
 
     # Waits for the user to press a key.

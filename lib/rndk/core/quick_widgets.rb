@@ -49,7 +49,7 @@ module RNDK
       return if message.class != Array or message.empty?
 
       self.cleanly do
-        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, true, false)
+        popup = RNDK::Label.new(self, CENTER, CENTER, message, true, false)
         popup.draw(true)
 
         # Wait for some input.
@@ -67,7 +67,7 @@ module RNDK
       return if message.class != Array or message.empty?
 
       self.cleanly do
-        popup = RNDK::LABEL.new(self, CENTER, CENTER, message, true, false)
+        popup = RNDK::Label.new(self, CENTER, CENTER, message, true, false)
         popup.setBackgroundAttrib attrib
         popup.draw(true)
 
@@ -254,7 +254,7 @@ module RNDK
       width = [width, title.size].max
       width += 5
 
-      scrollp = RNDK::SCROLL.new(self,
+      scrollp = RNDK::Scroll.new(self,
                                  RNDK::CENTER,
                                  RNDK::CENTER,
                                  RNDK::RIGHT,
@@ -291,7 +291,7 @@ module RNDK
     # `title`, `label` and `initial_value` are passed to the Widget.
     def get_string(title, label, initial_value="")
 
-      widget = RNDK::ENTRY.new(self,
+      widget = RNDK::Entry.new(self,
                                RNDK::CENTER,
                                RNDK::CENTER,
                                title,

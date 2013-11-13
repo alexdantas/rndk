@@ -2,7 +2,7 @@ require 'rndk'
 
 module RNDK
   # TODO This Widget's very buggy! Somehow improve it later!
-  class SWINDOW < RNDK::Widget
+  class SWINDOW < Widget
     def initialize(rndkscreen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
       super()
@@ -97,11 +97,11 @@ module RNDK
 
       # Create the key bindings
       bindings.each do |from, to|
-        self.bind(:SWINDOW, from, :getc, to)
+        self.bind(:swindow, from, :getc, to)
       end
 
       # Register this baby.
-      rndkscreen.register(:SWINDOW, self)
+      rndkscreen.register(:swindow, self)
     end
 
     # This sets the lines and the box attribute of the scrolling window.
@@ -343,14 +343,14 @@ module RNDK
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
         # Call the pre-process function.
-        pp_return = @pre_process_func.call(:SWINDOW, self,
+        pp_return = @pre_process_func.call(:swindow, self,
             @pre_process_data, input)
       end
 
       # Should we continue?
       if pp_return != 0
         # Check for a key binding.
-        if self.checkBind(:SWINDOW, input)
+        if self.checkBind(:swindow, input)
           complete = true
         else
           case input
@@ -428,7 +428,7 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:SWINDOW, self, @post_process_data, input)
+          @post_process_func.call(:swindow, self, @post_process_data, input)
         end
       end
 
@@ -522,10 +522,10 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:SWINDOW)
+      self.clean_bindings(:swindow)
 
       # Unregister this object.
-      RNDK::Screen.unregister(:SWINDOW, self)
+      RNDK::Screen.unregister(:swindow, self)
     end
 
     # This function erases the scrolling window widget.
@@ -576,7 +576,7 @@ module RNDK
     # scrolling window to a file.
     def saveInformation
       # Create the entry field to get the filename.
-      entry = RNDK::ENTRY.new(@screen, RNDK::CENTER, RNDK::CENTER,
+      entry = RNDK::Entry.new(@screen, RNDK::CENTER, RNDK::CENTER,
           '<C></B/5>Enter the filename of the save file.',
           'Filename: ', Ncurses::A_NORMAL, '_'.ord, :MIXED,
           20, 1, 256, true, false)
@@ -760,7 +760,7 @@ module RNDK
     end
 
     def object_type
-      :SWINDOW
+      :swindow
     end
   end
 end

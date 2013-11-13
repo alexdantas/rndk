@@ -1,7 +1,7 @@
 require 'rndk/scale'
 
 module RNDK
-  class FSCALE < RNDK::SCALE
+  class FSCALE < SCALE
     def initialize(rndkscreen,
                    xplace,
                    yplace,

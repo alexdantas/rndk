@@ -2,7 +2,7 @@ require 'rndk/scroller'
 
 module RNDK
   # TODO This Widget's very buggy! Somehow improve it later!
-  class SELECTION < RNDK::SCROLLER
+  class SELECTION < SCROLLER
     attr_reader :selections
 
     def initialize(rndkscreen, xplace, yplace, splace, height, width, title,

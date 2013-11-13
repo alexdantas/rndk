@@ -18,7 +18,7 @@ begin
   mesg = ['</1/B>HH:MM:SS']
 
   # Declare the labels.
-  label = RNDK::LABEL.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, mesg, true, true)
+  label = RNDK::Label.new(rndkscreen, RNDK::CENTER, RNDK::CENTER, mesg, true, true)
 
   # Woops, something bad happened
   if label.nil?

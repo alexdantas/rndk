@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class BUTTON < RNDK::Widget
+  class BUTTON < Widget
     def initialize(rndkscreen, xplace, yplace, text, callback, box, shadow)
       super()
       parent_width = Ncurses.getmaxx(rndkscreen.window)
@@ -177,7 +177,7 @@ module RNDK
       end
     end
 
-    # This moves the button field to the given location.
+    # @see Widget#move
     def move(xplace, yplace, relative, refresh_flag)
       current_x = Ncurses.getbegx(@win)
       current_y = Ncurses.getbegy(@win)

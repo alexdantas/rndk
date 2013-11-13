@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class SLIDER < RNDK::Widget
+  class SLIDER < Widget
     def initialize(rndkscreen, xplace, yplace, title, label, filler,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()

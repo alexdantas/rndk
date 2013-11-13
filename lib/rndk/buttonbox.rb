@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class BUTTONBOX < RNDK::Widget
+  class BUTTONBOX < Widget
     attr_reader :current_button
 
     def initialize(rndkscreen, x_pos, y_pos, height, width, title, rows, cols,

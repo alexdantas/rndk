@@ -175,7 +175,7 @@ class Appointment
       marker = Appointment::GPAppointmentAttributes[selection]
 
       # Create the entry field for the description.
-      entry = RNDK::ENTRY.new(calendar.screen,
+      entry = RNDK::Entry.new(calendar.screen,
                               RNDK::CENTER,
                               RNDK::CENTER,
                               '<C>Enter a description of the appointment.',
@@ -292,7 +292,7 @@ class Appointment
       end
 
       # Create the label widget
-      label = RNDK::LABEL.new(calendar.screen, RNDK::CENTER, RNDK::CENTER, mesg, true, false)
+      label = RNDK::Label.new(calendar.screen, RNDK::CENTER, RNDK::CENTER, mesg, true, false)
       label.draw(label.box)
       label.wait(' ')
       label.destroy

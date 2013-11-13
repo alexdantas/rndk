@@ -2,7 +2,13 @@ require 'rndk'
 
 module RNDK
 
-  class SCROLLER < RNDK::Widget
+  # Common actions and functionality between
+  # scrolling Widgets.
+  #
+  # @note Do **not** instantiate this class!
+  #       Use it's subclasses.
+  class SCROLLER < Widget
+
     def initialize
       super()
     end
@@ -181,5 +187,7 @@ module RNDK
     def setCurrentItem(item)
       self.setPosition(item);
     end
+
   end
 end
+

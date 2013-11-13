@@ -1,7 +1,7 @@
 require 'rndk/slider'
 
 module RNDK
-  class FSLIDER < RNDK::SLIDER
+  class FSLIDER < SLIDER
     def initialize(rndkscreen,
                    xplace,
                    yplace,

@@ -1,7 +1,7 @@
 require 'rndk/scroller'
 
 module RNDK
-  class RADIO < RNDK::SCROLLER
+  class RADIO < SCROLLER
     def initialize(rndkscreen, xplace, yplace, splace, height, width, title,
         list, list_size, choice_char, def_item, highlight, box, shadow)
       super()

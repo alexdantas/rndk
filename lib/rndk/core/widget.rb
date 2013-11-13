@@ -57,6 +57,8 @@ module RNDK
     def draw(a)
     end
 
+    # Erases the Widget from the Screen.
+    # @note It does not destroy the Widget.
     def erase
     end
 
@@ -136,6 +138,10 @@ module RNDK
     # had pressed it.
     #
     # Nice to simulate batch actions on a Widget.
+    #
+    # Besides normal keybindings (arrow keys and such), see
+    # Widget#set_exit_type to see how the Widget exits.
+    #
     def inject char
     end
 
@@ -160,6 +166,8 @@ module RNDK
     def refreshData
     end
 
+    # Destroys all windows inside the Widget and
+    # removes it from the Screen.
     def destroy
     end
 
@@ -315,7 +323,7 @@ module RNDK
     def bindableObject(rndktype)
       if rndktype != self.object_type
         return nil
-      elsif [:FSELECT, :ALPHALIST].include?(self.object_type)
+      elsif [:FSELECT, :alphalist].include?(self.object_type)
         return @entry_field
       else
         return self

@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class MENU < RNDK::Widget
+  class MENU < Widget
     TITLELINES = 1
     MAX_MENU_ITEMS = 30
     MAX_SUB_ITEMS = 98

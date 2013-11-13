@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class FSELECT < RNDK::Widget
+  class FSELECT < Widget
     attr_reader :scroll_field, :entry_field
     attr_reader :dir_attribute, :file_attribute, :link_attribute, :highlight
     attr_reader :sock_attribute, :field_attribute, :filler_character
@@ -83,7 +83,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 2 - label_len
                    end
-      @entry_field = RNDK::ENTRY.new(rndkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
+      @entry_field = RNDK::Entry.new(rndkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, field_attribute, filler_char, :MIXED, temp_width,
           0, 512, box, false)
 
@@ -148,7 +148,7 @@ module RNDK
         ]
 
         # Create the pop up label.
-        info_label = RNDK::LABEL.new(entry.screen, RNDK::CENTER, RNDK::CENTER,
+        info_label = RNDK::Label.new(entry.screen, RNDK::CENTER, RNDK::CENTER,
             mesg, 9, true, false)
         info_label.draw(true)
         info_label.getch([])
@@ -351,12 +351,12 @@ module RNDK
       end
 
       # Define the callbacks for the entry field.
-      @entry_field.bind(:ENTRY, Ncurses::KEY_UP, adjust_scroll_cb, self)
-      @entry_field.bind(:ENTRY, Ncurses::KEY_PPAGE, adjust_scroll_cb, self)
-      @entry_field.bind(:ENTRY, Ncurses::KEY_DOWN, adjust_scroll_cb, self)
-      @entry_field.bind(:ENTRY, Ncurses::KEY_NPAGE, adjust_scroll_cb, self)
-      @entry_field.bind(:ENTRY, RNDK::KEY_TAB, complete_filename_cb, self)
-      @entry_field.bind(:ENTRY, RNDK.CTRL('^'), display_file_info_cb, self)
+      @entry_field.bind(:entry, Ncurses::KEY_UP, adjust_scroll_cb, self)
+      @entry_field.bind(:entry, Ncurses::KEY_PPAGE, adjust_scroll_cb, self)
+      @entry_field.bind(:entry, Ncurses::KEY_DOWN, adjust_scroll_cb, self)
+      @entry_field.bind(:entry, Ncurses::KEY_NPAGE, adjust_scroll_cb, self)
+      @entry_field.bind(:entry, RNDK::KEY_TAB, complete_filename_cb, self)
+      @entry_field.bind(:entry, RNDK.CTRL('^'), display_file_info_cb, self)
 
       # Put the current working directory in the entry field.
       @entry_field.setValue(@pwd)
@@ -367,7 +367,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 1
                    end
-      @scroll_field = RNDK::SCROLL.new(rndkscreen,
+      @scroll_field = RNDK::Scroll.new(rndkscreen,
           Ncurses.getbegx(@win), Ncurses.getbegy(@win) + temp_height, RNDK::RIGHT,
           box_height - temp_height, temp_width, '', @dir_contents,
           @file_counter, false, @highlight, box, false)
@@ -608,11 +608,9 @@ module RNDK
       dir_list = []
 
       # Get the directory contents
-      file_count = RNDK.getDirectoryContents(@pwd, dir_list)
-      if file_count <= 0
-        # We couldn't read the directory. Return.
-        return false
-      end
+      dir_list = RNDK.get_directory_contents @pwd
+
+      return false if dir_list.size <= 0
 
       @dir_contents = dir_list
       @file_counter = file_count

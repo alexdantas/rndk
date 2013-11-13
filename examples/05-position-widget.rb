@@ -43,7 +43,7 @@ begin
   RNDK::Color.init
 
   # Create the entry field widget.
-  entry = RNDK::ENTRY.new(rndkscreen,
+  entry = RNDK::Entry.new(rndkscreen,
                           RNDK::CENTER, # x
                           RNDK::CENTER, # y
                           '',

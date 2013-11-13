@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class MENTRY < RNDK::Widget
+  class MEntry < Widget
     attr_accessor :info, :current_col, :current_row, :top_row
     attr_reader :disp_type, :field_width, :rows, :field_win
 
@@ -158,7 +158,7 @@ module RNDK
       end
 
       # Register
-      rndkscreen.register(:MENTRY, self)
+      rndkscreen.register(:MEntry, self)
     end
 
     # This actually activates the mentry widget...
@@ -249,14 +249,14 @@ module RNDK
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
         # Call the pre-process function
-        pp_return = @pre_process_func.call(:MENTRY, self,
+        pp_return = @pre_process_func.call(:MEntry, self,
             @pre_process_data, input)
       end
 
       # Should we continue?
       if pp_return != 0
         # Check for a key binding...
-        if self.checkBind(:MENTRY, input)
+        if self.checkBind(:MEntry, input)
           complete = true
         else
           moved = false
@@ -419,7 +419,7 @@ module RNDK
 
         # Should we do a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:MENTRY, self, @post_process_data, input)
+          @post_process_func.call(:MEntry, self, @post_process_data, input)
         end
       end
 
@@ -519,10 +519,10 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:MENTRY)
+      self.clean_bindings(:MEntry)
 
       # Unregister this object.
-      RNDK::Screen.unregister(:MENTRY, self)
+      RNDK::Screen.unregister(:MEntry, self)
     end
 
     # This sets multiple attributes of the widget.
@@ -613,7 +613,7 @@ module RNDK
     end
 
     def object_type
-      :MENTRY
+      :MEntry
     end
   end
 end

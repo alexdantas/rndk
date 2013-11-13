@@ -1,7 +1,7 @@
 require 'rndk'
 
 module RNDK
-  class MARQUEE < RNDK::Widget
+  class MARQUEE < Widget
     def initialize(rndkscreen, xpos, ypos, width, box, shadow)
       super()
 

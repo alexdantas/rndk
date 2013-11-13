@@ -1,7 +1,7 @@
 require 'rndk/fscale'
 
 module RNDK
-  class DSCALE < RNDK::FSCALE
+  class DSCALE < FSCALE
     # The original DScale handled unsigned values.
     # Since Ruby's typing is different this is really just FSCALE
     # but is nice it's nice to have this for compatibility/completeness

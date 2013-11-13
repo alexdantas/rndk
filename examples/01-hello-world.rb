@@ -24,7 +24,7 @@ begin
          ]
 
   # Declare the labels.
-  label = RNDK::LABEL.new(rndkscreen,   # screen
+  label = RNDK::Label.new(rndkscreen,   # screen
                           RNDK::CENTER, # x
                           RNDK::CENTER, # y
                           mesg,         # message

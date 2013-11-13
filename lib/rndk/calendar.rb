@@ -36,7 +36,7 @@ module RNDK
   #               to vESCAPE_HIT.
   # Ctrl-L::      Refreshes the screen.
   #
-  class Calendar < RNDK::Widget
+  class Calendar < Widget
 
     attr_reader :day, :month, :year
 
@@ -117,6 +117,10 @@ module RNDK
 
     # Creates a Calendar Widget.
     #
+    # * `xplace` is the x position - can be an integer or
+    #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
+    # * `yplace` is the y position - can be an integer or
+    #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `day`, `month` and `year` are integers. I suggest
     #   you to use Ruby's `Time.now.gmtime`.
     # * `title` can be more than one line - just split them
@@ -274,7 +278,7 @@ module RNDK
       @marker[Calendar.calendar_index(d, m, y)]
     end
 
-    # Activates the Calendar Widget, letting the user interact with it.
+    # Activates the Widget, letting the user interact with it.
     #
     # `actions` is an Array of characters. If it's non-null,
     # will #inject each char on it into the Widget.
@@ -306,14 +310,7 @@ module RNDK
       ret
     end
 
-    # Makes the Calendar react to `char` just as if the user
-    # had pressed it.
-    #
-    # Nice to simulate batch actions on a Widget.
-    #
-    # Besides normal keybindings (arrow keys and such), see
-    # Widget#set_exit_type to see how the Widget exits.
-    #
+    # @see Widget#inject
     def inject char
       pp_return = 1
       ret       = nil
@@ -386,7 +383,7 @@ module RNDK
       return ret
     end
 
-    # This moves the calendar field to the given location.
+    # @see Widget#move
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
 
@@ -568,8 +565,7 @@ module RNDK
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
-    # Erases the Calendar from the Screen.
-    # @note It does not destroy the widget.
+    # @see Widget#erase
     def erase
       return unless self.valid_widget?
 
@@ -579,8 +575,7 @@ module RNDK
       RNDK.window_erase @shadow_win
     end
 
-    # Destroys all windows inside the Widget and
-    # removes it from the Screen.
+    # @see Widget#destroy
     def destroy
       self.cleanTitle
 
