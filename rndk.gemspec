@@ -20,7 +20,7 @@ It means that you'll be able to master the dark arts of text-based
 applications, easily creating nice apps for the console.
 END_OF_DESCRIPTION
 
-  spec.homepage      = "https://github.com/alexdantas/rndk"
+  spec.homepage      = "http://alexdantas.net/projects/rndk"
   spec.license       = "BSD"
 
   spec.files         = `git ls-files`.split($/)

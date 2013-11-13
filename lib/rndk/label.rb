@@ -2,7 +2,7 @@ require 'rndk'
 
 module RNDK
 
-  # Pop-up Label window.
+  # Customizable text on the screen.
   #
   class Label < Widget
 
@@ -237,3 +237,4 @@ module RNDK
 
   end
 end
+

@@ -10,50 +10,48 @@ applications, easily creating nice apps for the console.
 `RNDK` is a fork from `tawny-cdk`, a [Chris Sauro Ruby port][tawny]
 of [Thomas Dickey's Curses Development Kit][cdk] (in C).
 
-Currently implemented widgets:
+Here's the list of currently implemented widgets:
 
- * Alphalist
- * Button
- * Buttonbox
- * Calendar
- * Dialog
- * Entry
- * File Selector
- * Graph
- * Histogram
- * Item List
- * Label
- * Matrix
- * Marquee
- * Menu
- * Multiple Line Entry
- * Radio List
- * Scale
- * Scrolling List
- * Scrolling Window
- * Selection List
- * Slider
- * Template
- * Viewer
+| Widget                | Description                                     | Has examples? |
+| --------------------- | ----------------------------------------------- | ------------- |
+| Alphalist             | Scrolling list of alphabetically sorted words   | not yet       |
+| Button                | Message attached to a callback                  | not yet       |
+| Buttonbox             | Labeled set of buttons                          | not yet       |
+| Calendar              | Pop-up traversable calendar                     | yes!          |
+| Dialog                | Dialog box with a message and some buttons      | not yet       |
+| Entry                 | Text-entry box with a label                     | yes!          |
+| File Selector         | Interact graphically with the file system       | not yet       |
+| Graph                 | Plots a graph with x/y coordinates              | not yet       |
+| Histogram             | Vertical/horizontal histogram                   | not yet       |
+| Item List             | Select from a preset item list                  | not yet       |
+| Label                 | Pop-up label window                             | not yet       |
+| Matrix                | Matrix widget                                   | not yet       |
+| Marquee               | Movable text                                    | not yet       |
+| Menu                  | Pull-down menu list                             | not yet       |
+| Multiple Line Entry   | Multiple-line entry box with a label            | not yet       |
+| Radio List            | Radio item list                                 | not yet       |
+| Scale                 | Draggable scale box with a label                | not yet       |
+| Scrolling List        | Scrolling item list                             | yes!          |
+| Scrolling Window      | Display scrollable long messages                | not yet       |
+| Selection List        | Selection list widget                           | not yet       |
+| Slider                | Visual slider box                               | not yet       |
+| Template              | Insert info on a field with a pre-set format    | not yet       |
+| Viewer                | View contents of a file on a scrollable box     | not yet       |
+
+The ones with examples (on the root `examples` directory) are ready to use.
+The others are kinda unstable, since the API is being completely rewritten.
 
 ## WARNING
 
-This is a very unstable Work-in-Progress library.
+This is a very unstable Work-in-Progress library. I'm currently reviewing
+`tawny-cdk`'s API, so a lot of things are changing real fast.
 
-I'm currently reviewing `tawny-cdk`'s API, so a lot of things are
-changing real fast.
-
-Be sure to know that whenever I remove this notice, things will be
-nicer.
-
-For now, I recommend you to **not** use `rndk` for production
-programs!
-
-## Requirements
-
-`rndk` requires the gem `ffi-ncurses`.
+Be sure to know that whenever I remove this notice, things will be nicer. For
+now, I recommend you to **not** use `rndk` for production programs!
 
 ## Installation
+
+`rndk` requires the gem `ffi-ncurses`.
 
 Add this line to your application's Gemfile:
 
@@ -75,20 +73,25 @@ and run:
 
     ruby -Ilib examples/YOUR_EXAMPLE_HERE
 
-There's also some more comples demo applications under the `demos`
+There's also some more complex demo applications under the `demos`
 directory. Do the same:
 
     ruby -Ilib demos/YOUR_DEMO_HERE
 
 ## Contributing
 
+Any help would be largely appreciated! For a list of things
+to do, see the `TODO` file.
+
 Currently `rndk` has a C-like API, since it was directly taken
-from `cdk`. The top priority is to make it more rubyish (maybe
-studying [rbcurse]?).
+from `cdk`. The top priority is to make it more rubyish.
 
-Also, see the `TODO` file.
+I'm getting inspiration from [rbcurse] and some non-ruby Widget
+sets.
 
-1. Fork it
+Step-by-step guide to contribute:
+
+1. Fork this repository
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)

@@ -366,5 +366,7 @@ module RNDK
     def object_type
       :BUTTON
     end
+
   end
 end
+
