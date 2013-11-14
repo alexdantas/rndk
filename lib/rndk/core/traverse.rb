@@ -1,4 +1,5 @@
 module RNDK
+
   module Traverse
     def Traverse.resetRNDKScreen(screen)
       refreshDataRNDKScreen(screen)
@@ -285,5 +286,7 @@ module RNDK
         end
       end
     end
+
   end
 end
+

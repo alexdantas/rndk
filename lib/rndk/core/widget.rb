@@ -274,13 +274,13 @@ module RNDK
     end
 
     # Set data for preprocessing
-    def setPreProcess (fn, data)
+    def before_processing(fn, data=nil)
       @pre_process_func = fn
       @pre_process_data = data
     end
 
     # Set data for postprocessing
-    def setPostProcess (fn, data)
+    def after_processing(fn, data=nil)
       @post_process_func = fn
       @post_process_data = data
     end

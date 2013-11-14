@@ -351,7 +351,7 @@ module RNDK
       @entry_field.bind(:entry, RNDK::KEY_TAB,      complete_word_cb,    self)
 
       # Set up the post-process function for the entry field.
-      @entry_field.setPreProcess(pre_process_entry_field, self)
+      @entry_field.before_processing(pre_process_entry_field, self)
 
       # Create the scrolling list.  It overlaps the entry field by one line if
       # we are using box-borders.
@@ -622,13 +622,13 @@ module RNDK
     end
 
     # This function sets the pre-process function.
-    def setPreProcess(callback, data)
-      @entry_field.setPreProcess(callback, data)
+    def before_processing(callback, data)
+      @entry_field.before_processing(callback, data)
     end
 
     # This function sets the post-process function.
-    def setPostProcess(callback, data)
-      @entry_field.setPostProcess(callback, data)
+    def after_processing(callback, data)
+      @entry_field.after_processing(callback, data)
     end
 
     def createList list

@@ -69,6 +69,7 @@ module RNDK
   # for Widget interaction.
   #
   # Example:  `RNDK.CTRL('L')` is `Ctrl+L` or `C-l`
+
   REFRESH    = RNDK.CTRL('L')
   PASTE      = RNDK.CTRL('V')
   COPY       = RNDK.CTRL('Y')
