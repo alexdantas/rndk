@@ -1,12 +1,90 @@
 require 'rndk'
 
 module RNDK
-  class SLIDER < Widget
-    def initialize(rndkscreen, xplace, yplace, title, label, filler,
-        field_width, start, low, high, inc, fast_inc, box, shadow)
+
+  # Visual slider box with a label.
+  #
+  # ## Keybindings
+  #
+  # Down Arrow::  Decrements the field by the normal decrement value.
+  # Up Arrow::    Increments the field by the normal increment value.
+  # u::           Increments the field by the normal increment value.
+  # Prev Page::   Decrements the field by the accelerated decrement value.
+  # U::           Decrements the field by the accelerated decrement value.
+  # Ctrl-B::      Decrements the field by the accelerated decrement value.
+  # Next Page::   Increments the field by the accelerated increment value.
+  # D::           Increments the field by the accelerated increment value.
+  # Ctrl-F::      Increments the field by the accelerated increment value.
+  # Home::        Sets the value to the low value.
+  # g::           Sets the value to the low value.
+  # End::         Sets the value to the high value.
+  # G::           Sets the value to the high value.
+  # $::           Sets the value to the high value.
+  # Return::      Exits the widget and returns the current value. This also sets the widget data `exit_type` to `:NORMAL`.
+  # Tab::         Exits the widget and returns the current value. This also sets the widget data `exit_type` to `:NORMAL`.
+  # Escape::      Exits the widget and returns `nil`.  Also  sets the widget data `exit_type` to `:ESCAPE_HIT`.
+  # Ctrl-L::      Refreshes the screen.
+  #
+  # If the cursor  is not pointing to the field's value,
+  # the following key bindings apply.
+  #
+  # You may use the left/right arrows to move the cursor
+  # onto the field's value and modify it by typing characters
+  # to replace the digits and sign.
+  #
+  # Left Arrow::  Decrements the scale by the normal value.
+  # Right Arrow:: Increments the scale by the normal value.
+  # d::           Decrements the scale by the normal value.
+  # D::           Increments the scale by the accelerated value.
+  # -::           Decrements the scale by the normal value.
+  # +::           Increments the scale by the normal value.
+  # 0::           Sets the scale to the low value.
+  #
+  class Slider < Widget
+
+    # Creates a new Slider Widget.
+    #
+    # * `xplace` is the x position - can be an integer or
+    #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
+    # * `yplace` is the y position - can be an integer or
+    #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
+    # * `title` can be more than one line - just split them
+    #   with `\n`s.
+    # * `label` is the label of the slider field.
+    # * `filler` is the character to draw the slider bar. You
+    #   can combine it with colors too - use the pipe ('|')
+    #   operator to combine Ncurses attributes with RNDK Colors.
+    # * `field_width` is the width of the field. It it's 0,
+    #   will be created with full width of the screen.
+    #   If it's a negative value, will create with full width
+    #   minus that value.
+    # * `start` is the initial value of the widget.
+    # * `low`/`high` are the minimum and maximum values of
+    #   the slider.
+    # * `inc` is the increment value.
+    # * `fast_inc` is the accelerated increment value.
+    # * `box` if the Widget is drawn with a box outside it.
+    # * `shadow` turns on/off the shadow around the Widget.
+    #
+    def initialize(rndkscreen,
+                   xplace,
+                   yplace,
+                   title,
+                   label,
+                   filler,
+                   field_width,
+                   start,
+                   low,
+                   high,
+                   inc,
+                   fast_inc,
+                   box,
+                   shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
+
+      parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
+
       bindings = {
           'u'           => Ncurses::KEY_UP,
           'U'           => Ncurses::KEY_PPAGE,
@@ -132,16 +210,20 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(:SLIDER, from, :getc, to)
+        self.bind(:slider, from, :getc, to)
       end
 
-      rndkscreen.register(:SLIDER, self)
+      rndkscreen.register(:slider, self)
     end
 
-    # This allows the person to use the widget's data field.
-    def activate(actions)
-      # Draw the widget.
-      self.draw(@box)
+    # Activates the Widget, letting the user interact with it.
+    #
+    # `actions` is an Array of characters. If it's non-null,
+    # will #inject each char on it into the Widget.
+    #
+    # @return The current value of the slider.
+    def activate(actions=[])
+      self.draw @box
 
       if actions.nil? || actions.size == 0
         while true
@@ -165,7 +247,7 @@ module RNDK
 
       # Set the exit type and return.
       self.set_exit_type(0)
-      return -1
+      return nil
     end
 
     # Check if the value lies outside the low/high range. If so, force it in.
@@ -260,10 +342,10 @@ module RNDK
         temp[col] = input.chr
       elsif input == Ncurses::KEY_BACKSPACE
         # delete the char before the cursor
-        modify = RNDK::SLIDER.removeChar(temp, col - 1)
+        modify = RNDK::Slider.removeChar(temp, col - 1)
       elsif input == Ncurses::KEY_DC
         # delete the char at the cursor
-        modify = RNDK::SLIDER.removeChar(temp, col)
+        modify = RNDK::Slider.removeChar(temp, col)
       else
         modify = false
       end
@@ -292,10 +374,10 @@ module RNDK
       end
     end
 
-    # This function injects a single character into the widget.
-    def inject(input)
+    # @see Widget#inject
+    def inject input
       pp_return = 1
-      ret = -1
+      ret = nil
       complete = false
 
       # Set the exit type.
@@ -307,14 +389,14 @@ module RNDK
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
         # Call the pre-process function.
-        pp_return = @pre_process_func.call(:SLIDER, self,
+        pp_return = @pre_process_func.call(:slider, self,
             @pre_process_data, input)
       end
 
       # Should we continue?
       if pp_return != 0
         # Check for a key binding.
-        if self.checkBind(:SLIDER, input)
+        if self.checkBind(:slider, input)
           complete = true
         else
           case input
@@ -323,13 +405,13 @@ module RNDK
           when Ncurses::KEY_RIGHT
             self.setEditPosition(@field_edit - 1)
           when Ncurses::KEY_DOWN
-            @current = RNDK::SLIDER.Decrement(@current, @inc)
+            @current = RNDK::Slider.Decrement(@current, @inc)
           when Ncurses::KEY_UP
-            @current = RNDK::SLIDER.Increment(@current, @inc)
+            @current = RNDK::Slider.Increment(@current, @inc)
           when Ncurses::KEY_PPAGE
-            @current = RNDK::SLIDER.Increment(@current, @fastinc)
+            @current = RNDK::Slider.Increment(@current, @fastinc)
           when Ncurses::KEY_NPAGE
-            @current = RNDK::SLIDER.Decrement(@current, @fastinc)
+            @current = RNDK::Slider.Decrement(@current, @fastinc)
           when Ncurses::KEY_HOME
             @current = @low
           when Ncurses::KEY_END
@@ -374,7 +456,7 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:SLIDER, self, @post_process_data, input)
+          @post_process_func.call(:slider, self, @post_process_data, input)
         end
       end
 
@@ -387,26 +469,25 @@ module RNDK
       return ret
     end
 
-    # This moves the widget's data field to the given location.
+    # @see Widget#move
     def move(xplace, yplace, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
 
       self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
-    # This function draws the widget.
-    def draw(box)
+    # Draws the Widget on the Screen.
+    #
+    # If `box` is true, it is drawn with a box.
+    def draw box
+
       # Draw the shadow.
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       # Box the widget if asked.
-      if box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if box
 
-      self.drawTitle(@win)
+      self.drawTitle @win
 
       # Draw the label.
       unless @label_win.nil?
@@ -450,7 +531,7 @@ module RNDK
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?
     end
 
-    # This function destroys the widget.
+    # @see Widget#destroy
     def destroy
       self.cleanTitle
       @label = []
@@ -462,19 +543,19 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:SLIDER)
+      self.clean_bindings(:slider)
 
       # Unregister this object.
-      RNDK::Screen.unregister(:SLIDER, self)
+      RNDK::Screen.unregister(:slider, self)
     end
 
-    # This function erases the widget from the screen.
+    # @see Widget#erase
     def erase
       if self.valid_widget?
-        RNDK.window_erase(@label_win)
-        RNDK.window_erase(@field_win)
-        RNDK.window_erase(@lwin)
-        RNDK.window_erase(@shadow_win)
+        RNDK.window_erase @label_win
+        RNDK.window_erase @field_win
+        RNDK.window_erase @lwin
+        RNDK.window_erase @shadow_win
       end
     end
 
@@ -539,7 +620,7 @@ module RNDK
     end
 
     def object_type
-      :SLIDER
+      :slider
     end
   end
 end

@@ -4,6 +4,7 @@
 # temporary pre-made Widgets with a single action.
 #
 # They're automatically included within `require 'rndk'`.
+#
 require 'rndk'
 
 begin

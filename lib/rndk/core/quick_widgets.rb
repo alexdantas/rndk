@@ -258,11 +258,10 @@ module RNDK
                                  RNDK::CENTER,
                                  RNDK::CENTER,
                                  RNDK::RIGHT,
-                                 height,
                                  width,
+                                 height,
                                  title,
                                  list,
-                                 list.size,
                                  numbers,
                                  Ncurses::A_REVERSE,
                                  true,
@@ -288,8 +287,8 @@ module RNDK
     # Pops up an Entry Widget and returns the value supplied
     # by the user.
     #
-    # `title`, `label` and `initial_value` are passed to the Widget.
-    def get_string(title, label, initial_value="")
+    # `title`, `label` and `initial_text` are passed to the Widget.
+    def get_string(title, label, initial_text="")
 
       widget = RNDK::Entry.new(self,
                                RNDK::CENTER,
@@ -305,7 +304,7 @@ module RNDK
                                true,
                                false)
 
-      widget.setValue(initial_value)
+      widget.set_text(initial_text)
 
       value = widget.activate([])
 
@@ -316,7 +315,7 @@ module RNDK
       end
 
       # Return a copy of the string typed in.
-      value = widget.getValue.clone
+      value = widget.get_text.clone
       widget.destroy
 
       value

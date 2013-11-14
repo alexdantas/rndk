@@ -390,7 +390,7 @@ module RNDK
       self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
     end
 
-    # Draws the Calendar Widget on the Screen.
+    # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
     def draw(box=false)

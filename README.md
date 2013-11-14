@@ -1,4 +1,5 @@
 # Ruby Ncurses Development Kit (RNDK)
+[![Gem Version](https://badge.fury.io/rb/rndk.png)](http://badge.fury.io/rb/rndk)
 
 `rndk` aims to be a powerful, well-documented and easy-to-use
 Ncurses Development Kit in Ruby. Besides abstracting away Ncurses'
@@ -24,7 +25,7 @@ Here's the list of currently implemented widgets:
 | Graph                 | Plots a graph with x/y coordinates              | not yet       |
 | Histogram             | Vertical/horizontal histogram                   | not yet       |
 | Item List             | Select from a preset item list                  | not yet       |
-| Label                 | Pop-up label window                             | not yet       |
+| Label                 | Pop-up label window                             | yes!          |
 | Matrix                | Matrix widget                                   | not yet       |
 | Marquee               | Movable text                                    | not yet       |
 | Menu                  | Pull-down menu list                             | not yet       |
@@ -34,12 +35,13 @@ Here's the list of currently implemented widgets:
 | Scrolling List        | Scrolling item list                             | yes!          |
 | Scrolling Window      | Display scrollable long messages                | not yet       |
 | Selection List        | Selection list widget                           | not yet       |
-| Slider                | Visual slider box                               | not yet       |
+| Slider                | Visual slider box                               | yes!          |
 | Template              | Insert info on a field with a pre-set format    | not yet       |
 | Viewer                | View contents of a file on a scrollable box     | not yet       |
 
 The ones with examples (on the root `examples` directory) are ready to use.
 The others are kinda unstable, since the API is being completely rewritten.
+Also, [click here for screenshots][widgets]!
 
 ## WARNING
 
@@ -104,4 +106,14 @@ Step-by-step guide to contribute:
 [cdk]:http://invisible-island.net/cdk/
 [rbcurse]:https://github.com/rkumar/rbcurse
 [wiki]:https://github.com/alexdantas/rndk/wiki
+[widgets]:https://github.com/alexdantas/rndk/wiki/widgets
+
+## Contact
+
+Hi, I'm Alexandre Dantas! Thanks for having interest in this project. Please
+take the time to visit any of the links below.
+
+* `rndk` homepage: http://www.alexdantas.net/projects/rndk
+* Contact: `eu @ alexdantas.net`
+* My homepage: http://www.alexdantas.net
 
