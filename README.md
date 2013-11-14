@@ -67,6 +67,9 @@ Or install it yourself as:
 
 ## Usage
 
+[Take a look at the Wiki][wiki]! There's some tutorials and
+resources there.
+
 The `examples` directory contains lots of sample usages for every
 widget available. To execute them, go to the `rndk` root folder
 and run:
@@ -100,4 +103,5 @@ Step-by-step guide to contribute:
 [tawny]:https://github.com/masterzora/tawny-cdk
 [cdk]:http://invisible-island.net/cdk/
 [rbcurse]:https://github.com/rkumar/rbcurse
+[wiki]:https://github.com/alexdantas/rndk/wiki
 

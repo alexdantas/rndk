@@ -40,7 +40,7 @@ begin
                            RNDK::Color[:red],        # highlight
                            true,                     # has box?
                            false)                    # has shadow?
-  cal.activate []
+  cal.activate
 
   RNDK::Screen.end_rndk
 

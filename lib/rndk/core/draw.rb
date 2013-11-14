@@ -2,36 +2,6 @@
 module RNDK
 
   module Draw
-    # # This sets up a basic set of color pairs.
-    # # These can be redefined if wanted
-    # def Draw.initRNDKColor
-    #   color = [Ncurses::COLOR_WHITE,
-    #            Ncurses::COLOR_RED,
-    #            Ncurses::COLOR_GREEN,
-    #            Ncurses::COLOR_YELLOW,
-    #            Ncurses::COLOR_BLUE,
-    #            Ncurses::COLOR_MAGENTA,
-    #            Ncurses::COLOR_CYAN,
-    #            Ncurses::COLOR_BLACK]
-    #   pair = 1
-
-    #   if Ncurses.has_colors
-    #     # XXX: Only checks if terminal has colours not if colours are started
-    #     Ncurses.start_color
-    #     limit = if Ncurses.COLORS < 8
-    #             then Ncurses.COLORS
-    #             else 8
-    #             end
-
-    #     # Create the color pairs
-    #     (0...limit).each do |fg|
-    #       (0...limit).each do |bg|
-    #         Ncurses.init_pair(pair, color[fg], color[bg])
-    #         pair += 1
-    #       end
-    #     end
-    #   end
-    # end
 
     # This prints out a box around a window with attributes
     def Draw.boxWindow(window, attr)

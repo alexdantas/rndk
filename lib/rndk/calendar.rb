@@ -24,16 +24,16 @@ module RNDK
   # Enter::       Exits the widget and returns a value of
   #               time_t   which   represents   the   day
   #               selected at 1  second  after  midnight.
-  #               This also sets the widget data exitType
-  #               to vNORMAL.
+  #               This also sets the widget data `exit_type`
+  #               to `:NORMAL`.
   # Tab::         Exits the widget and returns a value of
   #               time_t   which   represents   the   day
   #               selected at 1  second  after  midnight.
-  #               This also sets the widget data exitType
-  #               to vNORMAL.
-  # Escape::      Exits the widget and returns (time_)-1
-  #               This also sets the widget data exitType
-  #               to vESCAPE_HIT.
+  #               This also sets the widget data `exit_type`
+  #               to `:NORMAL`.
+  # Escape::      Exits the widget and returns selected date
+  #               This also sets the widget data `exit_type`
+  #               to `:ESCAPE_HIT`.
   # Ctrl-L::      Refreshes the screen.
   #
   class Calendar < Widget
