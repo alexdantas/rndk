@@ -108,7 +108,7 @@ module RNDK
 
     # This allows the user to play with the widget.
     def activate(actions)
-      ret = -1
+      ret = false
 
       # Draw the widget.
       self.draw(@box)
@@ -143,8 +143,8 @@ module RNDK
 
     # This injects a single character into the widget.
     def inject(input)
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type.
@@ -160,7 +160,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check a predefined binding.
         if self.checkBind(:ITEMLIST, input)
           complete = true

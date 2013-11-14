@@ -134,13 +134,13 @@ module RNDK
       @current_high = @view_size - 1
     end
 
-    def maxViewSize
+    def max_view_size
       return @box_height - (2 * @border_size + @title_lines)
     end
 
     # Set variables that depend upon the list_size
-    def setViewSize(list_size)
-      @view_size = self.maxViewSize
+    def set_view_size(list_size)
+      @view_size = self.max_view_size
       @list_size = list_size
       @last_item = list_size - 1
       @max_top_item = list_size - @view_size
@@ -150,9 +150,9 @@ module RNDK
         @max_top_item = 0
       end
 
-      if @list_size > 0 && self.maxViewSize > 0
-        @step = 1.0 * self.maxViewSize / @list_size
-        @toggle_size = if @list_size > self.maxViewSize
+      if @list_size > 0 && self.max_view_size > 0
+        @step = 1.0 * self.max_view_size / @list_size
+        @toggle_size = if @list_size > self.max_view_size
                        then 1
                        else @step.ceil
                        end
@@ -162,7 +162,7 @@ module RNDK
       end
     end
 
-    def setPosition(item)
+    def set_position(item)
       if item <= 0
         self.KEY_HOME
       elsif item > @list_size - 1
@@ -180,12 +180,12 @@ module RNDK
     end
 
     # Get/Set the current item number of the scroller.
-    def getCurrentItem
+    def get_current_item
       @current_item
     end
 
-    def setCurrentItem(item)
-      self.setPosition(item);
+    def set_current_item(item)
+      self.set_position(item);
     end
 
   end

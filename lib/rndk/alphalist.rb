@@ -479,7 +479,7 @@ module RNDK
     # Widget#set_exit_type to see how the Widget exits.
     #
     def inject char
-      ret = -1
+      ret = false
 
       self.draw @box
 
@@ -490,7 +490,7 @@ module RNDK
       @exit_type = @entry_field.exit_type
 
       # Determine the exit status.
-      ret = -1 if @exit_type == :EARLY_EXIT
+      ret = false if @exit_type == :EARLY_EXIT
 
       @result_data = ret
       ret

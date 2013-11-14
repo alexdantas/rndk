@@ -154,8 +154,8 @@ module RNDK
     def inject(input)
       first_button = 0
       last_button = @button_count - 1
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type.
@@ -163,12 +163,14 @@ module RNDK
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:DIALOG, self,
-            @pre_process_data, input)
+        pp_return = @pre_process_func.call(:DIALOG,
+                                           self,
+                                           @pre_process_data,
+                                           input)
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check for a key binding.
         if self.checkBind(:DIALOG, input)
           complete = true

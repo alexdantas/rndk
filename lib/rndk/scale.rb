@@ -138,7 +138,7 @@ module RNDK
 
     # This allows the person to use the widget's data field.
     def activate(actions)
-      ret = -1
+      ret = false
       # Draw the widget.
       self.draw(@box)
 
@@ -290,8 +290,8 @@ module RNDK
 
     # This function injects a single character into the widget.
     def inject(input)
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type.
@@ -308,7 +308,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check for a key bindings.
         if self.checkBind(self.object_type, input)
           complete = true

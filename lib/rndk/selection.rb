@@ -184,8 +184,8 @@ module RNDK
 
     # This injects a single characer into the widget.
     def inject(input)
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type
@@ -201,7 +201,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check for a predefined binding.
         if self.checkBind(:SELECTION, input)
           complete = true

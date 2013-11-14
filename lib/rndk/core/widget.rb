@@ -36,14 +36,41 @@ module RNDK
       @binding_list = {}
     end
 
+    # Makes `block` execute right before processing input
+    # on the Widget.
+    #
+    # `block` is called with the following arguments:
+    #
+    # * The Widget type (`:scroll`, `:calendar`, etc)
+    # * The Widget itself (`self`)
+    # * That `data` you send as an argument to `before_processing`.
+    # * The input character the Widget just received.
+    #
+    # Make good use of them when making your callback.
+    def before_processing(data=nil, &block)
+      @pre_process_data = data
+      @pre_process_func = block
+    end
+
+    # Makes `block` execute right after processing input
+    # on the Widget.
+    #
+    # `block` is called with the following arguments:
+    #
+    # * The Widget type (`:scroll`, `:calendar`, etc)
+    # * The Widget itself (`self`)
+    # * That `data` you send as an argument to `after_processing`.
+    # * The input character the Widget just received.
+    #
+    # Make good use of them when making your callback.
+    def after_processing(data=nil, &block)
+      @post_process_data = data
+      @post_process_func = block
+    end
+
     def object_type
       # no type by default
       :NULL
-    end
-
-    def validObjType(type)
-      # dummy version for now
-      true
     end
 
     def Screen_XPOS(n)
@@ -92,45 +119,47 @@ module RNDK
       self.move_specific(xplace, yplace, relative, refresh_flag, [@win, @shadow_win], [])
     end
 
-    def move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
-      current_x = Ncurses.getbegx @win
-      current_y = Ncurses.getbegy @win
-      xpos = xplace
-      ypos = yplace
+    # Set the widget's title.
+    def set_title (title, box_width)
+      return if title.nil?
 
-      # If this is a relative move, then we will adjust where we want
-      # to move to.
-      if relative
-        xpos = Ncurses.getbegx(@win) + xplace
-        ypos = Ncurses.getbegy(@win) + yplace
+      temp = title.split "\n"
+      @title_lines = temp.size
+
+      if box_width >= 0
+        max_width = 0
+        temp.each do |line|
+          len = []
+          align = []
+          holder = RNDK.char2Chtype(line, len, align)
+          max_width = [len[0], max_width].max
+        end
+        box_width = [box_width, max_width + 2 * @border_size].max
+      else
+        box_width = -(box_width - 1)
       end
 
-      # Adjust the window if we need to
-      xtmp = [xpos]
-      ytmp = [ypos]
-      RNDK.alignxy(@screen.window, xtmp, ytmp, @box_width, @box_height)
-      xpos = xtmp[0]
-      ypos = ytmp[0]
-
-      # Get the difference
-      xdiff = current_x - xpos
-      ydiff = current_y - ypos
-
-      # Move the window to the new location.
-      windows.each do |window|
-        RNDK.window_move(window, -xdiff, -ydiff)
+      # For each line in the title convert from string to chtype array
+      title_width = box_width - (2 * @border_size)
+      @title = []
+      @title_pos = []
+      @title_len = []
+      (0...@title_lines).each do |x|
+        len_x = []
+        pos_x = []
+        @title << RNDK.char2Chtype(temp[x], len_x, pos_x)
+        @title_len.concat(len_x)
+        @title_pos << RNDK.justifyString(title_width, len_x[0], pos_x[0])
       end
+      box_width
+    end
 
-      subwidgets.each do |subwidget|
-        subwidget.move(xplace, yplace, relative, false)
-      end
-
-      # Touch the windows so they 'move'
-      RNDK.window_refresh @screen.window
-
-      # Redraw the window, if they asked for it
-      if refresh_flag
-        self.draw(@box)
+    # Draw the widget's title
+    def drawTitle(win)
+      (0...@title_lines).each do |x|
+        Draw.writeChtype(@win, @title_pos[x] + @border_size,
+            x + @border_size, @title[x], RNDK::HORIZONTAL, 0,
+            @title_len[x])
       end
     end
 
@@ -207,6 +236,8 @@ module RNDK
     end
 
     # This sets the background color of the widget.
+    #
+    # FIXME BUG
     def set_bg_color color
       return if color.nil? || color == ''
 
@@ -224,65 +255,9 @@ module RNDK
       self.SetBackAttrObj(holder[0])
     end
 
-    # Set the widget's title.
-    def set_title (title, box_width)
-      return if title.nil?
-
-      temp = title.split "\n"
-      @title_lines = temp.size
-
-      if box_width >= 0
-        max_width = 0
-        temp.each do |line|
-          len = []
-          align = []
-          holder = RNDK.char2Chtype(line, len, align)
-          max_width = [len[0], max_width].max
-        end
-        box_width = [box_width, max_width + 2 * @border_size].max
-      else
-        box_width = -(box_width - 1)
-      end
-
-      # For each line in the title convert from string to chtype array
-      title_width = box_width - (2 * @border_size)
-      @title = []
-      @title_pos = []
-      @title_len = []
-      (0...@title_lines).each do |x|
-        len_x = []
-        pos_x = []
-        @title << RNDK.char2Chtype(temp[x], len_x, pos_x)
-        @title_len.concat(len_x)
-        @title_pos << RNDK.justifyString(title_width, len_x[0], pos_x[0])
-      end
-      box_width
-    end
-
-    # Draw the widget's title
-    def drawTitle(win)
-      (0...@title_lines).each do |x|
-        Draw.writeChtype(@win, @title_pos[x] + @border_size,
-            x + @border_size, @title[x], RNDK::HORIZONTAL, 0,
-            @title_len[x])
-      end
-    end
-
     # Remove storage for the widget's title.
     def cleanTitle
       @title_lines = ''
-    end
-
-    # Set data for preprocessing
-    def before_processing(fn, data=nil)
-      @pre_process_func = fn
-      @pre_process_data = data
-    end
-
-    # Set data for postprocessing
-    def after_processing(fn, data=nil)
-      @post_process_func = fn
-      @post_process_data = data
     end
 
     # Set the Widget#exit_type based on the input `char`.
@@ -305,11 +280,16 @@ module RNDK
     end
 
     def valid_widget?
-      result = false
-      if RNDK::ALL_OBJECTS.include?(self)
-        result = self.validObjType(self.object_type)
-      end
-      result
+      return false unless RNDK::ALL_OBJECTS.include? self
+
+      self.valid_widget_type? self.object_type
+    end
+
+    # FIXME Dummy function
+    # TODO Figure out what to do with it
+    def valid_widget_type? type
+      # dummy version for now
+      true
     end
 
     # FIXME TODO What does `function_key` does?
@@ -514,6 +494,49 @@ module RNDK
     end
 
     protected
+
+    # Actually moves the widget.
+    def move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
+      current_x = Ncurses.getbegx @win
+      current_y = Ncurses.getbegy @win
+      xpos = xplace
+      ypos = yplace
+
+      # If this is a relative move, then we will adjust where we want
+      # to move to.
+      if relative
+        xpos = Ncurses.getbegx(@win) + xplace
+        ypos = Ncurses.getbegy(@win) + yplace
+      end
+
+      # Adjust the window if we need to
+      xtmp = [xpos]
+      ytmp = [ypos]
+      RNDK.alignxy(@screen.window, xtmp, ytmp, @box_width, @box_height)
+      xpos = xtmp[0]
+      ypos = ytmp[0]
+
+      # Get the difference
+      xdiff = current_x - xpos
+      ydiff = current_y - ypos
+
+      # Move the window to the new location.
+      windows.each do |window|
+        RNDK.window_move(window, -xdiff, -ydiff)
+      end
+
+      subwidgets.each do |subwidget|
+        subwidget.move(xplace, yplace, relative, false)
+      end
+
+      # Touch the windows so they 'move'
+      RNDK.window_refresh @screen.window
+
+      # Redraw the window, if they asked for it
+      if refresh_flag
+        self.draw(@box)
+      end
+    end
 
     # Gets a raw character from internal Ncurses window
     # and returns the result, capped to sane values.

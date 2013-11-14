@@ -316,8 +316,8 @@ module RNDK
       refresh_cells = false
       moved_cell = false
       charcount = @info[@row][@col].size
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type.
@@ -341,7 +341,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check the key bindings.
         if self.checkBind(:MATRIX, input)
           complete = true

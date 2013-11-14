@@ -312,7 +312,7 @@ module RNDK
 
     # @see Widget#inject
     def inject input
-      pp_return = 1
+      pp_return = true
       ret = 1
       complete = false
 
@@ -328,7 +328,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
 
         # Check a predefined binding
         if self.checkBind(:entry, input)

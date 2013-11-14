@@ -221,9 +221,9 @@ module RNDK
 
     # This injects a character into the widget.
     def inject(input)
-      pp_return = 1
+      pp_return = true
       complete = false
-      ret = -1
+      ret = false
 
       self.set_exit_type(0)
 
@@ -237,7 +237,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check a predefined binding
         if self.checkBind(:TEMPLATE, input)
           complete = true

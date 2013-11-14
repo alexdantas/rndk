@@ -1,32 +1,32 @@
 module RNDK
 
   module Traverse
-    def Traverse.resetRNDKScreen(screen)
+    def Traverse.reset(screen)
       refreshDataRNDKScreen(screen)
     end
 
-    def Traverse.exitOKRNDKScreen(screen)
+    def Traverse.exit_ok(screen)
       screen.exit_status = RNDK::Screen::EXITOK
     end
 
-    def Traverse.exitCancelRNDKScreen(screen)
+    def Traverse.exit_cancel(screen)
       screen.exit_status = RNDK::Screen::EXITCANCEL
     end
 
-    def Traverse.exitOKRNDKScreenOf(obj)
-      exitOKRNDKScreen(obj.screen)
+    def Traverse.exit_ok_of(obj)
+      exit_ok obj.screen
     end
 
-    def Traverse.exitCancelRNDKScreenOf(obj)
-      exitCancelRNDKScreen(obj.screen)
+    def Traverse.exit_cancel_of(obj)
+      exit_cancel obj.screen
     end
 
-    def Traverse.resetRNDKScreenOf(obj)
-      resetRNDKScreen(obj.screen)
+    def Traverse.reset_of(obj)
+      reset(obj.screen)
     end
 
     # Returns the object on which the focus lies.
-    def Traverse.getRNDKFocusCurrent(screen)
+    def Traverse.get_current_focus(screen)
       result = nil
       n = screen.object_focus
 
@@ -38,7 +38,7 @@ module RNDK
     end
 
     # Set focus to the next object, returning it.
-    def Traverse.setRNDKFocusNext(screen)
+    def Traverse.set_next_focus(screen)
       result = nil
       curobj = nil
       n = getFocusIndex(screen)
@@ -65,7 +65,7 @@ module RNDK
     end
 
     # Set focus to the previous object, returning it.
-    def Traverse.setRNDKFocusPrevious(screen)
+    def Traverse.set_previous_focus(screen)
       result = nil
       curobj = nil
       n = getFocusIndex(screen)
@@ -91,7 +91,7 @@ module RNDK
 
     # Set focus to a specific object, returning it.
     # If the object cannot be found, return nil.
-    def Traverse.setRNDKFocusCurrent(screen, newobj)
+    def Traverse.set_current_focus(screen, newobj)
       result = nil
       curobj = nil
       n = getFocusIndex(screen)
@@ -117,37 +117,48 @@ module RNDK
     end
 
     # Set focus to the first object in the screen.
-    def Traverse.setRNDKFocusFirst(screen)
+    def Traverse.set_first_focus(screen)
       setFocusIndex(screen, screen.object_count - 1)
-      return switchFocus(setRNDKFocusNext(screen), nil)
+      return switchFocus(set_next_focus(screen), nil)
     end
 
     # Set focus to the last object in the screen.
-    def Traverse.setRNDKFocusLast(screen)
+    def Traverse.set_last_focus(screen)
       setFocusIndex(screen, 0)
-      return switchFocus(setRNDKFocusPrevious(screen), nil)
+      return switchFocus(set_previous_focus(screen), nil)
     end
 
-    def Traverse.traverseRNDKOnce(screen, curobj, key_code,
-        function_key, func_menu_key)
+    # Traverse the screen just one time.
+    def Traverse.once(screen,
+                      curobj,
+                      key_code,
+                      function_key,
+                      func_menu_key)
+
       case key_code
       when Ncurses::KEY_BTAB
-        switchFocus(setRNDKFocusPrevious(screen), curobj)
+        switchFocus(set_previous_focus(screen), curobj)
+
       when RNDK::KEY_TAB
-        switchFocus(setRNDKFocusNext(screen), curobj)
+        switchFocus(set_next_focus(screen), curobj)
+
       when RNDK.KEY_F(10)
         # save data and exit
-        exitOKRNDKScreen(screen)
+        exit_ok(screen)
+
       when RNDK.CTRL('X')
-        exitCancelRNDKScreen(screen)
+        exit_cancel screen
+
       when RNDK.CTRL('R')
         # reset data to defaults
-        resetRNDKScreen(screen)
+        reset(screen)
         setFocus(curobj)
+
       when RNDK::REFRESH
         # redraw screen
         screen.refresh
         setFocus(curobj)
+
       else
         # not everyone wants menus, so we make them optional here
         if !(func_menu_key.nil?) &&
@@ -158,23 +169,24 @@ module RNDK
               Traverse.handleMenu(screen, object, curobj)
             end
           end
+
         else
           curobj.inject(key_code)
         end
       end
     end
 
-    # Traverse the widgets on a screen.
-    def Traverse.traverseRNDKScreen(screen)
+    # Traverse continuously the widgets on a screen.
+    def Traverse.over screen
       result = 0
-      curobj = setRNDKFocusFirst(screen)
+      curobj = set_first_focus(screen)
 
       unless curobj.nil?
         refreshDataRNDKScreen(screen)
 
         screen.exit_status = RNDK::Screen::NOEXIT
 
-        while !((curobj = getRNDKFocusCurrent(screen)).nil?) &&
+        while !((curobj = get_current_focus(screen)).nil?) &&
             screen.exit_status == RNDK::Screen::NOEXIT
           function = []
           key = curobj.getch(function)
@@ -185,7 +197,7 @@ module RNDK
           end
 
 
-          Traverse.traverseRNDKOnce(screen, curobj, key,
+          Traverse.once(screen, curobj, key,
               function[0], check_menu_key)
         end
 
@@ -262,8 +274,8 @@ module RNDK
         end
       end
 
-      if (newobj = Traverse.getRNDKFocusCurrent(screen)).nil?
-        newobj = Traverse.setRNDKFocusNext(screen)
+      if (newobj = Traverse.get_current_focus(screen)).nil?
+        newobj = Traverse.set_next_focus(screen)
       end
 
       return switchFocus(newobj, menu)

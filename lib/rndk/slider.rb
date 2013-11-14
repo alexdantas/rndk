@@ -376,7 +376,7 @@ module RNDK
 
     # @see Widget#inject
     def inject input
-      pp_return = 1
+      pp_return = true
       ret = nil
       complete = false
 
@@ -394,7 +394,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check for a key binding.
         if self.checkBind(:slider, input)
           complete = true

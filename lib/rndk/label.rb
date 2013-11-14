@@ -22,6 +22,10 @@ module RNDK
     #
     # If the Widget cannot be created, returns `nil`.
     def initialize(rndkscreen, xplace, yplace, mesg, box, shadow)
+
+      # Adjusting if the user sent us a String
+      mesg = [mesg] if mesg.class == String
+
       return nil if mesg.class != Array or mesg.empty?
 
       super()

@@ -485,7 +485,7 @@ module RNDK
 
     # This injects a single character into the file selector.
     def inject(input)
-      ret = -1
+      ret = false
       complete = false
 
       # Let the user play.

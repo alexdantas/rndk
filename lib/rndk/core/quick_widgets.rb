@@ -44,17 +44,20 @@ module RNDK
     # Creates a centered pop-up Label Widget that
     # waits until the user hits a character.
     #
-    # @note: `message` must be an array of strings.
+    # @note: `message` must be a String or an Array of Strings.
     def popup_label message
+      # Adjusting if the user sent us a String
+      message = [message] if message.class == String
+
       return if message.class != Array or message.empty?
 
       self.cleanly do
         popup = RNDK::Label.new(self, CENTER, CENTER, message, true, false)
-        popup.draw(true)
+        popup.draw true
 
         # Wait for some input.
         Ncurses.keypad(popup.win, true)
-        popup.getch([])
+        popup.getch
         popup.destroy
       end
     end
@@ -64,6 +67,9 @@ module RNDK
     #
     # @note: `message` must be an array of strings.
     def popup_label_attrib(message, attrib)
+      # Adjusting if the user sent us a String
+      message = [message] if message.class == String
+
       return if message.class != Array or message.empty?
 
       self.cleanly do
@@ -87,6 +93,12 @@ module RNDK
     #
     # @note: `message` and `buttons` must be Arrays of Strings.
     def popup_dialog(message, buttons)
+      # Adjusting if the user sent us a String
+      message = [message] if message.class == String
+
+      # Adjusting if the user sent us a String
+      buttons = [buttons] if buttons.class == String
+
       return nil if message.class != Array or message.empty?
       return nil if buttons.class != Array or buttons.empty?
 

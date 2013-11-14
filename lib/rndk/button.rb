@@ -77,7 +77,7 @@ module RNDK
     # This was added for the builder.
     def activate(actions)
       self.draw(@box)
-      ret = -1
+      ret = false
 
       if actions.nil? || actions.size == 0
         while true
@@ -314,7 +314,7 @@ module RNDK
 
     # This injects a single character into the widget.
     def inject(input)
-      ret = -1
+      ret = false
       complete = false
 
       self.set_exit_type(0)

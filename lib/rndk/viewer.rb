@@ -8,23 +8,26 @@ module RNDK
     def initialize(rndkscreen, xplace, yplace, height, width,
         buttons, button_count, button_highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
+      parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
-      box_width = width
+
+      box_width  = width
       box_height = height
+
       button_width = 0
       button_adj = 0
       button_pos = 1
+
       bindings = {
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-          'b'           => Ncurses::KEY_PPAGE,
-          'B'           => Ncurses::KEY_PPAGE,
+          'b'            => Ncurses::KEY_PPAGE,
+          'B'            => Ncurses::KEY_PPAGE,
           RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          ' '           => Ncurses::KEY_NPAGE,
-          'f'           => Ncurses::KEY_NPAGE,
-          'F'           => Ncurses::KEY_NPAGE,
-          '|'           => Ncurses::KEY_HOME,
-          '$'           => Ncurses::KEY_END,
+          ' '            => Ncurses::KEY_NPAGE,
+          'f'            => Ncurses::KEY_NPAGE,
+          'F'            => Ncurses::KEY_NPAGE,
+          '|'            => Ncurses::KEY_HOME,
+          '$'            => Ncurses::KEY_END,
       }
 
       self.set_box(box)

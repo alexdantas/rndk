@@ -129,7 +129,7 @@ module RNDK
                     else box_height
                     end
 
-      self.setViewSize(list.size)
+      self.set_view_size(list.size)
 
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
@@ -152,13 +152,13 @@ module RNDK
       # Create the scrollbar window.
       if splace == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win,
-                                        self.maxViewSize,
+                                        self.max_view_size,
                                         1,
                                         self.Screen_YPOS(ypos),
                                         xpos + box_width - @border_size - 1)
       elsif splace == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win,
-                                        self.maxViewSize,
+                                        self.max_view_size,
                                         1,
                                         self.Screen_YPOS(ypos),
                                         self.Screen_XPOS(xpos))
@@ -168,7 +168,7 @@ module RNDK
 
       # create the list window
       @list_win = Ncurses.subwin(@win,
-                                 self.maxViewSize,
+                                 self.max_view_size,
                                  box_width - (2 * @border_size) - scroll_adjust,
                                  self.Screen_YPOS(ypos),
                                  self.Screen_XPOS(xpos) + (if splace == RNDK::LEFT then 1 else 0 end))
@@ -186,12 +186,10 @@ module RNDK
       @input_window = @win
       @shadow = shadow
 
-      self.setPosition(0);
+      self.set_position(0);
 
       # Create the scrolling list item list and needed variables.
-      if self.createItemList(numbers, list, list.size) <= 0
-        return nil
-      end
+      return nil unless self.create_item_list(numbers, list)
 
       # Do we need to create a shadow?
       if shadow
@@ -209,7 +207,7 @@ module RNDK
 
       rndkscreen.register(:scroll, self);
 
-      return self
+      self
     end
 
     def object_type
@@ -221,28 +219,17 @@ module RNDK
       super @win
     end
 
-    # Put the cursor on the currently-selected item's row.
-    def fixCursorPosition
-      scrollbar_adj = if @scrollbar_placement == LEFT then 1 else 0 end
-      ypos = self.Screen_YPOS(@current_item - @current_top)
-      xpos = self.Screen_XPOS(0) + scrollbar_adj
-
-      Ncurses.wmove(@input_window, ypos, xpos)
-      Ncurses.wrefresh(@input_window)
-    end
-
     # Activates the Widget, letting the user interact with it.
     #
     # `actions` is an Array of characters. If it's non-null,
     # will #inject each char on it into the Widget.
     #
     def activate(actions=[])
-      # Draw the scrolling list
-      self.draw(@box)
+      self.draw @box
 
       if actions.nil? || actions.size == 0
         loop do
-          self.fixCursorPosition
+          self.fix_cursor_position
           input = self.getch([])
 
           # Inject the character into the widget.
@@ -261,64 +248,61 @@ module RNDK
 
       # Set the exit type for the widget and return
       self.set_exit_type(0)
-      return -1
+      return nil
     end
 
     # @see Widget#inject
     def inject input
-      pp_return = 1
-      ret = -1
+      ret = nil
       complete = false
 
-      # Set the exit type for the widget.
-      self.set_exit_type(0)
+      self.set_exit_type 0
 
       # Draw the scrolling list
-      self.drawList(@box)
+      self.draw_list @box
 
-      #Check if there is a pre-process function to be called.
+      # Calls a pre-process block if exists
+      pp_return = true
       unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:scroll, self,
-            @pre_process_data, input)
+        pp_return = @pre_process_func.call(:scroll,
+                                           self,
+                                           @pre_process_data,
+                                           input)
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
+
         # Check for a predefined key binding.
         if self.checkBind(:scroll, input) != false
           #self.checkEarlyExit
           complete = true
+
         else
           case input
-          when Ncurses::KEY_UP
-            self.KEY_UP
-          when Ncurses::KEY_DOWN
-            self.KEY_DOWN
-          when Ncurses::KEY_RIGHT
-            self.KEY_RIGHT
-          when Ncurses::KEY_LEFT
-            self.KEY_LEFT
-          when Ncurses::KEY_PPAGE
-            self.KEY_PPAGE
-          when Ncurses::KEY_NPAGE
-            self.KEY_NPAGE
-          when Ncurses::KEY_HOME
-            self.KEY_HOME
-          when Ncurses::KEY_END
-            self.KEY_END
-          when '$'
-            @left_char = @max_left_char
-          when '|'
-            @left_char = 0
+          when Ncurses::KEY_UP    then self.KEY_UP
+          when Ncurses::KEY_DOWN  then self.KEY_DOWN
+          when Ncurses::KEY_RIGHT then self.KEY_RIGHT
+          when Ncurses::KEY_LEFT  then self.KEY_LEFT
+          when Ncurses::KEY_PPAGE then self.KEY_PPAGE
+          when Ncurses::KEY_NPAGE then self.KEY_NPAGE
+          when Ncurses::KEY_HOME  then self.KEY_HOME
+          when Ncurses::KEY_END   then self.KEY_END
+          when '$'                then @left_char = @max_left_char
+          when '|'                then @left_char = 0
+
           when RNDK::KEY_ESC
             self.set_exit_type(input)
             complete = true
+
           when Ncurses::ERR
             self.set_exit_type(input)
             complete = true
+
           when RNDK::REFRESH
             @screen.erase
             @screen.refresh
+
           when RNDK::KEY_TAB, Ncurses::KEY_ENTER, RNDK::KEY_RETURN
             self.set_exit_type(input)
             ret = @current_item
@@ -326,36 +310,23 @@ module RNDK
           end
         end
 
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:scroll, self, @post_process_data, input)
+        if (not complete) and @post_process_func
+          @post_process_func.call(:scroll,
+                                  self,
+                                  @post_process_data,
+                                  input)
         end
       end
 
-      if !complete
-        self.drawList(@box)
+      if not complete
+        self.draw_list(@box)
         self.set_exit_type(0)
       end
 
-      self.fixCursorPosition
+      self.fix_cursor_position
       @result_data = ret
 
-      #return ret != -1
-      return ret
-    end
-
-    def getCurrentTop
-      return @current_top
-    end
-
-    def setCurrentTop(item)
-      if item < 0
-        item = 0
-      elsif item > @max_top_item
-        item = @max_top_item
-      end
-      @current_top = item
-
-      self.setPosition(item);
+      ret
     end
 
     # This moves the scroll field to the given location.
@@ -375,87 +346,14 @@ module RNDK
       self.drawTitle(@win)
 
       # Draw in the scrolling list items.
-      self.drawList(box)
-    end
-
-    def drawCurrent
-      # Rehighlight the current menu item.
-      screen_pos = @item_pos[@current_item] - @left_char
-      highlight = if self.has_focus
-                  then @highlight
-                  else Ncurses::A_NORMAL
-                  end
-
-      Draw.writeChtypeAttrib(@list_win,
-          if screen_pos >= 0 then screen_pos else 0 end,
-          @current_high, @item[@current_item], highlight, RNDK::HORIZONTAL,
-          if screen_pos >= 0 then 0 else 1 - screen_pos end,
-          @item_len[@current_item])
-    end
-
-    def drawList box
-      # If the list is empty, don't draw anything.
-      if @list_size > 0
-        # Redraw the list
-        (0...@view_size).each do |j|
-          k = j + @current_top
-
-          Draw.writeBlanks(@list_win, 0, j, RNDK::HORIZONTAL, 0,
-            @box_width - (2 * @border_size))
-
-          # Draw the elements in the scrolling list.
-          if k < @list_size
-            screen_pos = @item_pos[k] - @left_char
-            ypos = j
-
-            # Write in the correct line.
-            Draw.writeChtype(@list_win,
-                if screen_pos >= 0 then screen_pos else 1 end,
-                ypos, @item[k], RNDK::HORIZONTAL,
-                if screen_pos >= 0 then 0 else 1 - screen_pos end,
-                @item_len[k])
-          end
-        end
-
-        self.drawCurrent
-
-        # Determine where the toggle is supposed to be.
-        unless @scrollbar_win.nil?
-          @toggle_pos = (@current_item * @step).floor
-
-          # Make sure the toggle button doesn't go out of bounds.
-          if @toggle_pos >= Ncurses.getmaxy(@scrollbar_win)
-            @toggle_pos = Ncurses.getmaxy(@scrollbar_win) - 1
-          end
-
-          # Draw the scrollbar
-          Ncurses.mvwvline(@scrollbar_win,
-                           0,
-                           0,
-                           Ncurses::ACS_CKBOARD,
-                           Ncurses.getmaxy(@scrollbar_win))
-
-          Ncurses.mvwvline(@scrollbar_win,
-                           @toggle_pos,
-                           0,
-                           ' '.ord | Ncurses::A_REVERSE,
-                           @toggle_size)
-        end
-      end
-
-      # Box it if needed.
-      if box
-        Draw.drawObjBox(@win, self)
-      end
-
-      # Refresh the window
-      Ncurses.wrefresh @win
+      self.draw_list(box)
     end
 
     # This sets the background attribute of the widget.
     def set_bg_attrib(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@list_win, attrib)
+
       unless @scrollbar_win.nil?
         Ncurses.wbkgd(@scrollbar_win, attrib)
       end
@@ -484,26 +382,197 @@ module RNDK
       RNDK.window_erase(@shadow_win)
     end
 
-    def allocListArrays(old_size, new_size)
-      result = true
-      new_list = Array.new(new_size)
-      new_len = Array.new(new_size)
-      new_pos = Array.new(new_size)
+    # This sets certain attributes of the scrolling list.
+    def set(list, numbers, highlight, box)
+      self.set_items(list, numbers)
+      self.set_highlight(highlight)
+      self.set_box(box)
+    end
+
+    # Sets the scrolling list items.
+    # See Scroll#initialize.
+    def set_items(list, numbers)
+      return unless self.create_item_list(numbers, list)
+
+      # Clean up the display.
+      (0...@view_size).each do |x|
+        Draw.writeBlanks(@win, 1, x, RNDK::HORIZONTAL, 0, @box_width - 2);
+      end
+
+      self.set_view_size(list_size)
+      self.set_position(0)
+      self.erase
+
+      @left_char = 0
+    end
+
+    def get_items(list)
+      (0...@list_size).each do |x|
+        list << RNDK.chtype2Char(@item[x])
+      end
+
+      @list_size
+    end
+
+    # This sets the highlight of the scrolling list.
+    def set_highlight(highlight)
+      @highlight = highlight
+    end
+
+    def get_highlight(highlight)
+      return @highlight
+    end
+
+    # Adds a single item to a scrolling list, at the end of
+    # the list.
+    def add_item(item)
+      item_number = @list_size
+      widest_item = self.widest_item
+      temp = ''
+      have = 0
+
+      if (self.alloc_list_arrays(@list_size, @list_size + 1)) and
+          (self.alloc_list_item(item_number,
+                               temp,
+                               have,
+                               if @numbers then item_number + 1 else 0 end,
+                               item))
+        # Determine the size of the widest item.
+        widest_item = [@item_len[item_number], widest_item].max
+
+        self.update_view_width(widest_item)
+        self.set_view_size(@list_size + 1)
+      end
+    end
+
+    # Adds a single item to a scrolling list before the current
+    # item.
+    def insert_item(item)
+      widest_item = self.widest_item
+      temp = ''
+      have = 0
+
+      if self.alloc_list_arrays(@list_size, @list_size + 1) &&
+          self.insert_list_item(@current_item) &&
+          self.alloc_list_item(@current_item,
+                               temp,
+                               have,
+                               if @numbers then @current_item + 1 else 0 end,
+                               item)
+
+        # Determine the size of the widest item.
+        widest_item = [@item_len[@current_item], widest_item].max
+
+        self.update_view_width(widest_item)
+        self.set_view_size(@list_size + 1)
+        self.resequence
+      end
+    end
+
+    # This removes a single item from a scrolling list.
+    def delete_item(position)
+      if position >= 0 && position < @list_size
+        # Adjust the list
+        @item = @item[0...position] + @item[position+1..-1]
+        @item_len = @item_len[0...position] + @item_len[position+1..-1]
+        @item_pos = @item_pos[0...position] + @item_pos[position+1..-1]
+
+        self.set_view_size(@list_size - 1)
+
+        self.resequence if @list_size > 0
+
+        if @list_size < self.max_view_size
+          Ncurses.werase @win  # force the next redraw to be complete
+        end
+
+        # do this to update the view size, etc
+        self.set_position(@current_item)
+      end
+    end
+
+    def focus
+      self.draw_current
+      Ncurses.wrefresh @list_win
+    end
+
+    def unfocus
+      self.draw_current
+      Ncurses.wrefresh @list_win
+    end
+
+    #                  _            _           _
+    #                 | |          | |         | |
+    #  _ __  _ __ ___ | |_ ___  ___| |_ ___  __| |
+    # | '_ \| '__/ _ \| __/ _ \/ __| __/ _ \/ _` |
+    # | |_) | | | (_) | ||  __| (__| ||  __| (_| |
+    # | .__/|_|  \___/ \__\___|\___|\__\___|\__,_|
+    # | |
+    # |_|
+    protected
+
+    # Creates the scrolling list information and sets up the
+    # needed variables for the scrolling list to work correctly.
+    def create_item_list(numbers, list)
+      status = false
+
+      if list.size > 0
+        widest_item = 0
+        x = 0
+        have = 0
+        temp = ''
+
+        if alloc_list_arrays(0, list.size)
+          # Create the items in the scrolling list.
+          status = true
+          (0...list.size).each do |x|
+            number = if numbers then x + 1 else 0 end
+
+            unless self.alloc_list_item(x, temp, have, number, list[x])
+              status = false
+              break
+            end
+
+            widest_item = [@item_len[x], widest_item].max
+          end
+
+          if status
+            self.update_view_width widest_item
+
+            # Keep the boolean flag 'numbers'
+            @numbers = numbers
+          end
+        end
+
+      else
+        status = true  # null list is ok - for a while
+      end
+
+      @list_size = list.size
+      status
+    end
+
+    def alloc_list_arrays(old_size, new_size)
+
+      new_list = Array.new new_size
+      new_len  = Array.new new_size
+      new_pos  = Array.new new_size
 
       (0...old_size).each do |n|
         new_list[n] = @item[n]
-        new_len[n] = @item_len[n]
-        new_pos[n] = @item_pos[n]
+        new_len[n]  = @item_len[n]
+        new_pos[n]  = @item_pos[n]
       end
 
-      @item = new_list
+      @item     = new_list
       @item_len = new_len
       @item_pos = new_pos
 
-      return result
+      true
     end
 
-    def allocListItem(which, work, used, number, value)
+    # Creates a single item on the scroll list.
+    def alloc_list_item(which, work, used, number, value)
+
       if number > 0
         value = "%4d. %s" % [number, value]
       end
@@ -515,84 +584,9 @@ module RNDK
       @item_pos[which] = item_pos[0]
 
       @item_pos[which] = RNDK.justifyString(@box_width,
-          @item_len[which], @item_pos[which])
-      return true
-    end
-
-    # This function creates the scrolling list information and sets up the
-    # needed variables for the scrolling list to work correctly.
-    def createItemList(numbers, list, list_size)
-      status = 0
-      if list_size > 0
-        widest_item = 0
-        x = 0
-        have = 0
-        temp = ''
-        if allocListArrays(0, list_size)
-          # Create the items in the scrolling list.
-          status = 1
-          (0...list_size).each do |x|
-            number = if numbers then x + 1 else 0 end
-            if !self.allocListItem(x, temp, have, number, list[x])
-              status = 0
-              break
-            end
-
-            widest_item = [@item_len[x], widest_item].max
-          end
-
-          if status
-            self.updateViewWidth(widest_item);
-
-            # Keep the boolean flag 'numbers'
-            @numbers = numbers
-          end
-        end
-      else
-        status = 1  # null list is ok - for a while
-      end
-
-      return status
-    end
-
-    # This sets certain attributes of the scrolling list.
-    def set(list, list_size, numbers, highlight, box)
-      self.setItems(list, list_size, numbers)
-      self.set_highlight(highlight)
-      self.set_box(box)
-    end
-
-    # This sets the scrolling list items
-    def setItems(list, list_size, numbers)
-      if self.createItemList(numbers, list, list_size) <= 0
-        return
-      end
-
-      # Clean up the display.
-      (0...@view_size).each do |x|
-        Draw.writeBlanks(@win, 1, x, RNDK::HORIZONTAL, 0, @box_width - 2);
-      end
-
-      self.setViewSize(list_size)
-      self.setPosition(0)
-      @left_char = 0
-    end
-
-    def getItems(list)
-      (0...@list_size).each do |x|
-        list << RNDK.chtype2Char(@item[x])
-      end
-
-      return @list_size
-    end
-
-    # This sets the highlight of the scrolling list.
-    def set_highlight(highlight)
-      @highlight = highlight
-    end
-
-    def getHighlight(highlight)
-      return @highlight
+                                            @item_len[which],
+                                            @item_pos[which])
+      true
     end
 
     # Resequence the numbers after an insertion/deletion.
@@ -618,99 +612,138 @@ module RNDK
       end
     end
 
-    def insertListItem(item)
+    def insert_list_item(item)
       @item = @item[0..item] + @item[item..-1]
       @item_len = @item_len[0..item] + @item_len[item..-1]
       @item_pos = @item_pos[0..item] + @item_pos[item..-1]
-      return true
+
+      true
     end
 
-    # This adds a single item to a scrolling list, at the end of the list.
-    def addItem(item)
-      item_number = @list_size
-      widest_item = self.WidestItem
-      temp = ''
-      have = 0
-
-      if self.allocListArrays(@list_size, @list_size + 1) &&
-          self.allocListItem(item_number, temp, have,
-          if @numbers then item_number + 1 else 0 end,
-          item)
-        # Determine the size of the widest item.
-        widest_item = [@item_len[item_number], widest_item].max
-
-        self.updateViewWidth(widest_item)
-        self.setViewSize(@list_size + 1)
-      end
-    end
-
-    # This adds a single item to a scrolling list before the current item
-    def insertItem(item)
-      widest_item = self.WidestItem
-      temp = ''
-      have = 0
-
-      if self.allocListArrays(@list_size, @list_size + 1) &&
-          self.insertListItem(@current_item) &&
-          self.allocListItem(@current_item, temp, have,
-          if @numbers then @current_item + 1 else 0 end,
-          item)
-        # Determine the size of the widest item.
-        widest_item = [@item_len[@current_item], widest_item].max
-
-        self.updateViewWidth(widest_item)
-        self.setViewSize(@list_size + 1)
-        self.resequence
-      end
-    end
-
-    # This removes a single item from a scrolling list.
-    def deleteItem(position)
-      if position >= 0 && position < @list_size
-        # Adjust the list
-        @item = @item[0...position] + @item[position+1..-1]
-        @item_len = @item_len[0...position] + @item_len[position+1..-1]
-        @item_pos = @item_pos[0...position] + @item_pos[position+1..-1]
-
-        self.setViewSize(@list_size - 1)
-
-        self.resequence if @list_size > 0
-
-        if @list_size < self.maxViewSize
-          Ncurses.werase @win  # force the next redraw to be complete
-        end
-
-        # do this to update the view size, etc
-        self.setPosition(@current_item)
-      end
-    end
-
-    def focus
-      self.drawCurrent
-      Ncurses.wrefresh @list_win
-    end
-
-    def unfocus
-      self.drawCurrent
-      Ncurses.wrefresh @list_win
-    end
-
-    def AvailableWidth
+    def available_width
       @box_width - (2 * @border_size)
     end
 
-    def updateViewWidth(widest)
+    def update_view_width(widest)
       @max_left_char = if @box_width > widest
                        then 0
-                       else widest - self.AvailableWidth
+                       else widest - self.available_width
                        end
     end
 
-    def WidestItem
-      @max_left_char + self.AvailableWidth
+    def widest_item
+      @max_left_char + self.available_width
     end
 
-    private
+    # Draws the scrolling list.
+    def draw_list box
+
+      # If the list is empty, don't draw anything.
+      if @list_size > 0
+
+        # Redraw the list
+        (0...@view_size).each do |j|
+          k = j + @current_top
+
+          Draw.writeBlanks(@list_win,
+                           0,
+                           j,
+                           RNDK::HORIZONTAL, 0,
+                           @box_width - (2 * @border_size))
+
+          # Draw the elements in the scrolling list.
+          if k < @list_size
+            ################################################################################
+            if @item_pos[k].nil?
+              RNDK::Screen.end_rndk
+              puts "lol"
+              puts k
+              puts @list_size
+              puts "lol"
+              exit!
+            end
+
+            screen_pos = @item_pos[k] - @left_char
+            ypos = j
+
+            # Write in the correct line.
+            Draw.writeChtype(@list_win,
+                             if screen_pos >= 0 then screen_pos else 1 end,
+                             ypos, @item[k], RNDK::HORIZONTAL,
+                             if screen_pos >= 0 then 0 else 1 - screen_pos end,
+                             @item_len[k])
+          end
+        end
+
+        self.draw_current
+
+        # Determine where the toggle is supposed to be.
+        unless @scrollbar_win.nil?
+          @toggle_pos = (@current_item * @step).floor
+
+          # Make sure the toggle button doesn't go out of bounds.
+          if @toggle_pos >= Ncurses.getmaxy(@scrollbar_win)
+            @toggle_pos = Ncurses.getmaxy(@scrollbar_win) - 1
+          end
+
+          # Draw the scrollbar
+          Ncurses.mvwvline(@scrollbar_win,
+                           0,
+                           0,
+                           Ncurses::ACS_CKBOARD,
+                           Ncurses.getmaxy(@scrollbar_win))
+
+          Ncurses.mvwvline(@scrollbar_win,
+                           @toggle_pos,
+                           0,
+                           ' '.ord | Ncurses::A_REVERSE,
+                           @toggle_size)
+        end
+      end
+
+      Draw.drawObjBox(@win, self) if box
+      Ncurses.wrefresh @win
+    end
+
+    def get_current_top
+      @current_top
+    end
+
+    def set_current_top(item)
+      if item < 0
+        item = 0
+      elsif item > @max_top_item
+        item = @max_top_item
+      end
+      @current_top = item
+
+      self.set_position(item);
+    end
+
+    def draw_current
+      # Rehighlight the current menu item.
+      screen_pos = @item_pos[@current_item] - @left_char
+      highlight = if self.has_focus
+                  then @highlight
+                  else Ncurses::A_NORMAL
+                  end
+
+      Draw.writeChtypeAttrib(@list_win,
+                             if screen_pos >= 0 then screen_pos else 0 end,
+                             @current_high, @item[@current_item], highlight, RNDK::HORIZONTAL,
+                             if screen_pos >= 0 then 0 else 1 - screen_pos end,
+                             @item_len[@current_item])
+    end
+
+    # Put the cursor on the currently-selected item's row.
+    def fix_cursor_position
+      scrollbar_adj = if @scrollbar_placement == LEFT then 1 else 0 end
+      ypos = self.Screen_YPOS(@current_item - @current_top)
+      xpos = self.Screen_XPOS(0) + scrollbar_adj
+
+      Ncurses.wmove(@input_window, ypos, xpos)
+      Ncurses.wrefresh(@input_window)
+    end
 
   end
 end

@@ -151,8 +151,8 @@ module RNDK
     def inject(input)
       first_button = 0
       last_button = @button_count - 1
-      pp_return = 1
-      ret = -1
+      pp_return = true
+      ret = false
       complete = false
 
       # Set the exit type
@@ -164,7 +164,7 @@ module RNDK
       end
 
       # Should we continue?
-      if pp_return != 0
+      if pp_return
         # Check for a key binding.
         if self.checkBind(:BUTTONBOX, input)
           complete = true
