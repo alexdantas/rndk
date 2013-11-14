@@ -1,24 +1,41 @@
 require 'rndk'
 
 module RNDK
+
   class FSELECT < Widget
+
     attr_reader :scroll_field, :entry_field
     attr_reader :dir_attribute, :file_attribute, :link_attribute, :highlight
     attr_reader :sock_attribute, :field_attribute, :filler_character
     attr_reader :dir_contents, :file_counter, :pwd, :pathname
 
-    def initialize(rndkscreen, xplace, yplace, height, width, title, label,
-        field_attribute, filler_char, highlight, d_attribute, f_attribute,
-        l_attribute, s_attribute, box, shadow)
+    def initialize(rndkscreen,
+                   xplace,
+                   yplace,
+                   height,
+                   width,
+                   title,
+                   label,
+                   field_attribute,
+                   filler_char,
+                   highlight,
+                   d_attribute,
+                   f_attribute,
+                   l_attribute,
+                   s_attribute,
+                   box,
+                   shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
+
+      parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
+
       bindings = {
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
           RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
       }
 
-      self.set_box(box)
+      self.set_box box
 
       # If the height is a negative value the height will be ROWS-height,
       # otherwise the height will be the given height
@@ -177,7 +194,7 @@ module RNDK
         # Try to expand the filename if it starts with a ~
         unless (new_filename = RNDK::FSELECT.expandTilde(filename)).nil?
           filename = new_filename
-          entry.setValue(filename)
+          entry.set_text(filename)
           entry.draw(entry.box)
         end
 
@@ -196,7 +213,7 @@ module RNDK
         # If we can, change into the directory.
         # XXX original: if isDirectory (with 0 as success result)
         if is_directory
-          entry.setValue(filename)
+          entry.set_text(filename)
           entry.draw(entry.box)
         end
 
@@ -272,7 +289,7 @@ module RNDK
             end
           else
             # Set the entry field with the found item.
-            entry.setValue(list[index])
+            entry.set_text(list[index])
             entry.draw(entry.box)
           end
         end
@@ -341,7 +358,7 @@ module RNDK
           temp = RNDK::FSELECT.make_pathname(fselect.pwd, current)
 
           # Set the value in the entry field.
-          entry.setValue(temp)
+          entry.set_text(temp)
           entry.draw(entry.box)
 
           return true
@@ -359,7 +376,7 @@ module RNDK
       @entry_field.bind(:entry, RNDK.CTRL('^'), display_file_info_cb, self)
 
       # Put the current working directory in the entry field.
-      @entry_field.setValue(@pwd)
+      @entry_field.set_text(@pwd)
 
       # Create the scrolling list in the selector.
       temp_height = Ncurses.getmaxy(@entry_field.win) - @border_size
@@ -368,13 +385,21 @@ module RNDK
                    else box_width - 1
                    end
       @scroll_field = RNDK::Scroll.new(rndkscreen,
-          Ncurses.getbegx(@win), Ncurses.getbegy(@win) + temp_height, RNDK::RIGHT,
-          box_height - temp_height, temp_width, '', @dir_contents,
-          @file_counter, false, @highlight, box, false)
+                                       Ncurses.getbegx(@win),
+                                       Ncurses.getbegy(@win) + temp_height,
+                                       RNDK::RIGHT,
+                                       temp_width,
+                                       box_height - temp_height,
+                                       '',
+                                       @dir_contents,
+                                       false,
+                                       @highlight,
+                                       box,
+                                       false)
 
       # Set the lower left/right characters of the entry field.
-      @scroll_field.setULchar(Ncurses::ACS_LTEE)
-      @scroll_field.setURchar(Ncurses::ACS_RTEE)
+      @scroll_field.setULchar Ncurses::ACS_LTEE
+      @scroll_field.setURchar Ncurses::ACS_RTEE
 
       # Do we want a shadow?
       if shadow
@@ -544,7 +569,7 @@ module RNDK
       @highlight = highlight
 
       # Set the attributes of the entry field/scrolling list.
-      self.setFillerChar(filler)
+      self.set_filler_char(filler)
       self.set_highlight(highlight)
 
       # Only do the directory stuff if the directory is not nil.
@@ -590,7 +615,7 @@ module RNDK
       @sock_attribute = sock_attribute.clone
 
       # Set the contents of the entry field.
-      fentry.setValue(@pwd)
+      fentry.set_text(@pwd)
       fentry.draw(fentry.box)
 
       # Get the directory contents.
@@ -600,7 +625,7 @@ module RNDK
       end
 
       # Set the values in the scrolling list.
-      fscroll.setItems(@dir_contents, @file_counter, false)
+      fscroll.set_items(@dir_contents, false)
     end
 
     # This creates a list of the files in the current directory.
@@ -613,7 +638,7 @@ module RNDK
       return false if dir_list.size <= 0
 
       @dir_contents = dir_list
-      @file_counter = file_count
+      @file_counter = dir_list.size
 
       # Set the properties of the files.
       (0...@file_counter).each do |x|
@@ -667,13 +692,13 @@ module RNDK
           @pwd = Dir.getwd
 
           # Set the contents of the entry field.
-          fentry.setValue(@pwd)
+          fentry.set_text(@pwd)
           fentry.draw(fentry.box)
 
           # Get the directory contents.
           if self.setDirContents
             # Set the values in the scrolling list.
-            fscroll.setItems(@dir_contents, @file_counter, false)
+            fscroll.set_items(@dir_contents, @file_counter, false)
           else
             result = 0
           end
@@ -687,9 +712,9 @@ module RNDK
     end
 
     # This sets the filler character of the entry field.
-    def setFillerChar(filler)
+    def set_filler_char(filler)
       @filler_character = filler
-      @entry_field.setFillerChar(filler)
+      @entry_field.set_filler_char(filler)
     end
 
     def getFillerChar
@@ -796,7 +821,7 @@ module RNDK
         @scroll_field.setCurrent(item)
 
         data = self.contentToPath(@dir_contents[@scroll_field.getCurrentItem])
-        @entry_field.setValue(data)
+        @entry_field.set_text(data)
       end
     end
 

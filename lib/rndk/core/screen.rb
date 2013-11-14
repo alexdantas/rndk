@@ -131,7 +131,7 @@ module RNDK
         # Update the object-focus
         if screen.object_focus == index
           screen.object_focus -= 1
-          Traverse.setRNDKFocusNext(screen)
+          Traverse.set_next_focus(screen)
 
         elsif screen.object_focus > index
           screen.object_focus -= 1

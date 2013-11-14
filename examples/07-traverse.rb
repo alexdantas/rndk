@@ -68,7 +68,7 @@ begin
 
   # Simple label to tell the user how to quit the example
   msg = "</77>Press F10 to quit"
-  label = RNDK::Label.new(screen, RNDK::CENTER, RNDK::TOP, [msg], true, false)
+  label = RNDK::Label.new(screen, RNDK::CENTER, RNDK::TOP, msg, true, false)
 
   # Finally, activating the widgets and setting them
   # up for traversal.
