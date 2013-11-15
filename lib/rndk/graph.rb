@@ -2,7 +2,7 @@ require 'rndk'
 
 module RNDK
   class GRAPH < Widget
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    height,
@@ -11,8 +11,9 @@ module RNDK
                    xtitle,
                    ytitle)
       super()
-      parent_width = Ncurses.getmaxx rndkscreen.window
-      parent_height = Ncurses.getmaxy rndkscreen.window
+      @widget_type = :GRAPH
+      parent_width = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       self.set_box(false)
 
@@ -26,13 +27,13 @@ module RNDK
       # Rejustify the x and y positions if we need to
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Create the widget pointer
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @box_height = box_height
       @box_width = box_width
@@ -84,7 +85,7 @@ module RNDK
       @graph_char = 0
       @values = []
 
-      rndkscreen.register(:GRAPH, self)
+      screen.register(:GRAPH, self)
     end
 
     # This was added for the builder.
@@ -378,20 +379,19 @@ module RNDK
 
     def destroy
       self.clean_title
-      self.clean_bindings(:GRAPH)
-      @screen.unregister(:GRAPH, self)
+      self.clean_bindings
+      @screen.unregister self
       RNDK.window_delete(@win)
     end
 
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
       end
     end
 
-    def widget_type
-      :GRAPH
-    end
+
+
 
     def position
       super(@win)

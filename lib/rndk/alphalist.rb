@@ -62,7 +62,7 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    width,
@@ -75,9 +75,9 @@ module RNDK
                    box,
                    shadow)
       super()
-
-      parent_width  = Ncurses.getmaxx rndkscreen.window
-      parent_height = Ncurses.getmaxy rndkscreen.window
+      @widget_type  = :alphalist
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       box_width  = width
       box_height = height
@@ -114,7 +114,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -127,8 +127,8 @@ module RNDK
       end
       Ncurses.keypad(@win, true)
 
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @highlight   = highlight
       @filler_char = filler_char
 
@@ -149,7 +149,7 @@ module RNDK
                     else box_width - 2 - label_len
                     end
 
-      @entry_field = RNDK::Entry.new(rndkscreen,
+      @entry_field = RNDK::Entry.new(screen,
                                      Ncurses.getbegx(@win),
                                      Ncurses.getbegy(@win),
                                      title,
@@ -344,11 +344,11 @@ module RNDK
       end
 
       # Set the key bindings for the entry field.
-      @entry_field.bind(:entry, Ncurses::KEY_UP,    adjust_alphalist_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_DOWN,  adjust_alphalist_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_NPAGE, adjust_alphalist_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_PPAGE, adjust_alphalist_cb, self)
-      @entry_field.bind(:entry, RNDK::KEY_TAB,      complete_word_cb,    self)
+      @entry_field.bind(Ncurses::KEY_UP,    adjust_alphalist_cb, self)
+      @entry_field.bind(Ncurses::KEY_DOWN,  adjust_alphalist_cb, self)
+      @entry_field.bind(Ncurses::KEY_NPAGE, adjust_alphalist_cb, self)
+      @entry_field.bind(Ncurses::KEY_PPAGE, adjust_alphalist_cb, self)
+      @entry_field.bind(RNDK::KEY_TAB,      complete_word_cb,    self)
 
       # Set up the post-process function for the entry field.
       @entry_field.before_processing(pre_process_entry_field, self)
@@ -361,7 +361,7 @@ module RNDK
                    else box_width - 1
                    end
 
-      @scroll_field = RNDK::Scroll.new(rndkscreen,
+      @scroll_field = RNDK::Scroll.new(screen,
                                       Ncurses.getbegx(@win),
                                       Ncurses.getbegy(@entry_field.win) + temp_height,
                                       RNDK::RIGHT,
@@ -379,15 +379,15 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(:alphalist, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:alphalist, self)
+      screen.register(:alphalist, self)
     end
 
     # @see Widget#erase
     def erase
-      if self.valid_widget?
+      if self.valid?
         @scroll_field.erase
         @entry_field.erase
 
@@ -608,7 +608,7 @@ module RNDK
       self.destroyInfo
 
       # Clean the key bindings.
-      self.clean_bindings(:alphalist)
+      self.clean_bindings
 
       @entry_field.destroy
       @scroll_field.destroy
@@ -618,7 +618,7 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Unregister the widget.
-      @screen.unregister(:alphalist, self)
+      @screen.unregister self
     end
 
     # This function sets the pre-process function.
@@ -673,8 +673,8 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :alphalist
-    end
+
+
+
   end
 end

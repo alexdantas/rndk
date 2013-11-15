@@ -131,7 +131,7 @@ module RNDK
     #       the current date for it.
     #       If all of them are 0, will use the complete date
     #       of today.
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    title,
@@ -145,11 +145,12 @@ module RNDK
                    box,
                    shadow)
       super()
+      @widget_type = :calendar
       self.set_date(day, month, year)
       self.set_box box
 
-      parent_width  = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      parent_width  = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
 
       box_width  = 24
       box_height = 11
@@ -175,7 +176,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -198,8 +199,8 @@ module RNDK
       @day_name = dayname
 
       # Set the rest of the widget values.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
 
       @xpos = xpos
       @ypos = ypos
@@ -257,10 +258,10 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(:calendar, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:calendar, self)
+      screen.register(:calendar, self)
     end
 
     # Returns the specific internal index of `d`/`m`/`y`.
@@ -330,7 +331,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding
-        if self.check_bind(:calendar, char)
+        if self.check_bind(char)
 
           ## FIXME What the heck? Missing method?
           #self.checkEarlyExit
@@ -567,7 +568,7 @@ module RNDK
 
     # @see Widget#erase
     def erase
-      return unless self.valid_widget?
+      return unless self.valid?
 
       RNDK.window_erase @label_win
       RNDK.window_erase @field_win
@@ -584,9 +585,9 @@ module RNDK
       RNDK.window_delete @shadow_win
       RNDK.window_delete @win
 
-      self.clean_bindings :calendar
+      self.clean_bindings
 
-      @screen.unregister(:calendar, self)
+      @screen.unregister self
     end
 
     # Sets a marker on a specific date.
@@ -835,9 +836,9 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :calendar
-    end
+
+
+
 
     private
 

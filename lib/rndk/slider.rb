@@ -66,7 +66,7 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    title,
@@ -81,9 +81,10 @@ module RNDK
                    box,
                    shadow)
       super()
+      @widget_type = :slider
 
-      parent_width  = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      parent_width  = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
 
       bindings = {
           'u'           => Ncurses::KEY_UP,
@@ -133,7 +134,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -174,8 +175,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
-      @screen = rndkscreen
-      @window = rndkscreen.window
+      @screen = screen
+      @window = screen.window
       @shadow_win = nil
       @box_width = box_width
       @box_height = box_height
@@ -210,10 +211,10 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(:slider, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:slider, self)
+      screen.register(:slider, self)
     end
 
     # Activates the Widget, letting the user interact with it.
@@ -396,7 +397,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(:slider, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -543,15 +544,15 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:slider)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:slider, self)
+      @screen.unregister self
     end
 
     # @see Widget#erase
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase @label_win
         RNDK.window_erase @field_win
         RNDK.window_erase @lwin
@@ -619,8 +620,5 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :slider
-    end
   end
 end

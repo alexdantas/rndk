@@ -9,7 +9,7 @@ module RNDK
     attr_reader :current_title, :current_subtitle
     attr_reader :sublist
 
-    def initialize(rndkscreen,
+    def initialize(screen,
                    menu_list,
                    menu_items,
                    subsize,
@@ -18,20 +18,21 @@ module RNDK
                    title_attr,
                    subtitle_attr)
       super()
+      @widget_type = :MENU
 
       right_count = menu_items - 1
-      rightloc = Ncurses.getmaxx rndkscreen.window
+      rightloc = Ncurses.getmaxx screen.window
       leftloc = 0
-      xpos = Ncurses.getbegx rndkscreen.window
-      ypos = Ncurses.getbegy rndkscreen.window
-      ymax = Ncurses.getmaxy rndkscreen.window
+      xpos = Ncurses.getbegx screen.window
+      ypos = Ncurses.getbegy screen.window
+      ymax = Ncurses.getmaxy screen.window
 
       # Start making a copy of the information.
-      @screen = rndkscreen
+      @screen = screen
       @box = false
       @accepts_focus = false
       rightcount = menu_items - 1
-      @parent = rndkscreen.window
+      @parent = screen.window
       @menu_items = menu_items
       @title_attr = title_attr
       @subtitle_attr = subtitle_attr
@@ -91,13 +92,13 @@ module RNDK
         @title[x1] = RNDK.char2Chtype(menu_list[x][0], title_len, [])
         @title_len[x1] = title_len[0]
         @subsize[x1] = subsize[x] - RNDK::MENU::TITLELINES
-        @title_win[x1] = Ncurses.subwin(rndkscreen.window,
+        @title_win[x1] = Ncurses.subwin(screen.window,
                                         RNDK::MENU::TITLELINES,
                                         @title_len[x1] + 2,
                                         ypos + y1,
                                         xpos + x2)
 
-        @pull_win[x1] = Ncurses.subwin(rndkscreen.window,
+        @pull_win[x1] = Ncurses.subwin(screen.window,
                                        high,
                                        max + 2,
                                        ypos + y2,
@@ -115,7 +116,7 @@ module RNDK
       @input_window = @title_win[@current_title]
 
       # Register this baby.
-      rndkscreen.register(:MENU, self)
+      screen.register(:MENU, self)
     end
 
     # This activates the RNDK Menu
@@ -255,7 +256,7 @@ module RNDK
 
       if pp_return
         # Check for key bindings.
-        if self.check_bind(:MENU, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -392,15 +393,15 @@ module RNDK
       end
 
       # Clean the key bindings.
-      self.clean_bindings(:MENU)
+      self.clean_bindings
 
       # Unregister the widget
-      @screen.unregister(:MENU, self)
+      @screen.unregister self
     end
 
     # Erase the menu widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         (0...@menu_items).each do |x|
           Ncurses.werase   @title_win[x]
           Ncurses.wrefresh @title_win[x]
@@ -471,8 +472,7 @@ module RNDK
       return within
     end
 
-    def widget_type
-      :MENU
-    end
+
+
   end
 end

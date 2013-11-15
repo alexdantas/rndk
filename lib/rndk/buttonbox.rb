@@ -4,11 +4,12 @@ module RNDK
   class BUTTONBOX < Widget
     attr_reader :current_button
 
-    def initialize(rndkscreen, x_pos, y_pos, height, width, title, rows, cols,
+    def initialize(screen, x_pos, y_pos, height, width, title, rows, cols,
         buttons, button_count, highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :BUTTONBOX
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       col_width = 0
       current_button = 0
       @button = []
@@ -69,13 +70,13 @@ module RNDK
       # Now we have to readjust the x and y positions
       xtmp = [x_pos]
       ytmp = [y_pos]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the buttonbox box attributes.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
@@ -114,7 +115,7 @@ module RNDK
       end
 
       # Register this baby.
-      rndkscreen.register(:BUTTONBOX, self)
+      screen.register(:BUTTONBOX, self)
     end
 
     # This activates the widget.
@@ -166,7 +167,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(:BUTTONBOX, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -308,7 +309,7 @@ module RNDK
 
     # This erases the buttonbox box from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase @win
         RNDK.window_erase @shadow_win
       end
@@ -321,9 +322,9 @@ module RNDK
       RNDK.window_delete @shadow_win
       RNDK.window_delete @win
 
-      self.clean_bindings(:BUTTONBOX)
+      self.clean_bindings
 
-      @screen.unregister(:BUTTONBOX, self)
+      @screen.unregister self
     end
 
     def setCurrentButton(button)
@@ -348,9 +349,8 @@ module RNDK
       self.draw(@box)
     end
 
-    def widget_type
-      :BUTTONBOX
-    end
+
+
 
     def position
       super(@win)

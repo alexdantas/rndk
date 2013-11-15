@@ -2,11 +2,12 @@ require 'rndk'
 
 module RNDK
   class SCALE < Widget
-    def initialize(rndkscreen, xplace, yplace, title, label, field_attr,
+    def initialize(screen, xplace, yplace, title, label, field_attr,
         field_width, start, low, high, inc, fast_inc, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :SCALE
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       bindings = {
           'u'           => Ncurses::KEY_UP,
           'U'           => Ncurses::KEY_PPAGE,
@@ -57,7 +58,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -98,8 +99,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the widget's data field.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @box_width = box_width
       @box_height = box_height
@@ -133,7 +134,7 @@ module RNDK
         self.bind(self.widget_type, from, :getc, to)
       end
 
-      rndkscreen.register(self.widget_type, self)
+      screen.register(self.widget_type, self)
     end
 
     # This allows the person to use the widget's data field.
@@ -459,7 +460,7 @@ module RNDK
       RNDK.window_delete @win
 
       # Clean the key bindings.
-      self.clean_bindings(self.widget_type)
+      self.clean_bindings
 
       # Unregister this widget
       @screen.unregister(self.widget_type, self)
@@ -467,7 +468,7 @@ module RNDK
 
     # This function erases the widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase @label_win
         RNDK.window_erase @field_win
         RNDK.window_erase @win
@@ -531,8 +532,7 @@ module RNDK
       '%d%c'
     end
 
-    def widget_type
-      :SCALE
-    end
+
+
   end
 end

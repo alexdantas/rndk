@@ -7,6 +7,7 @@ details, it provides some widgets for rapid console app development.
 
 It means that you'll be able to master the dark arts of text-based
 applications, easily creating nice apps for the console.
+Not convinced? [Here's some screenshots][screens]!
 
 `RNDK` is a fork from `tawny-cdk`, a [Chris Sauro Ruby port][tawny]
 of [Thomas Dickey's Curses Development Kit][cdk] (in C).
@@ -53,8 +54,6 @@ now, I recommend you to **not** use `rndk` for production programs!
 
 ## Installation
 
-`rndk` requires the gem `ffi-ncurses`.
-
 Add this line to your application's Gemfile:
 
     gem 'rndk'
@@ -67,14 +66,22 @@ Or install it yourself as:
 
     $ gem install rndk
 
+## Requirements
+
+`rndk` requires the following gems:
+
+* [ffi-ncurses][ffi]
+
+They'll get installed automatically if you're using `bundle` or `gem install`.
+
 ## Usage
 
 [Take a look at the Wiki][wiki]! There's some tutorials and
 resources there.
 
 The `examples` directory contains lots of sample usages for every
-widget available. To execute them, go to the `rndk` root folder
-and run:
+widget available. If you've not installed `rndk` yet, go to the
+root folder and run:
 
     ruby -Ilib examples/YOUR_EXAMPLE_HERE
 
@@ -107,6 +114,8 @@ Step-by-step guide to contribute:
 [rbcurse]:https://github.com/rkumar/rbcurse
 [wiki]:https://github.com/alexdantas/rndk/wiki
 [widgets]:https://github.com/alexdantas/rndk/wiki/widgets
+[ffi]:http://rubygems.org/gems/ffi-ncurses
+[screens]:https://github.com/alexdantas/rndk/wiki/screenshots
 
 ## Contact
 

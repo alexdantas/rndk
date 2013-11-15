@@ -2,11 +2,12 @@ require 'rndk/scroller'
 
 module RNDK
   class RADIO < SCROLLER
-    def initialize(rndkscreen, xplace, yplace, splace, height, width, title,
+    def initialize(screen, xplace, yplace, splace, height, width, title,
         list, list_size, choice_char, def_item, highlight, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :RADIO
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_width = width
       box_height = height
       widest_item = 0
@@ -64,7 +65,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, @box_width, @box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -92,8 +93,8 @@ module RNDK
       end
 
       # Set the rest of the variables
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @scrollbar_placement = splace
       @widest_item = widest_item
       @left_char = 0
@@ -117,10 +118,10 @@ module RNDK
 
       # Setup the key bindings
       bindings.each do |from, to|
-        self.bind(:RADIO, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:RADIO, self)
+      screen.register(:RADIO, self)
     end
 
     # Put the cursor on the currently-selected item.
@@ -185,7 +186,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a predefined key binding.
-        if self.check_bind(:RADIO, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -359,15 +360,15 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean up the key bindings.
-      self.clean_bindings(:RADIO)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:RADIO, self)
+      @screen.unregister self
     end
 
     # This function erases the radio widget
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -531,8 +532,7 @@ module RNDK
       @item_pos[n] - @left_char + scrollbar_adj + @border_size
     end
 
-    def widget_type
-      :RADIO
-    end
+
+
   end
 end

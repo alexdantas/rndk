@@ -10,11 +10,11 @@ begin
   label = '</B>Current Value:'
 
   # Set up RNDK
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   # Create the widget
-  widget = RNDK::Slider.new(rndkscreen,
+  widget = RNDK::Slider.new(screen,
                             RNDK::CENTER,
                             RNDK::CENTER,
                             title,
@@ -53,7 +53,7 @@ begin
 
   # A quick popup widget! Check out the
   # example file 'quick-widgets.rb'
-  rndkscreen.popup_label mesg
+  screen.popup_label mesg
 
   # Clean up
   RNDK::Screen.end_rndk

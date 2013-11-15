@@ -2,11 +2,12 @@ require 'rndk'
 
 module RNDK
   class HISTOGRAM < Widget
-    def initialize(rndkscreen, xplace, yplace, height, width, orient,
+    def initialize(screen, xplace, yplace, height, width, orient,
         title, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :HISTOGRAM
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
 
       self.set_box(box)
 
@@ -34,13 +35,13 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the histogram data
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @box_width = box_width
@@ -84,7 +85,7 @@ module RNDK
                                      xpos + 1)
       end
 
-      rndkscreen.register(:HISTOGRAM, self)
+      screen.register(:HISTOGRAM, self)
     end
 
     # This was added for the builder
@@ -391,22 +392,21 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:HISTOGRAM)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:HISTOGRAM, self)
+      @screen.unregister self
     end
 
     # Erase the widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
     end
 
-    def widget_type
-      :HISTOGRAM
-    end
+
+
   end
 end

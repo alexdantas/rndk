@@ -2,11 +2,13 @@ require 'rndk'
 
 module RNDK
   class ITEMLIST < Widget
-    def initialize(rndkscreen, xplace, yplace, title, label, item, count,
+    def initialize(screen, xplace, yplace, title, label, item, count,
         default_item, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :ITEMLIST
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       field_width = 0
 
       if !self.createList(item, count)
@@ -43,7 +45,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -77,8 +79,8 @@ module RNDK
       end
 
       # Set up the rest of the structure
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @accepts_focus = true
       @shadow = shadow
@@ -103,7 +105,7 @@ module RNDK
       end
 
       # Register this baby.
-      rndkscreen.register(:ITEMLIST, self)
+      screen.register(:ITEMLIST, self)
     end
 
     # This allows the user to play with the widget.
@@ -162,7 +164,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding.
-        if self.check_bind(:ITEMLIST, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -285,7 +287,7 @@ module RNDK
 
     # This function removes the widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@field_win)
         RNDK.window_erase(@label_win)
         RNDK.window_erase(@win)
@@ -310,9 +312,9 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:ITEMLIST)
+      self.clean_bindings
 
-      @screen.unregister(:ITEMLIST, self)
+      @screen.unregister self
     end
 
     # This sets multiple attributes of the widget.
@@ -467,8 +469,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :ITEMLIST
-    end
+
+
   end
 end

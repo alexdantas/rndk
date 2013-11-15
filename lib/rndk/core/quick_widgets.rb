@@ -7,9 +7,9 @@
 #
 # For example:
 #
-#     rndkscreen = RNDK::Screen.new
+#     screen = RNDK::Screen.new
 #     message = ["awesome quick label!"]
-#     rndkscreen.popup_label message
+#     screen.popup_label message
 #
 
 # Since I'm including a lot of widgets here, maybe I

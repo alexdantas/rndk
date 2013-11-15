@@ -2,11 +2,13 @@ require 'rndk'
 
 module RNDK
   class TEMPLATE < Widget
-    def initialize(rndkscreen, xplace, yplace, title, label, plate,
+    def initialize(screen, xplace, yplace, title, label, plate,
         overlay, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :TEMPLATE
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
       box_height = if box then 3 else 1 end
       plate_len = 0
@@ -61,7 +63,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -95,8 +97,8 @@ module RNDK
       @plate = plate.clone
 
       # Set up the rest of the structure.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @field_width = field_width
       @box_height = box_height
@@ -187,7 +189,7 @@ module RNDK
             ypos + 1, xpos + 1)
       end
 
-      rndkscreen.register(:TEMPLATE, self)
+      screen.register(:TEMPLATE, self)
     end
 
     # This actually manages the tempalte widget
@@ -239,7 +241,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding
-        if self.check_bind(:TEMPLATE, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -467,14 +469,14 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:TEMPLATE)
+      self.clean_bindings
 
-      @screen.unregister(:TEMPLATE, self)
+      @screen.unregister self
     end
 
     # Erase the widget.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@field_win)
         RNDK.window_erase(@label_win)
         RNDK.window_erase(@shadow_win)
@@ -553,8 +555,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :TEMPLATE
-    end
+
+
   end
 end

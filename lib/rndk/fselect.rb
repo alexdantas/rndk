@@ -9,7 +9,7 @@ module RNDK
     attr_reader :sock_attribute, :field_attribute, :filler_character
     attr_reader :dir_contents, :file_counter, :pwd, :pathname
 
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    height,
@@ -26,9 +26,10 @@ module RNDK
                    box,
                    shadow)
       super()
+      @widget_type = :FSELECT
 
-      parent_width  = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      parent_width  = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
 
       bindings = {
           RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
@@ -48,7 +49,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -67,8 +68,8 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Set some variables.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @dir_attribute = d_attribute.clone
       @file_attribute = f_attribute.clone
       @link_attribute = l_attribute.clone
@@ -100,7 +101,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 2 - label_len
                    end
-      @entry_field = RNDK::Entry.new(rndkscreen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
+      @entry_field = RNDK::Entry.new(screen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
           title, label, field_attribute, filler_char, :MIXED, temp_width,
           0, 512, box, false)
 
@@ -368,12 +369,12 @@ module RNDK
       end
 
       # Define the callbacks for the entry field.
-      @entry_field.bind(:entry, Ncurses::KEY_UP, adjust_scroll_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_PPAGE, adjust_scroll_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_DOWN, adjust_scroll_cb, self)
-      @entry_field.bind(:entry, Ncurses::KEY_NPAGE, adjust_scroll_cb, self)
-      @entry_field.bind(:entry, RNDK::KEY_TAB, complete_filename_cb, self)
-      @entry_field.bind(:entry, RNDK.CTRL('^'), display_file_info_cb, self)
+      @entry_field.bind(Ncurses::KEY_UP, adjust_scroll_cb, self)
+      @entry_field.bind(Ncurses::KEY_PPAGE, adjust_scroll_cb, self)
+      @entry_field.bind(Ncurses::KEY_DOWN, adjust_scroll_cb, self)
+      @entry_field.bind(Ncurses::KEY_NPAGE, adjust_scroll_cb, self)
+      @entry_field.bind(RNDK::KEY_TAB, complete_filename_cb, self)
+      @entry_field.bind(RNDK.CTRL('^'), display_file_info_cb, self)
 
       # Put the current working directory in the entry field.
       @entry_field.set_text(@pwd)
@@ -384,7 +385,7 @@ module RNDK
                    then RNDK::FULL
                    else box_width - 1
                    end
-      @scroll_field = RNDK::Scroll.new(rndkscreen,
+      @scroll_field = RNDK::Scroll.new(screen,
                                        Ncurses.getbegx(@win),
                                        Ncurses.getbegy(@win) + temp_height,
                                        RNDK::RIGHT,
@@ -409,15 +410,15 @@ module RNDK
 
       # Setup the key bindings
       bindings.each do |from, to|
-        self.bind(:FSELECT, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:FSELECT, self)
+      screen.register(:FSELECT, self)
     end
 
     # This erases the file selector from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         @scroll_field.erase
         @entry_field.erase
         RNDK.window_erase(@win)
@@ -865,7 +866,7 @@ module RNDK
 
     # This destroys the file selector.
     def destroy
-      self.clean_bindings(:FSELECT)
+      self.clean_bindings
 
       # Destroy the other RNDK widgets
       @scroll_field.destroy
@@ -877,7 +878,7 @@ module RNDK
 
       # Clean the key bindings.
       # Unregister the widget.
-      @screen.unregister(:FSELECT, self)
+      @screen.unregister self
     end
 
     # Currently a wrapper for File.expand_path
@@ -956,8 +957,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :FSELECT
-    end
+
+
   end
 end

@@ -2,10 +2,12 @@ require 'rndk'
 
 module RNDK
   class BUTTON < Widget
-    def initialize(rndkscreen, xplace, yplace, text, callback, box, shadow)
+    def initialize(screen, xplace, yplace, text, callback, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :BUTTON
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
       xpos = xplace
       ypos = yplace
@@ -38,14 +40,14 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Create the button.
-      @screen = rndkscreen
+      @screen = screen
       # ObjOf (button)->fn = &my_funcs;
-      @parent = rndkscreen.window
+      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @xpos = xpos
@@ -71,7 +73,7 @@ module RNDK
       end
 
       # Register this baby.
-      rndkscreen.register(:BUTTON, self)
+      screen.register(:BUTTON, self)
     end
 
     # This was added for the builder.
@@ -171,7 +173,7 @@ module RNDK
 
     # This erases the button widget.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -307,9 +309,9 @@ module RNDK
       RNDK.window_delete(@shadow_win)
       RNDK.window_delete(@win)
 
-      self.clean_bindings(:BUTTON)
+      self.clean_bindings
 
-      @screen.unregister(:BUTTON, self)
+      @screen.unregister self
     end
 
     # This injects a single character into the widget.
@@ -320,7 +322,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Check a predefined binding.
-      if self.check_bind(:BUTTON, input)
+      if self.check_bind(input)
         complete = true
       else
         case input
@@ -361,10 +363,6 @@ module RNDK
     def unfocus
       self.drawText
       Ncurses.wrefresh @win
-    end
-
-    def widget_type
-      :BUTTON
     end
 
   end

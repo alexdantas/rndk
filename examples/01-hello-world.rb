@@ -7,7 +7,7 @@ require 'rndk/label'
 
 begin
   # Startup Ncurses and RNDK
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
 
   # Set up RNDK colors
   RNDK::Color.init
@@ -24,7 +24,7 @@ begin
          ]
 
   # Declare the labels.
-  label = RNDK::Label.new(rndkscreen,   # screen
+  label = RNDK::Label.new(screen,   # screen
                           RNDK::CENTER, # x
                           RNDK::CENTER, # y
                           mesg,         # message
@@ -33,7 +33,7 @@ begin
 
   if label.nil?
     # Clean up the memory.
-    rndkscreen.destroy
+    screen.destroy
 
     # End curses...
     RNDK::Screen.end_rndk
@@ -43,7 +43,7 @@ begin
   end
 
   # Draw the RNDK screen and waits for space to be pressed.
-  rndkscreen.refresh
+  screen.refresh
   label.wait(' ')
 
   # Ending Ncurses and RNDK

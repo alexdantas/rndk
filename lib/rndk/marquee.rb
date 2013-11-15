@@ -2,11 +2,12 @@ require 'rndk'
 
 module RNDK
   class MARQUEE < Widget
-    def initialize(rndkscreen, xpos, ypos, width, box, shadow)
+    def initialize(screen, xpos, ypos, width, box, shadow)
       super()
+      @widget_type = :MARQUEE
 
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win = Ncurses.newwin(1, 1, ypos, xpos)
       @active = true
       @width = width
@@ -18,7 +19,7 @@ module RNDK
         # return (0);
       end
 
-      rndkscreen.register(:MARQUEE, self)
+      screen.register(:MARQUEE, self)
     end
 
     # This activates the widget.
@@ -162,15 +163,15 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:MARQUEE)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:MARQUEE, self)
+      @screen.unregister self
     end
 
     # This erases the widget.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -186,9 +187,8 @@ module RNDK
       self.layoutWidget(xpos, ypos)
     end
 
-    def widget_type
-      :MARQUEE
-    end
+
+
 
     def position
       super(@win)
@@ -200,7 +200,7 @@ module RNDK
     end
 
     def layoutWidget(xpos, ypos)
-      rndkscreen = @screen
+      screen = @screen
       parent_width = Ncurses.getmaxx(@screen.window)
 
       RNDK::MARQUEE.discardWin(@win)

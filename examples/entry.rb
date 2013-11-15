@@ -8,7 +8,7 @@ require 'rndk/entry'
 
 begin
   # Startup RNDK and Colors
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   # Watch out for that markup
@@ -17,7 +17,7 @@ begin
   label = "</U/5>Oh yeah<!U!5>:"
 
   # Create the entry field widget.
-  entry = RNDK::Entry.new(rndkscreen,
+  entry = RNDK::Entry.new(screen,
                           RNDK::CENTER,
                           RNDK::CENTER,
                           title,
@@ -40,7 +40,7 @@ begin
   end
 
   # Draw the screen.
-  rndkscreen.refresh
+  screen.refresh
 
   # Activate the entry field.
   info = entry.activate
@@ -59,7 +59,7 @@ begin
   end
 
   # Quick widget - see example 'quick-widgets.rb' for details
-  rndkscreen.popup_label mesg
+  screen.popup_label mesg
 
   # Quitting
   RNDK::Screen.end_rndk

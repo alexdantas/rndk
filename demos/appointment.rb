@@ -117,13 +117,13 @@ class Appointment
     readAppointmentFile(filename, appointment_info)
 
     # Set up RNDK
-    rndkscreen = RNDK::Screen.new
+    screen = RNDK::Screen.new
 
     # Set up RNDK colors
     RNDK::Color.init
 
     # Create the calendar widget.
-    calendar = RNDK::Calendar.new(rndkscreen,
+    calendar = RNDK::Calendar.new(screen,
                                   RNDK::CENTER,
                                   RNDK::CENTER,
                                   title, day, month, year,
@@ -310,17 +310,17 @@ class Appointment
              " '?' displays appointment for selected day",
              " 'enter' or 'tab' quits"]
 
-      rndkscreen.popup_label msg
+      screen.popup_label msg
     end
 
     # Now we bind actions to the calendar.
     # Create a key binding to mark days on the calendar.
-    calendar.bind(:calendar, 'm', create_calendar_mark_cb, appointment_info)
-    calendar.bind(:calendar, 'M', create_calendar_mark_cb, appointment_info)
-    calendar.bind(:calendar, 'r', remove_calendar_mark_cb, appointment_info)
-    calendar.bind(:calendar, 'R', remove_calendar_mark_cb, appointment_info)
-    calendar.bind(:calendar, '?', display_calendar_mark_cb, appointment_info)
-    calendar.bind(:calendar, 'h', show_help, nil)
+    calendar.bind('m', create_calendar_mark_cb, appointment_info)
+    calendar.bind('M', create_calendar_mark_cb, appointment_info)
+    calendar.bind('r', remove_calendar_mark_cb, appointment_info)
+    calendar.bind('R', remove_calendar_mark_cb, appointment_info)
+    calendar.bind('?', display_calendar_mark_cb, appointment_info)
+    calendar.bind('h', show_help, nil)
 
     # Set all the appointments read from the file.
     appointment_info.appointment.each do |appointment|

@@ -37,13 +37,13 @@ begin
 
   # Set up RNDK
   curses_win = Ncurses.initscr
-  rndkscreen = RNDK::Screen.new(curses_win)
+  screen = RNDK::Screen.new(curses_win)
 
   # Set up RNDK colors
   RNDK::Color.init
 
   # Create the entry field widget.
-  entry = RNDK::Entry.new(rndkscreen,
+  entry = RNDK::Entry.new(screen,
                           RNDK::CENTER, # x
                           RNDK::CENTER, # y
                           '',
@@ -58,7 +58,7 @@ begin
                           false)
 
   if entry.nil?
-    rndkscreen.destroy
+    screen.destroy
     RNDK::Screen.end_rndk
 
     puts "Cannot create the entry box. Is the window too small?"
@@ -79,7 +79,7 @@ begin
             "",
             "<C>Press any key to continue."
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
 
   elsif entry.exit_type == :NORMAL
     mesg = [
@@ -88,7 +88,7 @@ begin
             "",
             "<C>Press any key to continue."
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
   end
 
   RNDK::Screen.end_rndk

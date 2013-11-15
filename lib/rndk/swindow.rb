@@ -3,11 +3,13 @@ require 'rndk'
 module RNDK
   # TODO This Widget's very buggy! Somehow improve it later!
   class SWINDOW < Widget
-    def initialize(rndkscreen, xplace, yplace, height, width, title,
+    def initialize(screen, xplace, yplace, height, width, title,
         save_lines, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :swindow
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_width = width
       box_height = height
       bindings = {
@@ -46,7 +48,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -67,8 +69,8 @@ module RNDK
       Ncurses.keypad(@field_win, true)
 
       # Set the rest of the variables
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @box_height = box_height
       @box_width = box_width
@@ -97,11 +99,11 @@ module RNDK
 
       # Create the key bindings
       bindings.each do |from, to|
-        self.bind(:swindow, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
       # Register this baby.
-      rndkscreen.register(:swindow, self)
+      screen.register(:swindow, self)
     end
 
     # This sets the lines and the box attribute of the scrolling window.
@@ -350,7 +352,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(:swindow, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -522,15 +524,15 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:swindow)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:swindow, self)
+      @screen.unregister self
     end
 
     # This function erases the scrolling window widget.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -759,8 +761,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :swindow
-    end
+
+
   end
 end

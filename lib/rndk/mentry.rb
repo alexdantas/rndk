@@ -5,11 +5,13 @@ module RNDK
     attr_accessor :info, :current_col, :current_row, :top_row
     attr_reader :disp_type, :field_width, :rows, :field_win
 
-    def initialize(rndkscreen, xplace, yplace, title, label, field_attr,
+    def initialize(screen, xplace, yplace, title, label, field_attr,
         filler, disp_type, f_width, f_rows, logical_rows, min, box, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :MEntry
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       field_width = f_width
       field_rows = f_rows
 
@@ -52,7 +54,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -86,14 +88,14 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Set up the rest of the structure.
-      @parent = rndkscreen.window
+      @parent = screen.window
       @total_width = (field_width * logical_rows) + 1
 
       # Create the info string
       @info = ''
 
       # Set up the rest of the widget information.
-      @screen = rndkscreen
+      @screen = screen
       @shadow_win = nil
       @field_attr = field_attr
       @field_width = field_width
@@ -158,7 +160,7 @@ module RNDK
       end
 
       # Register
-      rndkscreen.register(:MEntry, self)
+      screen.register(:MEntry, self)
     end
 
     # This actually activates the mentry widget...
@@ -256,7 +258,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding...
-        if self.check_bind(:MEntry, input)
+        if self.check_bind(input)
           complete = true
         else
           moved = false
@@ -500,7 +502,7 @@ module RNDK
 
     # This function erases the multiple line entry field from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@field_win)
         RNDK.window_erase(@label_win)
         RNDK.window_erase(@win)
@@ -519,10 +521,10 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:MEntry)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:MEntry, self)
+      @screen.unregister self
     end
 
     # This sets multiple attributes of the widget.
@@ -612,8 +614,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :MEntry
-    end
+
+
   end
 end

@@ -10,12 +10,14 @@ module RNDK
 
     @@g_paste_buffer = ''
 
-    def initialize(rndkscreen, xplace, yplace, rows, cols, vrows, vcols,
+    def initialize(screen, xplace, yplace, rows, cols, vrows, vcols,
         title, rowtitles, coltitles, colwidths, colvalues, rspace, cspace,
         filler, dominant, box, box_cell, shadow)
       super()
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      @widget_type = :MATRIX
+
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_height = 0
       box_width = 0
       max_row_title_width = 0
@@ -118,7 +120,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -200,10 +202,10 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Keep the rest of the info.
-      @screen = rndkscreen
+      @screen = screen
       @accepts_focus = true
       @input_window = @win
-      @parent = rndkscreen.window
+      @parent = screen.window
       @vrows = vrows
       @vcols = vcols
       @box_width = box_width
@@ -273,11 +275,11 @@ module RNDK
 
       # Set up the key bindings.
       bindings.each do |from, to|
-        self.bind(:MATRIX, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
       # Register this baby.
-      rndkscreen.register(:MATRIX, self)
+      screen.register(:MATRIX, self)
     end
 
     # This activates the matrix.
@@ -343,7 +345,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check the key bindings.
-        if self.check_bind(:MATRIX, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -892,15 +894,15 @@ module RNDK
       RNDK.window_delete @win
 
       # Clean the key bindings.
-      self.clean_bindings(:MATRIX)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:MATRIX, self)
+      @screen.unregister self
     end
 
     # This function erases the matrix widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         # Clear the matrix cells.
         RNDK.window_erase @cell[0][0]
 
@@ -1182,8 +1184,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :MATRIX
-    end
+
+
   end
 end

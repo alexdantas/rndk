@@ -21,7 +21,7 @@ module RNDK
     # * `shadow` turns on/off the shadow around the Widget.
     #
     # If the Widget cannot be created, returns `nil`.
-    def initialize(rndkscreen, xplace, yplace, mesg, box, shadow)
+    def initialize(screen, xplace, yplace, mesg, box, shadow)
 
       # Adjusting if the user sent us a String
       mesg = [mesg] if mesg.class == String
@@ -29,10 +29,11 @@ module RNDK
       return nil if mesg.class != Array or mesg.empty?
 
       super()
+      @widget_type = :label
       rows = mesg.size
 
-      parent_width  = Ncurses.getmaxx rndkscreen.window
-      parent_height = Ncurses.getmaxy rndkscreen.window
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
       box_width  = -2**30  # -INFINITY
       box_height = 0
       xpos = [xplace]
@@ -78,10 +79,10 @@ module RNDK
                    end
 
       # Rejustify the x and y positions if we need to
-      RNDK.alignxy(rndkscreen.window, xpos, ypos, box_width, box_height)
+      RNDK.alignxy(screen.window, xpos, ypos, box_width, box_height)
 
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win    = Ncurses.newwin(box_height, box_width, ypos[0], xpos[0])
       @shadow_win = nil
       @xpos = xpos[0]
@@ -109,7 +110,7 @@ module RNDK
       end
 
       # Register this
-      rndkscreen.register(:label, self)
+      screen.register(:label, self)
     end
 
     # Obsolete entrypoint which calls Label#draw.
@@ -165,9 +166,8 @@ module RNDK
       return @info
     end
 
-    def widget_type
-      :label
-    end
+
+
 
     def position
       super(@win)
@@ -215,9 +215,9 @@ module RNDK
       RNDK.window_delete @shadow_win
       RNDK.window_delete @win
 
-      self.clean_bindings :label
+      self.clean_bindings
 
-      @screen.unregister(:label, self)
+      @screen.unregister self
     end
 
     # Waits for the user to press a key.

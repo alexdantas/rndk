@@ -10,13 +10,13 @@ require 'rndk/calendar'
 
 begin
   # Start RNDK and Colors
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   title = "<C></U>RNDK Calendar Widget\n<C>Demo"
 
   # Declare the calendar widget.
-  calendar = RNDK::Calendar.new(rndkscreen,
+  calendar = RNDK::Calendar.new(screen,
                                 RNDK::CENTER, # x
                                 RNDK::CENTER, # y
                                 title,
@@ -58,10 +58,10 @@ begin
   #
   # They must be lambdas.
 
-  calendar.bind(:calendar, 'm', create_calendar_mark, calendar)
-  calendar.bind(:calendar, 'M', create_calendar_mark, calendar)
-  calendar.bind(:calendar, 'r', remove_calendar_mark, calendar)
-  calendar.bind(:calendar, 'R', remove_calendar_mark, calendar)
+  calendar.bind('m', create_calendar_mark, calendar)
+  calendar.bind('M', create_calendar_mark, calendar)
+  calendar.bind('r', remove_calendar_mark, calendar)
+  calendar.bind('R', remove_calendar_mark, calendar)
 
   calendar.week_base = 0
 
@@ -75,7 +75,7 @@ begin
             '',
             '<C>Press any key to continue.'
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
 
   elsif calendar.exit_type == :NORMAL
     mesg = [
@@ -84,7 +84,7 @@ begin
                                                      calendar.day, calendar.month, calendar.year],
             '<C>Press any key to continue.'
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
   end
 
   # Finishing up and printing message

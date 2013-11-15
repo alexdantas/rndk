@@ -5,6 +5,11 @@ module RNDK
   # Wrapper on common functionality between all RNDK Widgets.
   #
   class Widget
+    # Which widget this is.
+    # It's the name of the widget lowercased.
+    # Example: `:label`, `:calendar`, `:alphalist`
+    attr_reader :widget_type
+
     attr_accessor :screen_index, :screen, :has_focus, :is_visible, :box
     attr_accessor :ULChar, :URChar, :LLChar, :LRChar, :HZChar, :VTChar, :BXAttr
     attr_reader :binding_list, :accepts_focus, :exit_type, :border_size
@@ -324,25 +329,24 @@ module RNDK
       end
     end
 
-    # Binds a `function` to a `key`, according to this Widget's
-    # `type`.
+    # Binds a `function` to a `key`.
     #
-    def bind(type, key, function, data)
-      obj = self.bindable_widget type
+    def bind(key, function, data)
+      obj = self.bindable_widget @widget_type
 
       return if (key.ord >= Ncurses::KEY_MAX) or (key.ord.zero?) or (obj.nil?)
 
       obj.binding_list[key.ord] = [function, data]
     end
 
-    def unbind(type, key)
-      obj = self.bindable_widget type
+    def unbind key
+      obj = self.bindable_widget @widget_type
 
       obj.binding_list.delete(key) unless obj.nil?
     end
 
-    def clean_bindings type
-      obj = self.bindable_widget type
+    def clean_bindings
+      obj = self.bindable_widget @widget_type
 
       if (not obj.nil?) and (not obj.binding_list.nil?)
         obj.binding_list.clear
@@ -359,8 +363,8 @@ module RNDK
     # default keybinding for `key`.
     # If not, then we run our customs. See the widgets for details.
     #
-    def check_bind(widget_type, key)
-      obj = self.bindable_widget widget_type
+    def check_bind key
+      obj = self.bindable_widget @widget_type
 
       return false if obj.nil? or (not obj.binding_list.include? key)
 
@@ -370,16 +374,15 @@ module RNDK
       if function == :getc
         return data
       else
-        return function.call(widget_type, obj, data, key)
+        return function.call(obj, data, key)
       end
     end
 
     # Tells if the key binding for the key exists.
     def is_bound? key
-      type   = self.widget_type
       result = false
 
-      obj = self.bindable_widget type
+      obj = self.bindable_widget @widget_type
 
       unless obj.nil?
         result = obj.binding_list.include? key
@@ -518,19 +521,18 @@ module RNDK
     end
 
     # Tells if a widget is valid.
-    def valid_widget?
-      return false unless RNDK::ALL_WIDGETS.include? self
-
-      self.valid_widget_type? self.widget_type
+    def valid?
+      RNDK::ALL_WIDGETS.include?(self) and self.valid_type?
     end
 
-    # Tells if `type` is the type of an existing Widget.
-    def valid_widget_type? type
+    # Tells if current widget's type is the
+    # type of an existing Widget.
+    def valid_type?
       [:GRAPH,
        :HISTOGRAM,
        :label,
        :MARQUEE,
-       :VIEWER,
+       :viewer,
        :alphalist,
        :BUTTON,
        :BUTTONBOX,
@@ -552,7 +554,7 @@ module RNDK
        :swindow,
        :TEMPLATE,
        :USCALE,
-       :USLIDER].include? type
+       :USLIDER].include? @widget_type
     end
 
     protected

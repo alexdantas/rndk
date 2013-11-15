@@ -5,12 +5,14 @@ module RNDK
   class SELECTION < SCROLLER
     attr_reader :selections
 
-    def initialize(rndkscreen, xplace, yplace, splace, height, width, title,
+    def initialize(screen, xplace, yplace, splace, height, width, title,
         list, list_size, choices, choice_count, highlight, box, shadow)
       super()
+      @widget_type = :SELECTION
+
       widest_item = -1
-      parent_width = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      parent_width = Ncurses.getmaxx(screen.window)
+      parent_height = Ncurses.getmaxy(screen.window)
       box_width = width
       bindings = {
         RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
@@ -65,7 +67,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xplace]
       ytmp = [yplace]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, @box_width, @box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -93,8 +95,8 @@ module RNDK
       end
 
       # Set the rest of the variables
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @scrollbar_placement = splace
       @max_left_char = 0
       @left_char = 0
@@ -131,11 +133,11 @@ module RNDK
 
       # Setup the key bindings
       bindings.each do |from, to|
-        self.bind(:SELECTION, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
       # Register this baby.
-      rndkscreen.register(:SELECTION, self)
+      screen.register(:SELECTION, self)
     end
 
     # Put the cursor on the currently-selected item.
@@ -203,7 +205,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a predefined binding.
-        if self.check_bind(:SELECTION, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -377,15 +379,15 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean up the key bindings
-      self.clean_bindings(:SELECTION)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:SELECTION, self)
+      @screen.unregister self
     end
 
     # This function erases the selection list from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -623,8 +625,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :SELECTION
-    end
+
+
   end
 end

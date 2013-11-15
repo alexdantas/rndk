@@ -6,7 +6,7 @@ require 'rndk/label'
 
 begin
   # Starting things up
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   # Set the labels with some nice markup
@@ -17,7 +17,7 @@ begin
           "<C>This line should be set to whatever the screen default is."
          ]
 
-  label = RNDK::Label.new(rndkscreen,
+  label = RNDK::Label.new(screen,
                           RNDK::CENTER,
                           RNDK::CENTER,
                           mesg,
@@ -33,7 +33,7 @@ begin
 
   # Draw the RNDK screen and waits for
   # space to be pressed.
-  rndkscreen.refresh
+  screen.refresh
   label.wait(' ')
 
   # Clean up

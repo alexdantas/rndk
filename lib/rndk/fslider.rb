@@ -2,7 +2,7 @@ require 'rndk/slider'
 
 module RNDK
   class FSLIDER < Slider
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    title,
@@ -19,7 +19,8 @@ module RNDK
                    shadow)
 
       @digits = digits
-      super(rndkscreen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
+      super(screen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
+      @widget_type = :FSLIDER
     end
 
     # This draws the widget.
@@ -73,8 +74,7 @@ module RNDK
       '%g%c'
     end
 
-    def widget_type
-      :FSLIDER
-    end
+
+
   end
 end

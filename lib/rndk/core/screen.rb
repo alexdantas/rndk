@@ -128,7 +128,7 @@ module RNDK
         @widget.concat Array.new(@widget_limit - @widget.size, nil)
       end
 
-      if widget.valid_widget_type? rndktype
+      if widget.valid_type?
         self.set_screen_index(@widget_count, widget)
         @widget_count += 1
       end
@@ -144,8 +144,8 @@ module RNDK
     # `rndktype` states what RNDK Widget type this widget is.
     # `widget` is a pointer to the Widget itself.
     #
-    def unregister(rndktype, widget)
-      return unless ((widget.valid_widget_type? rndktype) and (widget.screen_index >= 0))
+    def unregister widget
+      return unless (widget.valid_type? and (widget.screen_index >= 0))
 
       index = widget.screen_index
       widget.screen_index = -1
@@ -182,16 +182,16 @@ module RNDK
     # `rndktype` states what RNDK Widget type this widget is.
     # `widget` is a pointer to the Widget itself.
     #
-    def self.raise_widget(rndktype, widget)
-      return unless  widget.valid_widget_type? rndktype
+    def self.raise_widget widget
+      return unless widget.valid_type?
 
       screen = widget.screen
       screen.swap_indexes(widget.screen_index, screen.widget_count - 1)
     end
 
     # Has the opposite effect of #raise_widget.
-    def self.lower_widget(rndktype, widget)
-      return unless widget.valid_widget_type? rndktype
+    def self.lower_widget widget
+      return unless widget.valid_type?
 
       widget.screen.swap_indexes(widget.screen_index, 0)
     end
@@ -213,7 +213,7 @@ module RNDK
       # drawn after all the invisible ones are erased
       (0...@widget_count).each do |x|
         obj = @widget[x]
-        if obj.valid_widget_type?(obj.widget_type)
+        if obj.valid_type?
           if obj.is_visible
             if visible < 0
               visible = x
@@ -230,7 +230,7 @@ module RNDK
       (0...@widget_count).each do |x|
         obj = @widget[x]
 
-        if obj.valid_widget_type?(obj.widget_type)
+        if obj.valid_type?
           obj.has_focus = (x == focused)
 
           if obj.is_visible
@@ -248,7 +248,7 @@ module RNDK
     def erase
       (0...@widget_count).each do |x|
         obj = @widget[x]
-        obj.erase if obj.valid_widget_type? obj.widget_type
+        obj.erase if obj.valid_type?
       end
       Ncurses.wrefresh(@window)
     end
@@ -259,7 +259,7 @@ module RNDK
         obj    = @widget[x]
         before = @widget_count
 
-        if obj.valid_widget_type?(obj.widget_type)
+        if obj.valid_type?
           obj.erase
           obj.destroy
           x -= (@widget_count - before)

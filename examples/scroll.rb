@@ -14,7 +14,7 @@ require 'rndk/scroll'
 
 begin
   # Set up RNDK and colors
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   # Turning off the blinking cursor
@@ -38,7 +38,7 @@ begin
 END
 
   # Create the scrolling list.
-  scroll_list = RNDK::Scroll.new(rndkscreen,
+  scroll_list = RNDK::Scroll.new(screen,
                                  RNDK::CENTER,      # x
                                  RNDK::CENTER,      # y
                                  RNDK::RIGHT,       # scrollbar position
@@ -92,9 +92,9 @@ END
   #
   # It only accepts lambdas.
 
-  scroll_list.bind(:scroll, 'a', add_item_callback, nil)
-  scroll_list.bind(:scroll, 'i', insert_item_callback, nil)
-  scroll_list.bind(:scroll, 'd', delete_item_callback, nil)
+  scroll_list.bind('a', add_item_callback, nil)
+  scroll_list.bind('i', insert_item_callback, nil)
+  scroll_list.bind('d', delete_item_callback, nil)
 
   # Activate the scrolling list.
   selection = scroll_list.activate
@@ -116,7 +116,7 @@ END
   end
 
   # A quick widget - see example 'quick-widgets.rb'
-  rndkscreen.popup_label msg
+  screen.popup_label msg
 
   RNDK::Screen.end_rndk
 

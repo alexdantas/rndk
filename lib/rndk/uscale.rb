@@ -7,8 +7,7 @@ module RNDK
     # but is nice it's nice to have this for compatibility/completeness
     # sake.
 
-    def widget_type
-      :USCALE
-    end
+    @widget_type = :USCALE
+
   end
 end

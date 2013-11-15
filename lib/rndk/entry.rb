@@ -114,7 +114,7 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    title,
@@ -128,9 +128,10 @@ module RNDK
                    box,
                    shadow)
       super()
+      @widget_type = :entry
 
-      parent_width  = Ncurses.getmaxx rndkscreen.window
-      parent_height = Ncurses.getmaxy rndkscreen.window
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       field_width = f_width
       box_width   = 0
@@ -174,12 +175,12 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Make the label window.
-      @win = Ncurses.subwin(rndkscreen.window, box_height, box_width, ypos, xpos)
+      @win = Ncurses.subwin(screen.window, box_height, box_width, ypos, xpos)
       if @win.nil?
         self.destroy
         return nil
@@ -211,8 +212,8 @@ module RNDK
       @info_width = max + 3
 
       # Set up the rest of the structure.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @field_attr = field_attr
       @field_width = field_width
@@ -257,14 +258,14 @@ module RNDK
 
       # Do we want a shadow?
       if shadow
-        @shadow_win = Ncurses.subwin(rndkscreen.window,
+        @shadow_win = Ncurses.subwin(screen.window,
                                      box_height,
                                      box_width,
                                      ypos + 1,
                                      xpos + 1)
       end
 
-      rndkscreen.register(:entry, self)
+      screen.register(:entry, self)
     end
 
     # Activates the Entry Widget, letting the user interact with it.
@@ -331,7 +332,7 @@ module RNDK
       if pp_return
 
         # Check a predefined binding
-        if self.check_bind(:entry, input)
+        if self.check_bind(input)
           complete = true
 
         else
@@ -540,7 +541,7 @@ module RNDK
 
     # @see Widget#erase
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@field_win)
         RNDK.window_erase(@label_win)
         RNDK.window_erase(@win)
@@ -557,9 +558,9 @@ module RNDK
       RNDK.window_delete(@shadow_win)
       RNDK.window_delete(@win)
 
-      self.clean_bindings(:entry)
+      self.clean_bindings
 
-      @screen.unregister(:entry, self)
+      @screen.unregister self
     end
 
     # Sets multiple attributes of the Widget.
@@ -669,9 +670,8 @@ module RNDK
       super @win
     end
 
-    def widget_type
-      :entry
-    end
+
+
 
     # Allows the programmer to set a different widget input handler.
     #

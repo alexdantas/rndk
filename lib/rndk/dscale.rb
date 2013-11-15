@@ -6,8 +6,6 @@ module RNDK
     # Since Ruby's typing is different this is really just FSCALE
     # but is nice it's nice to have this for compatibility/completeness
     # sake.
-    def widget_type
-      :DSCALE
-    end
+    @widget_type = :DSCALE
   end
 end

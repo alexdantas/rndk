@@ -5,9 +5,10 @@ module RNDK
     attr_reader :current_button
     MIN_DIALOG_WIDTH = 10
 
-    def initialize(rndkscreen, xplace, yplace, mesg, rows, button_label,
+    def initialize(screen, xplace, yplace, mesg, rows, button_label,
         button_count, highlight, separator, box, shadow)
       super()
+      @widget_type = :DIALOG
       box_width = DIALOG::MIN_DIALOG_WIDTH
       max_message_width = -1
       button_width = 0
@@ -58,13 +59,13 @@ module RNDK
       # Now we have to readjust the x and y positions.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
       # Set up the dialog box attributes.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
@@ -105,7 +106,7 @@ module RNDK
       end
 
       # Register this baby.
-      rndkscreen.register(:DIALOG, self)
+      screen.register(:DIALOG, self)
     end
 
     # This lets the user select the button.
@@ -172,7 +173,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(:DIALOG, input)
+        if self.check_bind(input)
           complete = true
         else
           case input
@@ -258,15 +259,15 @@ module RNDK
       RNDK.window_delete(@shadow_win)
 
       # Clean the key bindings
-      self.clean_bindings(:DIALOG)
+      self.clean_bindings
 
       # Unregister this widget
-      @screen.unregister(:DIALOG, self)
+      @screen.unregister self
     end
 
     # This function erases the dialog widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -352,9 +353,8 @@ module RNDK
       self.draw @box
     end
 
-    def widget_type
-      :DIALOG
-    end
+
+
 
     def position
       super(@win)

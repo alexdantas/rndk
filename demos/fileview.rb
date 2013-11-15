@@ -20,14 +20,14 @@ begin
            ]
 
   # Set up RNDK and Colors
-  rndkscreen = RNDK::Screen.new
+  screen = RNDK::Screen.new
   RNDK::Color.init
 
   # Get the filename
   if filename == ''
     title = '<C>Pick a file.'
     label = 'File: '
-    fselect = RNDK::FSELECT.new(rndkscreen,
+    fselect = RNDK::FSELECT.new(screen,
                                 RNDK::CENTER,
                                 RNDK::CENTER,
                                 20,
@@ -62,7 +62,7 @@ begin
               '',
               '<C>Press any key to continue.',
              ]
-      rndkscreen.popup_label(mesg, 3)
+      screen.popup_label(mesg, 3)
 
       fselect.destroy
 
@@ -73,7 +73,7 @@ begin
   end
 
   # Create the file viewer to view the file selected.
-  example = RNDK::VIEWER.new(rndkscreen,
+  example = RNDK::VIEWER.new(screen,
                              RNDK::CENTER,
                              RNDK::CENTER,
                              20,
@@ -115,7 +115,7 @@ begin
             '',
             '<C>Press any key to continue.',
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
 
   elsif example.exit_type == :NORMAL
     mesg = [
@@ -123,7 +123,7 @@ begin
             '',
             '<C>Press any key to continue.',
            ]
-    rndkscreen.popup_label mesg
+    screen.popup_label mesg
   end
 
   # Clean up

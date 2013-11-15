@@ -2,7 +2,7 @@ require 'rndk/scale'
 
 module RNDK
   class FSCALE < SCALE
-    def initialize(rndkscreen,
+    def initialize(screen,
                    xplace,
                    yplace,
                    title,
@@ -18,7 +18,8 @@ module RNDK
                    box,
                    shadow)
       @digits = digits
-      super(rndkscreen, xplace, yplace, title, label, field_attr, field_width, start, low, high, inc, fast_inc, box, shadow)
+      super(screen, xplace, yplace, title, label, field_attr, field_width, start, low, high, inc, fast_inc, box, shadow)
+      @widget_type = :FSCALE
     end
 
     def drawField
@@ -54,8 +55,7 @@ module RNDK
       '%g%c'
     end
 
-    def widget_type
-      :FSCALE
-    end
+
+
   end
 end

@@ -59,7 +59,7 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize (rndkscreen,
+    def initialize (screen,
                     xplace,
                     yplace,
                     splace,
@@ -72,9 +72,10 @@ module RNDK
                     box,
                     shadow)
       super()
+      @widget_type = :scroll
 
-      parent_width  = Ncurses.getmaxx rndkscreen.window
-      parent_height = Ncurses.getmaxy rndkscreen.window
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       box_width  = width
       box_height = height
@@ -134,7 +135,7 @@ module RNDK
       # Rejustify the x and y positions if we need to.
       xtmp = [xpos]
       ytmp = [ypos]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, @box_width, @box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -174,8 +175,8 @@ module RNDK
                                  self.Screen_XPOS(xpos) + (if splace == RNDK::LEFT then 1 else 0 end))
 
       # Set the rest of the variables
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @scrollbar_placement = splace
       @max_left_char = 0
@@ -201,18 +202,17 @@ module RNDK
 
       # Set up the key bindings.
       bindings.each do |from, to|
-        #self.bind(:scroll, from, getc_lambda, to)
-        self.bind(:scroll, from, :getc, to)
+        #self.bind(from, getc_lambda, to)
+        self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:scroll, self);
+      screen.register(:scroll, self);
 
       self
     end
 
-    def widget_type
-      :scroll
-    end
+
+
 
     # @see Widget#position
     def position
@@ -274,7 +274,7 @@ module RNDK
       if pp_return
 
         # Check for a predefined key binding.
-        if self.check_bind(:scroll, input) != false
+        if self.check_bind(input) != false
           #self.checkEarlyExit
           complete = true
 
@@ -370,10 +370,10 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings(:scroll)
+      self.clean_bindings
 
       # Unregister this widget
-      @screen.unregister(:scroll, self)
+      @screen.unregister self
     end
 
     # This function erases the scrolling list from the screen.

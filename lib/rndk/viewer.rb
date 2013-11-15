@@ -8,6 +8,8 @@ module RNDK
     def initialize(rndkscreen, xplace, yplace, height, width,
         buttons, button_count, button_highlight, box, shadow)
       super()
+      @widget_type = :viewer
+
       parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
 
@@ -107,7 +109,7 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(:VIEWER, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
       rndkscreen.register(:VIEWER, self)
@@ -353,7 +355,7 @@ module RNDK
         refresh = false
 
         input = self.getch([])
-        if !self.check_bind(:VIEWER, input)
+        if !self.check_bind(input)
           case input
           when RNDK::KEY_TAB
             if @button_count > 1
@@ -704,15 +706,15 @@ module RNDK
       RNDK.window_delete @win
 
       # Clean the key bindings.
-      self.clean_bindings(:VIEWER)
+      self.clean_bindings
 
       # Unregister this widget.
-      @screen.unregister(:VIEWER, self)
+      @screen.unregister self
     end
 
     # This function erases the viewer widget from the screen.
     def erase
-      if self.valid_widget?
+      if self.valid?
         RNDK.window_erase(@win)
         RNDK.window_erase(@shadow_win)
       end
@@ -820,8 +822,7 @@ module RNDK
       super(@win)
     end
 
-    def widget_type
-      :VIEWER
-    end
+
+
   end
 end
