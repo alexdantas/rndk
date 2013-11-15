@@ -379,7 +379,7 @@ module RNDK
     def destroy
       self.cleanTitle
       self.clean_bindings(:GRAPH)
-      RNDK::Screen.unregister(:GRAPH, self)
+      @screen.unregister(:GRAPH, self)
       RNDK.window_delete(@win)
     end
 
@@ -389,7 +389,7 @@ module RNDK
       end
     end
 
-    def object_type
+    def widget_type
       :GRAPH
     end
 

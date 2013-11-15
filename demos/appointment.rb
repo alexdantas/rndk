@@ -139,7 +139,7 @@ class Appointment
     end
 
     # This adds a marker to the calendar.
-    create_calendar_mark_cb = lambda do |object_type, calendar, info, key|
+    create_calendar_mark_cb = lambda do |widget_type, calendar, info, key|
       items = [
           'Birthday',
           'Anniversary',
@@ -222,7 +222,7 @@ class Appointment
     end
 
     # This removes a marker from the calendar.
-    remove_calendar_mark_cb = lambda do |object_type, calendar, info, key|
+    remove_calendar_mark_cb = lambda do |widget_type, calendar, info, key|
       info.appointment.each do |appointment|
         if appointment.day == calendar.day &&
             appointment.month == calendar.month &&
@@ -241,7 +241,7 @@ class Appointment
     end
 
     # This displays the marker(s) on the given day.
-    display_calendar_mark_cb = lambda do |object_type, calendar, info, key|
+    display_calendar_mark_cb = lambda do |widget_type, calendar, info, key|
       found = 0
       type = ''
       mesg = []
@@ -303,7 +303,7 @@ class Appointment
     end
 
     # Shows a help popup with keybindings.
-    show_help = lambda do |object_type, calendar, info, key|
+    show_help = lambda do |widget_type, calendar, info, key|
       msg = ["Keybindings:",
              " 'm' create appointment at selected day",
              " 'r' remove appointment at selected day",

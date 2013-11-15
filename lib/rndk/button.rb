@@ -302,14 +302,14 @@ module RNDK
       end
     end
 
-    # This destroys the button object pointer.
+    # This destroys the button widget pointer.
     def destroy
       RNDK.window_delete(@shadow_win)
       RNDK.window_delete(@win)
 
       self.clean_bindings(:BUTTON)
 
-      RNDK::Screen.unregister(:BUTTON, self)
+      @screen.unregister(:BUTTON, self)
     end
 
     # This injects a single character into the widget.
@@ -363,7 +363,7 @@ module RNDK
       Ncurses.wrefresh @win
     end
 
-    def object_type
+    def widget_type
       :BUTTON
     end
 

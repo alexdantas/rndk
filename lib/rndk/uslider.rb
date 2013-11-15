@@ -7,7 +7,7 @@ module RNDK
     # but is nice it's nice to have this for compatibility/completeness
     # sake.
 
-    def object_type
+    def widget_type
       :USLIDER
     end
   end

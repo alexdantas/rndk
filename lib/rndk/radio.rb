@@ -361,8 +361,8 @@ module RNDK
       # Clean up the key bindings.
       self.clean_bindings(:RADIO)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:RADIO, self)
+      # Unregister this widget.
+      @screen.unregister(:RADIO, self)
     end
 
     # This function erases the radio widget
@@ -531,7 +531,7 @@ module RNDK
       @item_pos[n] - @left_char + scrollbar_adj + @border_size
     end
 
-    def object_type
+    def widget_type
       :RADIO
     end
   end

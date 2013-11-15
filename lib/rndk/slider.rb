@@ -545,8 +545,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:slider)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:slider, self)
+      # Unregister this widget.
+      @screen.unregister(:slider, self)
     end
 
     # @see Widget#erase
@@ -619,7 +619,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :slider
     end
   end

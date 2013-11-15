@@ -16,12 +16,38 @@ module RNDK
   #
   # ## Developer Notes
   #
-  # If you want to create your own Widget, you'll need to
-  # call some methods in here to register/unregister it
-  # to a Screen.
+  # When a Widget is created, it calls Screen#register with it's
+  # type and self pointer.
+  #
+  # That adds the widget pointer to an Array `@widget` that
+  # contains all the widgets inside this screen.
+  #
+  # During it's lifetime, most widgets would call only Screen#erase
+  # and Screen#refresh.
+  #
+  # When Widget#destroy is called, we call Screen#unregister to
+  # remove it from the `@widget` array.
+  #
+  # Now, what happens when the Ruby garbage collector kills the
+  # widget?
   #
   class Screen
-    attr_accessor :object_focus, :object_count, :object_limit, :object, :window
+    # Index of the current focused widget
+    attr_accessor :widget_focus
+
+    # How many widgets we currently have
+    attr_accessor :widget_count
+
+    # Maximum widget capacity of the screen (always expands)
+    attr_accessor :widget_limit
+
+    # Array with all the widgets currently on the screen
+    attr_accessor :widget
+
+    # Raw Ncurses window that represents this Screen
+    attr_accessor :window
+
+    # Nothing... for now
     attr_accessor :exit_status
 
     NOEXIT     = 0
@@ -47,7 +73,7 @@ module RNDK
 
       # If the user didn't start Ncurses for us,
       # we'll do it anyway.
-      if RNDK::ALL_SCREENS.size == 0 or ncurses_window.nil?
+      if RNDK::ALL_SCREENS.empty? or ncurses_window.nil?
 
         ## Why is this here?
         # Set up basic curses settings.
@@ -61,15 +87,26 @@ module RNDK
       end
 
       RNDK::ALL_SCREENS << self
-      @object_count = 0
-      @object_limit = 2
-      @object = Array.new(@object_limit, nil)
+      @widget_count = 0
+      @widget_limit = 2
+      @widget = Array.new(@widget_limit, nil)
       @window = ncurses_window
-      @object_focus = 0
+      @widget_focus = 0
     end
 
-    # Shuts down RNDK and Ncurses.
+    # Shuts down RNDK and Ncurses, plus destroying all the
+    # widgets ever created.
     def self.end_rndk
+
+      ## If I do this it gives me a segmentation fault.
+      ## I guess that would happen because of the
+      ## ruby garbage collector.
+      ##
+      ## What should I do instead?
+      #
+      # RNDK::ALL_WIDGETS.each { |obj| obj.destroy }
+      # RNDK::ALL_SCREENS.each { |scr| scr.destroy }
+
       Ncurses.echo
       Ncurses.nocbreak
       Ncurses.endwin
@@ -79,87 +116,62 @@ module RNDK
     #
     # @note This is called automatically when a widget is created.
     #
-    # `rndktype` states what RNDK Widget type this object is.
-    # `object` is a pointer to the Widget itself.
+    # * `rndktype` states what RNDK Widget type this widget is.
+    # * `widget` is a pointer to the Widget itself.
     #
-    def register(rndktype, object)
-      if @object_count + 1 >= @object_limit
-        @object_limit += 2
-        @object_limit *= 2
-        @object.concat Array.new(@object_limit - @object.size, nil)
+    def register(rndktype, widget)
+
+      # Expanding the limit by 2
+      if (@widget_count + 1) >= @widget_limit
+        @widget_limit += 2
+        @widget_limit *= 2
+        @widget.concat Array.new(@widget_limit - @widget.size, nil)
       end
 
-      if object.valid_widget_type?(rndktype)
-        self.setScreenIndex(@object_count, object)
-        @object_count += 1
+      if widget.valid_widget_type? rndktype
+        self.set_screen_index(@widget_count, widget)
+        @widget_count += 1
       end
     end
 
-    # Removes a Widget from the Screen.
+    # Removes a Widget from this Screen.
     #
     # @note This is called automatically when a widget is destroyed.
     #
-    # This does NOT destroy the object, it removes the Widget
+    # This does NOT destroy the widget, it removes the Widget
     # from any further refreshes by Screen#refresh.
     #
-    # `rndktype` states what RNDK Widget type this object is.
-    # `object` is a pointer to the Widget itself.
+    # `rndktype` states what RNDK Widget type this widget is.
+    # `widget` is a pointer to the Widget itself.
     #
-    def self.unregister(rndktype, object)
-      return if not (object.valid_widget_type?(rndktype) && object.screen_index >= 0)
+    def unregister(rndktype, widget)
+      return unless ((widget.valid_widget_type? rndktype) and (widget.screen_index >= 0))
 
-      screen = object.screen
-      return if screen.nil?
+      index = widget.screen_index
+      widget.screen_index = -1
 
-      index = object.screen_index
-      object.screen_index = -1
-
-      # Resequence the objects
-      (index...screen.object_count - 1).each do |x|
-        screen.setScreenIndex(x, screen.object[x+1])
+      # Resequence the widgets
+      (index...self.widget_count - 1).each do |x|
+        self.set_screen_index(x, self.widget[x+1])
       end
 
-      if screen.object_count <= 1
-        # if no more objects, remove the array
-        screen.object = []
-        screen.object_count = 0
-        screen.object_limit = 0
-      else
-        screen.object[screen.object_count] = nil
-        screen.object_count -= 1
+      if self.widget_count <= 1
+        # if no more widgets, remove the array
+        self.widget = []
+        self.widget_count = 0
+        self.widget_limit = 0
 
-        # Update the object-focus
-        if screen.object_focus == index
-          screen.object_focus -= 1
+      else
+        self.widget[self.widget_count] = nil
+        self.widget_count -= 1
+
+        # Update the widget-focus
+        if self.widget_focus == index
+          self.widget_focus -= 1
           Traverse.set_next_focus(screen)
 
-        elsif screen.object_focus > index
-          screen.object_focus -= 1
-        end
-      end
-    end
-
-    def setScreenIndex(number, obj)
-      obj.screen_index = number
-      obj.screen = self
-      @object[number] = obj
-    end
-
-    def validIndex(n)
-      n >= 0 && n < @object_count
-    end
-
-    def swapRNDKIndices(n1, n2)
-      if n1 != n2 && self.validIndex(n1) && self.validIndex(n2)
-        o1 = @object[n1]
-        o2 = @object[n2]
-        self.setScreenIndex(n1, o2)
-        self.setScreenIndex(n2, o1)
-
-        if @object_focus == n1
-          @object_focus = n2
-        elsif @object_focus == n2
-          @object_focus = n1
+        elsif self.widget_focus > index
+          self.widget_focus -= 1
         end
       end
     end
@@ -167,21 +179,21 @@ module RNDK
     # Raises the Widget to the top of the screen.
     # It will now overlap any other obstructing Widgets.
     #
-    # `rndktype` states what RNDK Widget type this object is.
-    # `object` is a pointer to the Widget itself.
+    # `rndktype` states what RNDK Widget type this widget is.
+    # `widget` is a pointer to the Widget itself.
     #
-    def self.raise_widget(rndktype, object)
-      if object.valid_widget_type?(rndktype)
-        screen = object.screen
-        screen.swapRNDKIndices(object.screen_index, screen.object_count - 1)
-      end
+    def self.raise_widget(rndktype, widget)
+      return unless  widget.valid_widget_type? rndktype
+
+      screen = widget.screen
+      screen.swap_indexes(widget.screen_index, screen.widget_count - 1)
     end
 
     # Has the opposite effect of #raise_widget.
-    def self.lower_widget(rndktype, object)
-      if object.valid_widget_type?(rndktype)
-        object.screen.swapRNDKIndices(object.screen_index, 0)
-      end
+    def self.lower_widget(rndktype, widget)
+      return unless widget.valid_widget_type? rndktype
+
+      widget.screen.swap_indexes(widget.screen_index, 0)
     end
 
     # Redraws all Widgets inside this Screen.
@@ -196,12 +208,12 @@ module RNDK
 
       RNDK.window_refresh(@window)
 
-      # We erase all the invisible objects, then only draw it all back, so
-      # that the objects can overlap, and the visible ones will always be
+      # We erase all the invisible widgets, then only draw it all back, so
+      # that the widgets can overlap, and the visible ones will always be
       # drawn after all the invisible ones are erased
-      (0...@object_count).each do |x|
-        obj = @object[x]
-        if obj.valid_widget_type?(obj.object_type)
+      (0...@widget_count).each do |x|
+        obj = @widget[x]
+        if obj.valid_widget_type?(obj.widget_type)
           if obj.is_visible
             if visible < 0
               visible = x
@@ -215,10 +227,10 @@ module RNDK
         end
       end
 
-      (0...@object_count).each do |x|
-        obj = @object[x]
+      (0...@widget_count).each do |x|
+        obj = @widget[x]
 
-        if obj.valid_widget_type?(obj.object_type)
+        if obj.valid_widget_type?(obj.widget_type)
           obj.has_focus = (x == focused)
 
           if obj.is_visible
@@ -234,33 +246,63 @@ module RNDK
     #       characters on the terminal screen.
     #       This does NOT destroy any widgets.
     def erase
-      (0...@object_count).each do |x|
-        obj = @object[x]
-        obj.erase if obj.valid_widget_type? obj.object_type
+      (0...@widget_count).each do |x|
+        obj = @widget[x]
+        obj.erase if obj.valid_widget_type? obj.widget_type
       end
       Ncurses.wrefresh(@window)
     end
 
     # Destroys all the Widgets inside this Screen.
     def destroy_widgets
-      (0...@object_count).each do |x|
-        obj    = @object[x]
-        before = @object_count
+      (0...@widget_count).each do |x|
+        obj    = @widget[x]
+        before = @widget_count
 
-        if obj.valid_widget_type?(obj.object_type)
+        if obj.valid_widget_type?(obj.widget_type)
           obj.erase
           obj.destroy
-          x -= (@object_count - before)
+          x -= (@widget_count - before)
         end
       end
     end
 
     # Destroys this Screen.
+    #
     # @note It does nothing to the widgets inside it.
     #       You must either destroy them separatedly
     #       or call #destroy_widgets before.
     def destroy
       RNDK::ALL_SCREENS.delete self
+    end
+
+    protected
+
+    def set_screen_index(number, obj)
+      obj.screen_index = number
+      obj.screen = self
+      @widget[number] = obj
+    end
+
+    def valid_index? n
+      (n >= 0) and (n < @widget_count)
+    end
+
+    # Swap positions of widgets with indexes `n1` and `n2`.
+    def swap_indexes(n1, n2)
+      return unless (n1 != n2) and (self.valid_index? n1) and (self.valid_index? n2)
+
+      o1 = @widget[n1]
+      o2 = @widget[n2]
+      self.set_screen_index(n1, o2)
+      self.set_screen_index(n2, o1)
+
+      if @widget_focus == n1
+        @widget_focus = n2
+
+      elsif @widget_focus == n2
+        @widget_focus = n1
+      end
     end
 
   end

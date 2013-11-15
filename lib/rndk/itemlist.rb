@@ -312,7 +312,7 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:ITEMLIST)
 
-      RNDK::Screen.unregister(:ITEMLIST, self)
+      @screen.unregister(:ITEMLIST, self)
     end
 
     # This sets multiple attributes of the widget.
@@ -467,7 +467,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :ITEMLIST
     end
   end

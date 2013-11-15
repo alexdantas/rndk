@@ -54,7 +54,7 @@ module RNDK
       '%g%c'
     end
 
-    def object_type
+    def widget_type
       :FSCALE
     end
   end

@@ -260,8 +260,8 @@ module RNDK
       # Clean the key bindings
       self.clean_bindings(:DIALOG)
 
-      # Unregister this object
-      RNDK::Screen.unregister(:DIALOG, self)
+      # Unregister this widget
+      @screen.unregister(:DIALOG, self)
     end
 
     # This function erases the dialog widget from the screen.
@@ -352,7 +352,7 @@ module RNDK
       self.draw @box
     end
 
-    def object_type
+    def widget_type
       :DIALOG
     end
 

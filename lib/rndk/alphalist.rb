@@ -170,7 +170,7 @@ module RNDK
       @entry_field.setLRchar Ncurses::ACS_RTEE
 
       # Callback functions
-      adjust_alphalist_cb = lambda do |object_type, object, alphalist, key|
+      adjust_alphalist_cb = lambda do |widget_type, widget, alphalist, key|
         scrollp = alphalist.scroll_field
         entry   = alphalist.entry_field
 
@@ -189,7 +189,7 @@ module RNDK
         false
       end
 
-      complete_word_cb = lambda do |object_type, object, alphalist, key|
+      complete_word_cb = lambda do |widget_type, widget, alphalist, key|
         entry = alphalist.entry_field
         scrollp = nil
         selected = -1
@@ -288,7 +288,7 @@ module RNDK
         true
       end
 
-      pre_process_entry_field = lambda do |rndktype, object, alphalist, input|
+      pre_process_entry_field = lambda do |rndktype, widget, alphalist, input|
         scrollp = alphalist.scroll_field
         entry = alphalist.entry_field
         info_len = entry.info.size
@@ -617,8 +617,8 @@ module RNDK
       RNDK.window_delete(@shadow_win)
       RNDK.window_delete(@win)
 
-      # Unregister the object.
-      RNDK::Screen.unregister(:alphalist, self)
+      # Unregister the widget.
+      @screen.unregister(:alphalist, self)
     end
 
     # This function sets the pre-process function.
@@ -673,7 +673,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :alphalist
     end
   end

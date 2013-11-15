@@ -521,8 +521,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:MEntry)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:MEntry, self)
+      # Unregister this widget.
+      @screen.unregister(:MEntry, self)
     end
 
     # This sets multiple attributes of the widget.
@@ -612,7 +612,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :MEntry
     end
   end

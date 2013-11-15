@@ -210,7 +210,7 @@ module RNDK
       self
     end
 
-    def object_type
+    def widget_type
       :scroll
     end
 
@@ -372,8 +372,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:scroll)
 
-      # Unregister this object
-      RNDK::Screen.unregister(:scroll, self)
+      # Unregister this widget
+      @screen.unregister(:scroll, self)
     end
 
     # This function erases the scrolling list from the screen.

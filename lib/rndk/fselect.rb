@@ -116,7 +116,7 @@ module RNDK
 
       # This is a callback to the scrolling list which displays information
       # about the current file.  (and the whole directory as well)
-      display_file_info_cb = lambda do |object_type, entry, fselect, key|
+      display_file_info_cb = lambda do |widget_type, entry, fselect, key|
         # Get the file name.
         filename = fselect.entry_field.info
 
@@ -178,7 +178,7 @@ module RNDK
       end
 
       # This tries to complete the filename
-      complete_filename_cb = lambda do |object_type, object, fselect, key|
+      complete_filename_cb = lambda do |widget_type, widget, fselect, key|
         scrollp = fselect.scroll_field
         entry = fselect.entry_field
         filename = entry.info.clone
@@ -298,7 +298,7 @@ module RNDK
       end
 
       # This allows the user to delete a file.
-      delete_file_cb = lambda do |object_type, fscroll, fselect|
+      delete_file_cb = lambda do |widget_type, fscroll, fselect|
         buttons = ['No', 'Yes']
 
         # Get the filename which is to be deleted.
@@ -342,7 +342,7 @@ module RNDK
       end
 
       # Start of callback functions.
-      adjust_scroll_cb = lambda do |object_type, object, fselect, key|
+      adjust_scroll_cb = lambda do |widget_type, widget, fselect, key|
         scrollp = fselect.scroll_field
         entry = fselect.entry_field
 
@@ -867,7 +867,7 @@ module RNDK
     def destroy
       self.clean_bindings(:FSELECT)
 
-      # Destroy the other RNDK objects
+      # Destroy the other RNDK widgets
       @scroll_field.destroy
       @entry_field.destroy
 
@@ -876,8 +876,8 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      # Unregister the object.
-      RNDK::Screen.unregister(:FSELECT, self)
+      # Unregister the widget.
+      @screen.unregister(:FSELECT, self)
     end
 
     # Currently a wrapper for File.expand_path
@@ -956,7 +956,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :FSELECT
     end
   end

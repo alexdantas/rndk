@@ -323,7 +323,7 @@ module RNDK
 
       self.clean_bindings(:BUTTONBOX)
 
-      RNDK::Screen.unregister(:BUTTONBOX, self)
+      @screen.unregister(:BUTTONBOX, self)
     end
 
     def setCurrentButton(button)
@@ -348,7 +348,7 @@ module RNDK
       self.draw(@box)
     end
 
-    def object_type
+    def widget_type
       :BUTTONBOX
     end
 

@@ -559,7 +559,7 @@ module RNDK
 
       self.clean_bindings(:entry)
 
-      RNDK::Screen.unregister(:entry, self)
+      @screen.unregister(:entry, self)
     end
 
     # Sets multiple attributes of the Widget.
@@ -669,7 +669,7 @@ module RNDK
       super @win
     end
 
-    def object_type
+    def widget_type
       :entry
     end
 

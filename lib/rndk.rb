@@ -87,8 +87,11 @@ module RNDK
   KEY_RETURN = "\012".ord
   KEY_TAB    = "\t".ord
 
+  # All the screens eventually created.
   ALL_SCREENS = []
-  ALL_OBJECTS = []
+
+  # All the widgets eventually created.
+  ALL_WIDGETS = []
 
   # Beeps then flushes the stdout stream.
   #

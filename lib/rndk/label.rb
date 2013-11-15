@@ -165,7 +165,7 @@ module RNDK
       return @info
     end
 
-    def object_type
+    def widget_type
       :label
     end
 
@@ -217,7 +217,7 @@ module RNDK
 
       self.clean_bindings :label
 
-      RNDK::Screen.unregister(:label, self)
+      @screen.unregister(:label, self)
     end
 
     # Waits for the user to press a key.

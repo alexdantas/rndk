@@ -25,19 +25,19 @@ module RNDK
       reset(obj.screen)
     end
 
-    # Returns the object on which the focus lies.
+    # Returns the widget on which the focus lies.
     def Traverse.get_current_focus(screen)
       result = nil
-      n = screen.object_focus
+      n = screen.widget_focus
 
-      if n >= 0 && n < screen.object_count
-        result = screen.object[n]
+      if n >= 0 && n < screen.widget_count
+        result = screen.widget[n]
       end
 
       return result
     end
 
-    # Set focus to the next object, returning it.
+    # Set focus to the next widget, returning it.
     def Traverse.set_next_focus(screen)
       result = nil
       curobj = nil
@@ -46,10 +46,10 @@ module RNDK
 
       while true
         n+= 1
-        if n >= screen.object_count
+        if n >= screen.widget_count
           n = 0
         end
-        curobj = screen.object[n]
+        curobj = screen.widget[n]
         if !(curobj.nil?) && curobj.accepts_focus
           result = curobj
           break
@@ -64,7 +64,7 @@ module RNDK
       return result
     end
 
-    # Set focus to the previous object, returning it.
+    # Set focus to the previous widget, returning it.
     def Traverse.set_previous_focus(screen)
       result = nil
       curobj = nil
@@ -74,9 +74,9 @@ module RNDK
       while true
         n -= 1
         if n < 0
-          n = screen.object_count - 1
+          n = screen.widget_count - 1
         end
-        curobj = screen.object[n]
+        curobj = screen.widget[n]
         if !(curobj.nil?) && curobj.accepts_focus
           result = curobj
           break
@@ -89,8 +89,8 @@ module RNDK
       return result
     end
 
-    # Set focus to a specific object, returning it.
-    # If the object cannot be found, return nil.
+    # Set focus to a specific widget, returning it.
+    # If the widget cannot be found, return nil.
     def Traverse.set_current_focus(screen, newobj)
       result = nil
       curobj = nil
@@ -99,11 +99,11 @@ module RNDK
 
       while true
         n += 1
-        if n >= screen.object_count
+        if n >= screen.widget_count
           n = 0
         end
 
-        curobj = screen.object[n]
+        curobj = screen.widget[n]
         if curobj == newobj
           result = curobj
           break
@@ -116,13 +116,13 @@ module RNDK
       return result
     end
 
-    # Set focus to the first object in the screen.
+    # Set focus to the first widget in the screen.
     def Traverse.set_first_focus(screen)
-      setFocusIndex(screen, screen.object_count - 1)
+      setFocusIndex(screen, screen.widget_count - 1)
       return switchFocus(set_next_focus(screen), nil)
     end
 
-    # Set focus to the last object in the screen.
+    # Set focus to the last widget in the screen.
     def Traverse.set_last_focus(screen)
       setFocusIndex(screen, 0)
       return switchFocus(set_previous_focus(screen), nil)
@@ -164,9 +164,9 @@ module RNDK
         if !(func_menu_key.nil?) &&
             (func_menu_key.call(key_code, function_key))
           # find and enable drop down menu
-          screen.object.each do |object|
-            if !(object.nil?) && object.object_type == :MENU
-              Traverse.handleMenu(screen, object, curobj)
+          screen.widget.each do |widget|
+            if !(widget.nil?) && widget.widget_type == :MENU
+              Traverse.handleMenu(screen, widget, curobj)
             end
           end
 
@@ -212,7 +212,7 @@ module RNDK
     private
 
     def Traverse.limitFocusIndex(screen, value)
-      if value >= screen.object_count || value < 0
+      if value >= screen.widget_count || value < 0
         0
       else
         value
@@ -220,11 +220,11 @@ module RNDK
     end
 
     def Traverse.getFocusIndex(screen)
-      return limitFocusIndex(screen, screen.object_focus)
+      return limitFocusIndex(screen, screen.widget_focus)
     end
 
     def Traverse.setFocusIndex(screen, value)
-      screen.object_focus = limitFocusIndex(screen, value)
+      screen.widget_focus = limitFocusIndex(screen, value)
     end
 
     def Traverse.unsetFocus(obj)
@@ -283,18 +283,18 @@ module RNDK
 
     # Save data in widgets on a screen
     def Traverse.saveDataRNDKScreen(screen)
-      screen.object.each do |object|
-        unless object.nil?
-          object.saveData
+      screen.widget.each do |widget|
+        unless widget.nil?
+          widget.saveData
         end
       end
     end
 
     # Refresh data in widgets on a screen
     def Traverse.refreshDataRNDKScreen(screen)
-      screen.object.each do |object|
-        unless object.nil?
-          object.refreshData
+      screen.widget.each do |widget|
+        unless widget.nil?
+          widget.refreshData
         end
       end
     end

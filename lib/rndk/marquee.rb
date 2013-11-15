@@ -164,8 +164,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:MARQUEE)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:MARQUEE, self)
+      # Unregister this widget.
+      @screen.unregister(:MARQUEE, self)
     end
 
     # This erases the widget.
@@ -186,7 +186,7 @@ module RNDK
       self.layoutWidget(xpos, ypos)
     end
 
-    def object_type
+    def widget_type
       :MARQUEE
     end
 

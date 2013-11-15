@@ -130,10 +130,10 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(self.object_type, from, :getc, to)
+        self.bind(self.widget_type, from, :getc, to)
       end
 
-      rndkscreen.register(self.object_type, self)
+      rndkscreen.register(self.widget_type, self)
     end
 
     # This allows the person to use the widget's data field.
@@ -303,14 +303,14 @@ module RNDK
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
         # Call the pre-process function.
-        pp_return = @pre_process_func.call(self.object_type, self,
+        pp_return = @pre_process_func.call(self.widget_type, self,
             @pre_process_data, input)
       end
 
       # Should we continue?
       if pp_return
         # Check for a key bindings.
-        if self.checkBind(self.object_type, input)
+        if self.checkBind(self.widget_type, input)
           complete = true
         else
           case input
@@ -370,7 +370,7 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func).nil?
-          @post_process_func.call(self.object_type, self,
+          @post_process_func.call(self.widget_type, self,
               @post_process_data, input)
         end
       end
@@ -459,10 +459,10 @@ module RNDK
       RNDK.window_delete @win
 
       # Clean the key bindings.
-      self.clean_bindings(self.object_type)
+      self.clean_bindings(self.widget_type)
 
-      # Unregister this object
-      RNDK::Screen.unregister(self.object_type, self)
+      # Unregister this widget
+      @screen.unregister(self.widget_type, self)
     end
 
     # This function erases the widget from the screen.
@@ -531,7 +531,7 @@ module RNDK
       '%d%c'
     end
 
-    def object_type
+    def widget_type
       :SCALE
     end
   end

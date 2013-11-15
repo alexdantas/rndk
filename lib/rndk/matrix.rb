@@ -894,8 +894,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:MATRIX)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:MATRIX, self)
+      # Unregister this widget.
+      @screen.unregister(:MATRIX, self)
     end
 
     # This function erases the matrix widget from the screen.
@@ -1182,7 +1182,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :MATRIX
     end
   end

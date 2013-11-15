@@ -71,12 +71,12 @@ module RNDK
       end
     end
 
-    # Draw a box around the given window using the object's defined
+    # Draw a box around the given window using the widget's defined
     # line-drawing characters
-    def Draw.drawObjBox(win, object)
+    def Draw.drawObjBox(win, widget)
       Draw.attrbox(win,
-          object.ULChar, object.URChar, object.LLChar, object.LRChar,
-          object.HZChar, object.VTChar, object.BXAttr)
+          widget.ULChar, widget.URChar, widget.LLChar, widget.LRChar,
+          widget.HZChar, widget.VTChar, widget.BXAttr)
     end
 
     # This draws a line on the given window. (odd angle lines not working yet)

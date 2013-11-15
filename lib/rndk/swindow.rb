@@ -524,8 +524,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:swindow)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:swindow, self)
+      # Unregister this widget.
+      @screen.unregister(:swindow, self)
     end
 
     # This function erases the scrolling window widget.
@@ -759,7 +759,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :swindow
     end
   end

@@ -379,8 +379,8 @@ module RNDK
       # Clean up the key bindings
       self.clean_bindings(:SELECTION)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:SELECTION, self)
+      # Unregister this widget.
+      @screen.unregister(:SELECTION, self)
     end
 
     # This function erases the selection list from the screen.
@@ -623,7 +623,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :SELECTION
     end
   end

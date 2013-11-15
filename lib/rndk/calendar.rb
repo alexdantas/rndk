@@ -586,7 +586,7 @@ module RNDK
 
       self.clean_bindings :calendar
 
-      RNDK::Screen.unregister(:calendar, self)
+      @screen.unregister(:calendar, self)
     end
 
     # Sets a marker on a specific date.
@@ -835,7 +835,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :calendar
     end
 

@@ -697,18 +697,17 @@ module RNDK
     # This function destroys the viewer widget.
     def destroy
       self.destroyInfo
-
       self.cleanTitle
 
       # Clean up the windows.
-      RNDK.window_delete(@shadow_win)
-      RNDK.window_delete(@win)
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
 
       # Clean the key bindings.
       self.clean_bindings(:VIEWER)
 
-      # Unregister this object.
-      RNDK::Screen.unregister(:VIEWER, self)
+      # Unregister this widget.
+      @screen.unregister(:VIEWER, self)
     end
 
     # This function erases the viewer widget from the screen.
@@ -821,7 +820,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :VIEWER
     end
   end

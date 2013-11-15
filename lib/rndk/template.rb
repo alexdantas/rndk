@@ -408,7 +408,7 @@ module RNDK
     def drawField
       field_color = 0
 
-      # Draw in the label and the template object.
+      # Draw in the label and the template widget.
       unless @label_win.nil?
         Draw.writeChtype(@label_win, 0, 0, @label, RNDK::HORIZONTAL,
             0, @label_len)
@@ -469,7 +469,7 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:TEMPLATE)
 
-      RNDK::Screen.unregister(:TEMPLATE, self)
+      @screen.unregister(:TEMPLATE, self)
     end
 
     # Erase the widget.
@@ -553,7 +553,7 @@ module RNDK
       super(@win)
     end
 
-    def object_type
+    def widget_type
       :TEMPLATE
     end
   end

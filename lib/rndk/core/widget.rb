@@ -15,7 +15,7 @@ module RNDK
       @has_focus  = true
       @is_visible = true
 
-      RNDK::ALL_OBJECTS << self
+      RNDK::ALL_WIDGETS << self
 
       # set default line-drawing characters
       @ULChar = Ncurses::ACS_ULCORNER
@@ -68,7 +68,7 @@ module RNDK
       @post_process_func = block
     end
 
-    def object_type
+    def widget_type
       # no type by default
       :NULL
     end
@@ -200,37 +200,37 @@ module RNDK
     def destroy
     end
 
-    # Set the object's upper-left-corner line-drawing character.
+    # Set the widget's upper-left-corner line-drawing character.
     def setULchar(ch)
       @ULChar = ch
     end
 
-    # Set the object's upper-right-corner line-drawing character.
+    # Set the widget's upper-right-corner line-drawing character.
     def setURchar(ch)
       @URChar = ch
     end
 
-    # Set the object's lower-left-corner line-drawing character.
+    # Set the widget's lower-left-corner line-drawing character.
     def setLLchar(ch)
       @LLChar = ch
     end
 
-    # Set the object's upper-right-corner line-drawing character.
+    # Set the widget's upper-right-corner line-drawing character.
     def setLRchar(ch)
       @LRChar = ch
     end
 
-    # Set the object's horizontal line-drawing character
+    # Set the widget's horizontal line-drawing character
     def setHZchar(ch)
       @HZChar = ch
     end
 
-    # Set the object's vertical line-drawing character
+    # Set the widget's vertical line-drawing character
     def setVTchar(ch)
       @VTChar = ch
     end
 
-    # Set the object's box-attributes.
+    # Set the widget's box-attributes.
     def setBXattr(ch)
       @BXAttr = ch
     end
@@ -279,19 +279,6 @@ module RNDK
       end
     end
 
-    def valid_widget?
-      return false unless RNDK::ALL_OBJECTS.include? self
-
-      self.valid_widget_type? self.object_type
-    end
-
-    # FIXME Dummy function
-    # TODO Figure out what to do with it
-    def valid_widget_type? type
-      # dummy version for now
-      true
-    end
-
     # FIXME TODO What does `function_key` does?
     def getch(function_key=[])
       key = self.getc
@@ -300,10 +287,10 @@ module RNDK
       key
     end
 
-    def bindableObject(rndktype)
-      if rndktype != self.object_type
+    def bindableWidget(rndktype)
+      if rndktype != self.widget_type
         return nil
-      elsif [:FSELECT, :alphalist].include?(self.object_type)
+      elsif [:FSELECT, :alphalist].include?(self.widget_type)
         return @entry_field
       else
         return self
@@ -311,7 +298,7 @@ module RNDK
     end
 
     def bind(type, key, function, data)
-      obj = self.bindableObject(type)
+      obj = self.bindableWidget(type)
       if key.ord < Ncurses::KEY_MAX && !(obj.nil?)
         if key.ord != 0
           obj.binding_list[key.ord] = [function, data]
@@ -320,14 +307,14 @@ module RNDK
     end
 
     def unbind(type, key)
-      obj = self.bindableObject(type)
+      obj = self.bindableWidget(type)
       unless obj.nil?
         obj.binding_list.delete(key)
       end
     end
 
     def clean_bindings(type)
-      obj = self.bindableObject(type)
+      obj = self.bindableWidget(type)
       if !(obj.nil?) && !(obj.binding_list.nil?)
         obj.binding_list.clear
       end
@@ -338,7 +325,7 @@ module RNDK
     # If it doesn't it returns a false.  This way we can 'overwrite' coded
     # bindings.
     def checkBind(type, key)
-      obj = self.bindableObject(type)
+      obj = self.bindableWidget(type)
       if !(obj.nil?) && obj.binding_list.include?(key)
         function = obj.binding_list[key][0]
         data = obj.binding_list[key][1]
@@ -355,7 +342,7 @@ module RNDK
     # Checks to see if the binding for the key exists.
     def isBind(type, key)
       result = false
-      obj = self.bindableObject(type)
+      obj = self.bindableWidget(type)
       unless obj.nil?
         result = obj.binding_list.include?(key)
       end
@@ -493,6 +480,44 @@ module RNDK
       end
     end
 
+    # Tells if a widget is valid.
+    def valid_widget?
+      return false unless RNDK::ALL_WIDGETS.include? self
+
+      self.valid_widget_type? self.widget_type
+    end
+
+    # Tells if `type` is the type of an existing Widget.
+    def valid_widget_type? type
+      [:GRAPH,
+       :HISTOGRAM,
+       :label,
+       :MARQUEE,
+       :VIEWER,
+       :alphalist,
+       :BUTTON,
+       :BUTTONBOX,
+       :calendar,
+       :DIALOG,
+       :DSCALE,
+       :entry,
+       :FSCALE,
+       :FSELECT,
+       :FSLIDER,
+       :ITEMLIST,
+       :MATRIX,
+       :MEntry,
+       :RADIO,
+       :SCALE,
+       :scroll,
+       :SELECTION,
+       :slider,
+       :swindow,
+       :TEMPLATE,
+       :USCALE,
+       :USLIDER].include? type
+    end
+
     protected
 
     # Actually moves the widget.
@@ -541,8 +566,8 @@ module RNDK
     # Gets a raw character from internal Ncurses window
     # and returns the result, capped to sane values.
     def getc
-      rndktype = self.object_type
-      test   = self.bindableObject rndktype
+      rndktype = self.widget_type
+      test   = self.bindableWidget rndktype
       result = Ncurses.wgetch @input_window
 
       if (result >= 0) and

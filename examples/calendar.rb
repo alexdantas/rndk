@@ -41,14 +41,14 @@ begin
   # They must be lambdas.
 
   # This adds a marker ot the calendar.
-  create_calendar_mark = lambda do |object_type, calendar, client_data, key|
+  create_calendar_mark = lambda do |widget_type, calendar, client_data, key|
     calendar.setMarker(calendar.day, calendar.month, calendar.year)
     calendar.draw(calendar.box)
     return false
   end
 
   # This removes a marker from the calendar.
-  remove_calendar_mark = lambda do |object_type, calendar, client_data, key|
+  remove_calendar_mark = lambda do |widget_type, calendar, client_data, key|
     calendar.removeMarker(calendar.day, calendar.month, calendar.year)
     calendar.draw(calendar.box)
     return false

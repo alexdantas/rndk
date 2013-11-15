@@ -394,8 +394,8 @@ module RNDK
       # Clean the key bindings.
       self.clean_bindings(:MENU)
 
-      # Unregister the object
-      RNDK::Screen.unregister(:MENU, self)
+      # Unregister the widget
+      @screen.unregister(:MENU, self)
     end
 
     # Erase the menu widget from the screen.
@@ -471,7 +471,7 @@ module RNDK
       return within
     end
 
-    def object_type
+    def widget_type
       :MENU
     end
   end
