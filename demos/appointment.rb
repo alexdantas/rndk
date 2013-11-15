@@ -148,7 +148,7 @@ class Appointment
       ]
 
       # Create the itemlist widget.
-      itemlist = RNDK::ITEMLIST.new(calendar.screen,
+      itemlist = RNDK::Itemlist.new(calendar.screen,
                                     RNDK::CENTER,
                                     RNDK::CENTER,
                                     '',

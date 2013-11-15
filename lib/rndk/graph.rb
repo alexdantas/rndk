@@ -1,18 +1,22 @@
 require 'rndk'
 
 module RNDK
-  class GRAPH < Widget
+
+  # TODO Fix how this widget is displayed onscreen.
+  class Graph < Widget
+
     def initialize(screen, config={})
       super()
-      @widget_type = :GRAPH
+      @widget_type = :graph
 
       x      = 0
       y      = 0
       width  = 0
       height = 0
-      title  = "graph"
+      title  = "  graph"  # MUST HAVE TWO SPACES BECAUSE OF FUCK
       xtitle = "x"
       ytitle = "y"
+      box    = true
 
       config.each do |key, val|
         x      = val if key == :x
@@ -22,6 +26,7 @@ module RNDK
         title  = val if key == :title
         xtitle = val if key == :xtitle
         ytitle = val if key == :ytitle
+        box    = val if key == :box
       end
 
       parent_width = Ncurses.getmaxx screen.window
@@ -55,6 +60,7 @@ module RNDK
       @yscale = 0
       @count = 0
       @display_type = :LINE
+      @box = box
 
       if @win.nil?
         self.destroy
@@ -97,7 +103,7 @@ module RNDK
       @graph_char = 0
       @values = []
 
-      screen.register(:GRAPH, self)
+      screen.register(@widget_type, self)
     end
 
     # This was added for the builder.
@@ -106,8 +112,8 @@ module RNDK
     end
 
     # Set multiple attributes of the widget
-    def set(values, count, graph_char, start_at_zero, display_type)
-      ret = self.setValues(values, count, start_at_zero)
+    def set(values, graph_char, start_at_zero, display_type)
+      ret = self.set_values(values, start_at_zero)
       self.setCharacters(graph_char)
       self.setDisplayType(display_type)
       return ret
@@ -127,7 +133,9 @@ module RNDK
     end
 
     # Set the values of the graph.
-    def setValues(values, count, start_at_zero)
+    def set_values(values, start_at_zero)
+      count = values.size
+
       min = 2**30
       max = -2**30
 
@@ -287,12 +295,12 @@ module RNDK
 
       # Reraw the windowk if they asked for it
       if refresh_flag
-        self.draw(@box)
+        self.draw @box
       end
     end
 
-    # Draw the grpah widget
-    def draw(box)
+    # Draw the graph widget
+    def draw box
       adj = 2 + (if @xtitle.nil? || @xtitle.size == 0 then 0 else 1 end)
       spacing = 0
       attrib = ' '.ord | Ncurses::A_REVERSE

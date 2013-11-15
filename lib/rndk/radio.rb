@@ -1,10 +1,12 @@
 require 'rndk/scroller'
 
 module RNDK
-  class RADIO < SCROLLER
+
+  class Radio < SCROLLER
+
     def initialize(screen, config={})
       super()
-      @widget_type = :RADIO
+      @widget_type = :radio
 
       x           = 0
       y           = 0
@@ -12,9 +14,9 @@ module RNDK
       width       = 0
       height      = 0
       title       = "radio"
-      list        = []
+      items        = []
       choice_char = '#'.ord | Ncurses::A_REVERSE
-      def_item    = 0
+      default    = 0
       highlight   = Ncurses::A_REVERSE
       box         = true
       shadow      = false
@@ -26,15 +28,15 @@ module RNDK
         width       = val if key == :width
         height      = val if key == :height
         title       = val if key == :title
-        list        = val if key == :list
+        items       = val if key == :items
         choice_char = val if key == :choice_char
-        def_item    = val if key == :def_item
+        default     = val if key == :default
         highlight   = val if key == :highlight
         box         = val if key == :box
         shadow      = val if key == :shadow
       end
 
-      list_size    = list.size
+      items_size = items.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = width
@@ -65,7 +67,7 @@ module RNDK
 
       # Set the box height.
       if @title_lines > box_height
-        box_height = @title_lines + [list_size, 8].min + 2 * @border_size
+        box_height = @title_lines + [items_size, 8].min + 2 * @border_size
       end
 
       # Adjust the box width if there is a scroll bar.
@@ -80,13 +82,13 @@ module RNDK
       @box_width = [box_width, parent_width].min
       @box_height = [box_height, parent_height].min
 
-      self.setViewSize(list_size)
+      self.set_view_size(items_size)
 
       # Each item in the needs to be converted to chtype array
-      widest_item = self.createList(list, list_size, @box_width)
+      widest_item = self.create_items(items, @box_width)
       if widest_item > 0
         self.updateViewWidth(widest_item)
-      elsif list_size > 0
+      elsif items_size > 0
         self.destroy
         return nil
       end
@@ -112,10 +114,10 @@ module RNDK
 
       # Create the scrollbar window.
       if splace == RNDK::RIGHT
-        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.max_view_size, 1,
             self.Screen_YPOS(ypos), xpos + @box_width - @border_size - 1)
       elsif splace == RNDK::LEFT
-        @scrollbar_win = Ncurses.subwin(@win, self.maxViewSize, 1,
+        @scrollbar_win = Ncurses.subwin(@win, self.max_view_size, 1,
             self.Screen_YPOS(ypos), self.Screen_XPOS(xpos))
       else
         @scrollbar_win = nil
@@ -132,12 +134,12 @@ module RNDK
       @choice_char = choice_char.ord
       @left_box_char = '['.ord
       @right_box_char = ']'.ord
-      @def_item = def_item
+      @default = default
       @input_window = @win
       @accepts_focus = true
       @shadow = shadow
 
-      self.setCurrentItem(0)
+      self.set_current_item(0)
 
       # Do we need to create the shadow?
       if shadow
@@ -150,7 +152,7 @@ module RNDK
         self.bind(from, :getc, to)
       end
 
-      screen.register(:RADIO, self)
+      screen.register(@widget_type, self)
     end
 
     # Put the cursor on the currently-selected item.
@@ -165,7 +167,7 @@ module RNDK
 
     # This actually manages the radio widget.
     def activate(actions=[])
-      # Draw the radio list.
+      # Draw the radio items.
       self.draw(@box)
 
       if actions.nil? || actions.size == 0
@@ -202,13 +204,13 @@ module RNDK
       # Set the exit type
       self.set_exit_type(0)
 
-      # Draw the widget list
-      self.drawList(@box)
+      # Draw the widget items
+      self.drawItems(@box)
 
       # Check if there is a pre-process function to be called
       unless @pre_process_func.nil?
         # Call the pre-process function.
-        pp_return = @pre_process_func.call(:RADIO, self,
+        pp_return = @pre_process_func.call(@widget_type, self,
             @pre_process_data, input)
       end
 
@@ -260,12 +262,12 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:RADIO, self, @post_process_data, input)
+          @post_process_func.call(@widget_type, self, @post_process_data, input)
         end
       end
 
       if !complete
-        self.drawList(@box)
+        self.drawItems(@box)
         self.set_exit_type(0)
       end
 
@@ -290,19 +292,19 @@ module RNDK
 
       self.draw_title(@win)
 
-      # Draw in the radio list.
-      self.drawList(@box)
+      # Draw in the radio items.
+      self.drawItems(@box)
     end
 
-    # This redraws the radio list.
-    def drawList(box)
+    # This redraws the radio items.
+    def drawItems(box)
       scrollbar_adj = if @scrollbar_placement == RNDK::LEFT then 1 else 0 end
       screen_pos = 0
 
-      # Draw the list
+      # Draw the items
       (0...@view_size).each do |j|
         k = j + @current_top
-        if k < @list_size
+        if k < @items_size
           xpos = self.Screen_XPOS(0)
           ypos = self.Screen_YPOS(j)
 
@@ -331,7 +333,7 @@ module RNDK
       # Highlight the current item
       if @has_focus
         k = @current_item
-        if k < @list_size
+        if k < @items_size
           screen_pos = self.ScreenPOS(k, scrollbar_adj)
           ypos = self.Screen_YPOS(@current_high)
 
@@ -403,19 +405,17 @@ module RNDK
       end
     end
 
-    # This sets various attributes of the radio list.
+    # This sets various attributes of the radio items.
     def set(highlight, choice_char, box)
       self.set_highlight(highlight)
       self.setChoiceCHaracter(choice_char)
       self.set_box(box)
     end
 
-    # This sets the radio list items.
-    def setItems(list, list_size)
-      widest_item = self.createList(list, list_size, @box_width)
-      if widest_item <= 0
-        return
-      end
+    # This sets the radio items items.
+    def set_items(items)
+      widest_item = self.create_items(items, @box_width)
+      return if widest_item <= 0
 
       # Clean up the display.
       (0...@view_size).each do |j|
@@ -423,23 +423,23 @@ module RNDK
             RNDK::HORIZONTAL, 0, @box_width - @border_size)
       end
 
-      self.setViewSize(list_size)
+      self.set_view_size(items_size)
 
-      self.setCurrentItem(0)
+      self.set_current_item(0)
       @left_char = 0
       @selected_item = 0
 
       self.updateViewWidth(widest_item)
     end
 
-    def getItems(list)
-      (0...@list_size).each do |j|
-        list << RNDK.chtype2Char(@item[j])
+    def getItems(items)
+      (0...@items_size).each do |j|
+        items << RNDK.chtype2Char(@item[j])
       end
-      return @list_size
+      return @items_size
     end
 
-    # This sets the highlight bar of the radio list.
+    # This sets the highlight bar of the radio items.
     def set_highlight(highlight)
       @highlight = highlight
     end
@@ -448,7 +448,7 @@ module RNDK
       return @highlight
     end
 
-    # This sets the character to use when selecting na item in the list.
+    # This sets the character to use when selecting na item in the items.
     def setChoiceCharacter(character)
       @choice_char = character
     end
@@ -458,7 +458,7 @@ module RNDK
     end
 
     # This sets the character to use to drw the left side of the choice box
-    # on the list
+    # on the items
     def setLeftBrace(character)
       @left_box_char = character
     end
@@ -468,7 +468,7 @@ module RNDK
     end
 
     # This sets the character to use to draw the right side of the choice box
-    # on the list
+    # on the items
     def setRightBrace(character)
       @right_box_char = character
     end
@@ -478,8 +478,8 @@ module RNDK
     end
 
     # This sets the current highlighted item of the widget
-    def setCurrentItem(item)
-      self.setPosition(item)
+    def set_current_item(item)
+      self.set_position(item)
       @selected_item = item
     end
 
@@ -497,32 +497,32 @@ module RNDK
     end
 
     def focus
-      self.drawList(@box)
+      self.drawItems(@box)
     end
 
     def unfocus
-      self.drawList(@box)
+      self.drawItems(@box)
     end
 
-    def createList(list, list_size, box_width)
+    def create_items(items, box_width)
       status = false
       widest_item = 0
 
-      if list_size >= 0
-        new_list = []
+      if items.size >= 0
+        new_items = []
         new_len = []
         new_pos = []
 
         # Each item in the needs to be converted to chtype array
         status = true
         box_width -= 2 + @border_size
-        (0...list_size).each do |j|
+        (0...items.size).each do |j|
           lentmp = []
           postmp = []
-          new_list << RNDK.char2Chtype(list[j], lentmp, postmp)
+          new_items << RNDK.char2Chtype(items[j], lentmp, postmp)
           new_len << lentmp[0]
           new_pos << postmp[0]
-          if new_list[j].nil? || new_list[j].size == 0
+          if new_items[j].nil? || new_items[j].size == 0
             status = false
             break
           end
@@ -531,11 +531,12 @@ module RNDK
         end
         if status
           self.destroyInfo
-          @item = new_list
+          @item = new_items
           @item_len = new_len
           @item_pos = new_pos
         end
       end
+      @items_size = items.size
 
       return (if status then widest_item else 0 end)
     end

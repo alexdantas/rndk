@@ -1,17 +1,19 @@
 require 'rndk'
 
 module RNDK
-  class ITEMLIST < Widget
+
+  class Itemlist < Widget
+
     def initialize(screen, config={})
       super()
-      @widget_type = :ITEMLIST
+      @widget_type = :itemlist
 
       x            = 0
       y            = 0
       title        = "itemlist"
       label        = "label"
-      item         = []
-      default_item = 1
+      items        = []
+      default_item = 0
       box          = true
       shadow       = false
 
@@ -20,18 +22,18 @@ module RNDK
         y            = val if key == :y
         title        = val if key == :title
         label        = val if key == :label
-        item         = val if key == :item
+        items        = val if key == :items
         default_item = val if key == :default_item
         box          = val if key == :box
         shadow       = val if key == :shadow
       end
 
-      count = item.size
+      count = items.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       field_width = 0
 
-      if !self.createList(item, count)
+      if !self.create_list items
         self.destroy
         return nil
       end
@@ -125,7 +127,7 @@ module RNDK
       end
 
       # Register this baby.
-      screen.register(:ITEMLIST, self)
+      screen.register(@widget_type, self)
     end
 
     # This allows the user to play with the widget.
@@ -177,7 +179,7 @@ module RNDK
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:ITEMLIST, self,
+        pp_return = @pre_process_func.call(@widget_type, self,
             @pre_process_data, input)
       end
 
@@ -226,7 +228,7 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:ITEMLIST, self, @post_process_data, input)
+          @post_process_func.call(@widget_type, self, @post_process_data, input)
         end
       end
 
@@ -339,13 +341,13 @@ module RNDK
 
     # This sets multiple attributes of the widget.
     def set(list, count, current, box)
-      self.setValues(list, count, current)
+      self.set_values(list, count, current)
       self.set_box(box)
     end
 
     # This function sets the contents of the list
-    def setValues(item, count, default_item)
-      if self.createList(item, count)
+    def set_values(item, default_item)
+      if self.create_list item
         old_width = @field_width
 
         # Set the default item.
@@ -408,7 +410,9 @@ module RNDK
       self.drawField(false)
     end
 
-    def createList(item, count)
+    def create_list item
+      count = item.size
+
       status = false
       new_items = []
       new_pos = []
