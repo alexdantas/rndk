@@ -15,18 +15,18 @@ module RNDK
   # Next Page::   Increments the field by the accelerated increment value.
   # D::           Increments the field by the accelerated increment value.
   # Ctrl-F::      Increments the field by the accelerated increment value.
-  # Home::        Sets the value to the low value.
-  # g::           Sets the value to the low value.
-  # End::         Sets the value to the high value.
-  # G::           Sets the value to the high value.
-  # $::           Sets the value to the high value.
+  # Home::        Sets the value to the minimum value.
+  # g::           Sets the value to the minimum value.
+  # End::         Sets the value to the maximum value.
+  # G::           Sets the value to the maximum value.
+  # $::           Sets the value to the maximum value.
   # Return::      Exits the widget and returns the current value. This also sets the widget data `exit_type` to `:NORMAL`.
   # Tab::         Exits the widget and returns the current value. This also sets the widget data `exit_type` to `:NORMAL`.
   # Escape::      Exits the widget and returns `nil`.  Also  sets the widget data `exit_type` to `:ESCAPE_HIT`.
   # Ctrl-L::      Refreshes the screen.
   #
   # If the cursor  is not pointing to the field's value,
-  # the following key bindings apply.
+  # the folminimuming key bindings apply.
   #
   # You may use the left/right arrows to move the cursor
   # onto the field's value and modify it by typing characters
@@ -38,7 +38,7 @@ module RNDK
   # D::           Increments the scale by the accelerated value.
   # -::           Decrements the scale by the normal value.
   # +::           Increments the scale by the normal value.
-  # 0::           Sets the scale to the low value.
+  # 0::           Sets the scale to the minimum value.
   #
   class Slider < Widget
 
@@ -59,7 +59,7 @@ module RNDK
     #   If it's a negative value, will create with full width
     #   minus that value.
     # * `start` is the initial value of the widget.
-    # * `low`/`high` are the minimum and maximum values of
+    # * `minimum`/`maximum` are the minimum and maximum values of
     #   the slider.
     # * `inc` is the increment value.
     # * `fast_inc` is the accelerated increment value.
@@ -77,10 +77,10 @@ module RNDK
       filler      = ' '.ord | Ncurses::A_REVERSE
       field_width = 0
       start       = 0
-      low         = 0
-      high        = 100
-      inc         = 1
-      fast_inc    = 5
+      minimum     = 0
+      maximum     = 100
+      increment   = 1
+      fast_increment    = 5
       box         = true
       shadow      = false
 
@@ -92,10 +92,10 @@ module RNDK
         filler      = val if key == :filler
         field_width = val if key == :field_width
         start       = val if key == :start
-        low         = val if key == :low
-        high        = val if key == :high
-        inc         = val if key == :inc
-        fast_inc    = val if key == :fast_inc
+        minimum     = val if key == :minimum
+        maximum     = val if key == :maximum
+        increment   = val if key == :inc
+        fast_increment    = val if key == :fast_inc
         box         = val if key == :box
         shadow      = val if key == :shadow
       end
@@ -120,7 +120,7 @@ module RNDK
       @label = []
       @label_len = 0
       @label_win = nil
-      high_value_len = self.formattedSize(high)
+      maximum_value_len = self.formattedSize(maximum)
 
       # If the field_width is a negative will be COLS-field_width,
       # otherwise field_width will be the given width.
@@ -132,9 +132,9 @@ module RNDK
         @label = RNDK.char2Chtype(label, label_len, [])
         @label_len = label_len[0]
         box_width = @label_len + field_width +
-            high_value_len + 2 * @border_size
+            maximum_value_len + 2 * @border_size
       else
-        box_width = field_width + high_value_len + 2 * @border_size
+        box_width = field_width + maximum_value_len + 2 * @border_size
       end
 
       old_width = box_width
@@ -146,7 +146,7 @@ module RNDK
       # Make sure we didn't extend beyond the dimensions of the window.
       box_width = [box_width, parent_width].min
       box_height = [box_height, parent_height].min
-      field_width = [field_width, box_width - @label_len - high_value_len - 1].min
+      field_width = [field_width, box_width - @label_len - maximum_value_len - 1].min
 
       # Rejustify the x and y positions if we need to.
       xtmp = [x]
@@ -180,7 +180,7 @@ module RNDK
       # Create the widget's data field window.
       @field_win = Ncurses.subwin(@win,
                                   1,
-                                  field_width + high_value_len - 1,
+                                  field_width + maximum_value_len - 1,
                                   ypos + @title_lines + @border_size,
                                   xpos + @label_len + horizontal_adjust + @border_size)
 
@@ -199,19 +199,19 @@ module RNDK
       @box_height = box_height
       @field_width = field_width - 1
       @filler = filler
-      @low = low
-      @high = high
+      @minimum = minimum
+      @maximum = maximum
       @current = start
-      @inc = inc
-      @fastinc = fast_inc
+      @increment = increment
+      @fast_increment = fast_increment
       @accepts_focus = true
       @input_window = @win
       @shadow = shadow
       @field_edit = 0
 
       # Set the start value.
-      if start < low
-        @current = low
+      if start < minimum
+        @current = minimum
       end
 
       # Do we want a shadow?
@@ -268,13 +268,13 @@ module RNDK
       return nil
     end
 
-    # Check if the value lies outside the low/high range. If so, force it in.
+    # Check if the value lies outside the minimum/maximum range. If so, force it in.
     def limitCurrentValue
-      if @current < @low
-        @current = @low
+      if @current < @minimum
+        @current = @minimum
         RNDK.beep
-      elsif @current > @high
-        @current = @high
+      elsif @current > @maximum
+        @current = @maximum
         RNDK.beep
       end
     end
@@ -311,7 +311,7 @@ module RNDK
     end
 
     # Set the edit position.  Normally the cursor is one cell to the right of
-    # the editable field.  Moving it left, over the field, allows the user to
+    # the editable field.  Moving it left, over the field, alminimums the user to
     # modify cells by typing in replacement characters for the field's value.
     def setEditPosition(new_position)
       if new_position < 0
@@ -369,7 +369,7 @@ module RNDK
       end
       if modify &&
           ((value, test) = temp.scanf(self.SCAN_FMT)).size == 2 &&
-          test == ' ' && value >= @low && value <= @high
+          test == ' ' && value >= @minimum && value <= @maximum
         self.setValue(value)
         result = true
       end
@@ -423,17 +423,17 @@ module RNDK
           when Ncurses::KEY_RIGHT
             self.setEditPosition(@field_edit - 1)
           when Ncurses::KEY_DOWN
-            @current = RNDK::Slider.Decrement(@current, @inc)
+            @current = RNDK::Slider.Decrement(@current, @increment)
           when Ncurses::KEY_UP
-            @current = RNDK::Slider.Increment(@current, @inc)
+            @current = RNDK::Slider.Increment(@current, @increment)
           when Ncurses::KEY_PPAGE
-            @current = RNDK::Slider.Increment(@current, @fastinc)
+            @current = RNDK::Slider.Increment(@current, @fast_increment)
           when Ncurses::KEY_NPAGE
-            @current = RNDK::Slider.Decrement(@current, @fastinc)
+            @current = RNDK::Slider.Decrement(@current, @fast_increment)
           when Ncurses::KEY_HOME
-            @current = @low
+            @current = @minimum
           when Ncurses::KEY_END
-            @current = @high
+            @current = @maximum
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             self.set_exit_type(input)
             ret = @current
@@ -521,10 +521,10 @@ module RNDK
 
     # This draws the widget.
     def drawField
-      step = 1.0 * @field_width / (@high - @low)
+      step = 1.0 * @field_width / (@maximum - @minimum)
 
       # Determine how many filler characters need to be drawn.
-      filler_characters = (@current - @low) * step
+      filler_characters = (@current - @minimum) * step
 
       Ncurses.werase(@field_win)
 
@@ -581,9 +581,9 @@ module RNDK
       return value.to_s.size
     end
 
-    # This function sets the low/high/current values of the widget.
-    def set(low, high, value, box)
-      self.setLowHigh(low, high)
+    # This function sets the minimum/maximum/current values of the widget.
+    def set(minimum, maximum, value, box)
+      self.setMinimumMaximum(minimum, maximum)
       self.setValue(value)
       self.set_box(box)
     end
@@ -598,27 +598,27 @@ module RNDK
       return @current
     end
 
-    # This function sets the low/high values of the widget.
-    def setLowHigh(low, high)
+    # This function sets the minimum/maximum values of the widget.
+    def setMinimumMaximum(minimum, maximum)
       # Make sure the values aren't out of bounds.
-      if low <= high
-        @low = low
-        @high = high
-      elsif low > high
-        @low = high
-        @high = low
+      if minimum <= maximum
+        @minimum = minimum
+        @maximum = maximum
+      elsif minimum > maximum
+        @minimum = maximum
+        @maximum = minimum
       end
 
       # Make sure the user hasn't done something silly.
       self.limitCurrentValue
     end
 
-    def getLowValue
-      return @low
+    def getMinimumValue
+      return @minimum
     end
 
-    def getHighValue
-      return @high
+    def getMaximumValue
+      return @maximum
     end
 
     def focus
