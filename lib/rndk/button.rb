@@ -320,7 +320,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Check a predefined binding.
-      if self.checkBind(:BUTTON, input)
+      if self.check_bind(:BUTTON, input)
         complete = true
       else
         case input

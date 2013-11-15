@@ -295,7 +295,7 @@ module RNDK
         result = 1
         empty = false
 
-        if alphalist.isBind(:alphalist, input)
+        if alphalist.is_bound? input
           result = 1  # Don't try to use this key in editing
 
         elsif (RNDK.is_char?(input) &&

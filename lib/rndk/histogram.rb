@@ -337,7 +337,7 @@ module RNDK
         Draw.drawShadow(@shadow_win)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # If the user asked for labels, draw them in.
       if @view_type != :NONE
@@ -384,7 +384,7 @@ module RNDK
 
     # Destroy the widget.
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       # Clean up the windows.
       RNDK.window_delete(@shadow_win)

@@ -304,7 +304,7 @@ module RNDK
                     @box_height - 3,
                     Ncurses::ACS_HLINE)
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # Draw in the X axis title.
       if !(@xtitle.nil?) && @xtitle.size > 0
@@ -377,7 +377,7 @@ module RNDK
     end
 
     def destroy
-      self.cleanTitle
+      self.clean_title
       self.clean_bindings(:GRAPH)
       @screen.unregister(:GRAPH, self)
       RNDK.window_delete(@win)

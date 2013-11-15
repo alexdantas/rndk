@@ -162,7 +162,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding.
-        if self.checkBind(:ITEMLIST, input)
+        if self.check_bind(:ITEMLIST, input)
           complete = true
         else
           case input
@@ -231,7 +231,7 @@ module RNDK
         Draw.drawShadow(@shadow_win)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # Draw in the label to the widget.
       unless @label_win.nil?
@@ -300,7 +300,7 @@ module RNDK
 
     # This function destroys the widget and all the memory it used.
     def destroy
-      self.cleanTitle
+      self.clean_title
       self.destroyInfo
 
       # Delete the windows

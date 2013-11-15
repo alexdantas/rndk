@@ -1,15 +1,99 @@
 module RNDK
 
+  #
+  #
   module Traverse
-    def Traverse.reset(screen)
-      refreshDataRNDKScreen(screen)
+
+    # Traverse the screen just one time.
+    def Traverse.once(screen,
+                      curobj,
+                      key_code,
+                      function_key,
+                      func_menu_key)
+
+      case key_code
+      when Ncurses::KEY_BTAB
+        switchFocus(set_previous_focus(screen), curobj)
+
+      when RNDK::KEY_TAB
+        switchFocus(set_next_focus(screen), curobj)
+
+      when RNDK.KEY_F(10)
+        # save data and exit
+        exit_ok(screen)
+
+      when RNDK.CTRL('X')
+        exit_cancel screen
+
+      when RNDK.CTRL('R')
+        # reset data to defaults
+        reset(screen)
+        setFocus(curobj)
+
+      when RNDK::REFRESH
+        # redraw screen
+        screen.refresh
+        setFocus(curobj)
+
+      else
+        # not everyone wants menus, so we make them optional here
+        if !(func_menu_key.nil?) &&
+            (func_menu_key.call(key_code, function_key))
+          # find and enable drop down menu
+          screen.widget.each do |widget|
+            if !(widget.nil?) && widget.widget_type == :MENU
+              Traverse.handleMenu(screen, widget, curobj)
+            end
+          end
+
+        else
+          curobj.inject(key_code)
+        end
+      end
     end
 
-    def Traverse.exit_ok(screen)
+    # Traverse continuously the widgets on a screen.
+    def Traverse.over screen
+      result = 0
+      curobj = set_first_focus(screen)
+
+      unless curobj.nil?
+        refresh_data(screen)
+
+        screen.exit_status = RNDK::Screen::NOEXIT
+
+        while !((curobj = get_current_focus(screen)).nil?) &&
+            screen.exit_status == RNDK::Screen::NOEXIT
+          function = []
+          key = curobj.getch(function)
+
+          # TODO look at more direct way to do this
+          check_menu_key = lambda do |key_code, function_key|
+            Traverse.checkMenuKey(key_code, function_key)
+          end
+
+
+          Traverse.once(screen, curobj, key,
+              function[0], check_menu_key)
+        end
+
+        if screen.exit_status == RNDK::Screen::EXITOK
+          save_data(screen)
+          result = 1
+        end
+      end
+      return result
+    end
+
+    def Traverse.reset screen
+      refresh_data(screen)
+    end
+
+    def Traverse.exit_ok screen
       screen.exit_status = RNDK::Screen::EXITOK
     end
 
-    def Traverse.exit_cancel(screen)
+    def Traverse.exit_cancel screen
       screen.exit_status = RNDK::Screen::EXITCANCEL
     end
 
@@ -128,87 +212,6 @@ module RNDK
       return switchFocus(set_previous_focus(screen), nil)
     end
 
-    # Traverse the screen just one time.
-    def Traverse.once(screen,
-                      curobj,
-                      key_code,
-                      function_key,
-                      func_menu_key)
-
-      case key_code
-      when Ncurses::KEY_BTAB
-        switchFocus(set_previous_focus(screen), curobj)
-
-      when RNDK::KEY_TAB
-        switchFocus(set_next_focus(screen), curobj)
-
-      when RNDK.KEY_F(10)
-        # save data and exit
-        exit_ok(screen)
-
-      when RNDK.CTRL('X')
-        exit_cancel screen
-
-      when RNDK.CTRL('R')
-        # reset data to defaults
-        reset(screen)
-        setFocus(curobj)
-
-      when RNDK::REFRESH
-        # redraw screen
-        screen.refresh
-        setFocus(curobj)
-
-      else
-        # not everyone wants menus, so we make them optional here
-        if !(func_menu_key.nil?) &&
-            (func_menu_key.call(key_code, function_key))
-          # find and enable drop down menu
-          screen.widget.each do |widget|
-            if !(widget.nil?) && widget.widget_type == :MENU
-              Traverse.handleMenu(screen, widget, curobj)
-            end
-          end
-
-        else
-          curobj.inject(key_code)
-        end
-      end
-    end
-
-    # Traverse continuously the widgets on a screen.
-    def Traverse.over screen
-      result = 0
-      curobj = set_first_focus(screen)
-
-      unless curobj.nil?
-        refreshDataRNDKScreen(screen)
-
-        screen.exit_status = RNDK::Screen::NOEXIT
-
-        while !((curobj = get_current_focus(screen)).nil?) &&
-            screen.exit_status == RNDK::Screen::NOEXIT
-          function = []
-          key = curobj.getch(function)
-
-          # TODO look at more direct way to do this
-          check_menu_key = lambda do |key_code, function_key|
-            Traverse.checkMenuKey(key_code, function_key)
-          end
-
-
-          Traverse.once(screen, curobj, key,
-              function[0], check_menu_key)
-        end
-
-        if screen.exit_status == RNDK::Screen::EXITOK
-          saveDataRNDKScreen(screen)
-          result = 1
-        end
-      end
-      return result
-    end
-
     private
 
     def Traverse.limitFocusIndex(screen, value)
@@ -281,21 +284,17 @@ module RNDK
       return switchFocus(newobj, menu)
     end
 
-    # Save data in widgets on a screen
-    def Traverse.saveDataRNDKScreen(screen)
+    # Calls Widget#save_data on all widgets of `screen`.
+    def Traverse.save_data screen
       screen.widget.each do |widget|
-        unless widget.nil?
-          widget.saveData
-        end
+        widget.save_data unless widget.nil?
       end
     end
 
-    # Refresh data in widgets on a screen
-    def Traverse.refreshDataRNDKScreen(screen)
+    # Calls Widget#refresh_data on all widgets of `screen`.
+    def Traverse.refresh_data screen
       screen.widget.each do |widget|
-        unless widget.nil?
-          widget.refreshData
-        end
+        widget.refresh_data unless widget.nil?
       end
     end
 

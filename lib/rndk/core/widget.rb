@@ -155,7 +155,7 @@ module RNDK
     end
 
     # Draw the widget's title
-    def drawTitle(win)
+    def draw_title(win)
       (0...@title_lines).each do |x|
         Draw.writeChtype(@win, @title_pos[x] + @border_size,
             x + @border_size, @title[x], RNDK::HORIZONTAL, 0,
@@ -174,12 +174,15 @@ module RNDK
     def inject char
     end
 
-    def set_box(box)
+    # Makes the widget have a border if `box` is true,
+    # otherwise, cancel it.
+    def set_box box
       @box = box
       @border_size = if @box then 1 else 0 end
     end
 
-    def getBox
+    # Tells if the widget has borders.
+    def get_box
       return @box
     end
 
@@ -189,10 +192,23 @@ module RNDK
     def unfocus
     end
 
-    def saveData
+    # Somehow saves all data within this Widget.
+    #
+    # @note This method isn't called whatsoever!
+    #       It only exists at Traverse module.
+    #
+    # TODO Find out how can I insert this on Widgets.
+    def save_data
     end
 
-    def refreshData
+
+    # Somehow refreshes all data within this Widget.
+    #
+    # @note This method isn't called whatsoever!
+    #       It only exists at Traverse module.
+    #
+    # TODO Find out how can I insert this on Widgets.
+    def refresh_data
     end
 
     # Destroys all windows inside the Widget and
@@ -256,7 +272,7 @@ module RNDK
     end
 
     # Remove storage for the widget's title.
-    def cleanTitle
+    def clean_title
       @title_lines = ''
     end
 
@@ -287,67 +303,88 @@ module RNDK
       key
     end
 
-    def bindableWidget(rndktype)
-      if rndktype != self.widget_type
-        return nil
-      elsif [:FSELECT, :alphalist].include?(self.widget_type)
+    # Returns the internal Widget that accepts key bindings.
+    #
+    # Some widgets are made of others.
+    # So when we bind keys to those complex widgets,
+    # we can specify which internal Widget accepts keybindings.
+    #
+    # For example, on an Alphalist (which is composed of Scroll
+    # and Entry), we bind keys to the Entry, not Scroll.
+    #
+    def bindable_widget rndktype
+      return nil if rndktype != self.widget_type
+
+
+      if [:FSELECT, :alphalist].include? self.widget_type
         return @entry_field
+
       else
         return self
       end
     end
 
+    # Binds a `function` to a `key`, according to this Widget's
+    # `type`.
+    #
     def bind(type, key, function, data)
-      obj = self.bindableWidget(type)
-      if key.ord < Ncurses::KEY_MAX && !(obj.nil?)
-        if key.ord != 0
-          obj.binding_list[key.ord] = [function, data]
-        end
-      end
+      obj = self.bindable_widget type
+
+      return if (key.ord >= Ncurses::KEY_MAX) or (key.ord.zero?) or (obj.nil?)
+
+      obj.binding_list[key.ord] = [function, data]
     end
 
     def unbind(type, key)
-      obj = self.bindableWidget(type)
-      unless obj.nil?
-        obj.binding_list.delete(key)
-      end
+      obj = self.bindable_widget type
+
+      obj.binding_list.delete(key) unless obj.nil?
     end
 
-    def clean_bindings(type)
-      obj = self.bindableWidget(type)
-      if !(obj.nil?) && !(obj.binding_list.nil?)
+    def clean_bindings type
+      obj = self.bindable_widget type
+
+      if (not obj.nil?) and (not obj.binding_list.nil?)
         obj.binding_list.clear
       end
     end
 
-    # Checks to see if the binding for the key exists:
-    # If it does then it runs the command and returns its value, normally true
-    # If it doesn't it returns a false.  This way we can 'overwrite' coded
-    # bindings.
-    def checkBind(type, key)
-      obj = self.bindableWidget(type)
-      if !(obj.nil?) && obj.binding_list.include?(key)
-        function = obj.binding_list[key][0]
-        data = obj.binding_list[key][1]
+    # Checks to see if some binding for `key` exists and runs it.
+    #
+    # * If binding for `key` exists, runs the command it is bound
+    #   to and returns it's value (normally `true`)
+    # * If binding for `key` doesn't exist, returns `false`.
+    #
+    # This functions is used to see if there's a predefined
+    # default keybinding for `key`.
+    # If not, then we run our customs. See the widgets for details.
+    #
+    def check_bind(widget_type, key)
+      obj = self.bindable_widget widget_type
 
-        if function == :getc
-          return data
-        else
-          return function.call(type, obj, data, key)
-        end
+      return false if obj.nil? or (not obj.binding_list.include? key)
+
+      function = obj.binding_list[key][0]
+      data     = obj.binding_list[key][1]
+
+      if function == :getc
+        return data
+      else
+        return function.call(widget_type, obj, data, key)
       end
-      return false
     end
 
-    # Checks to see if the binding for the key exists.
-    def isBind(type, key)
+    # Tells if the key binding for the key exists.
+    def is_bound? key
+      type   = self.widget_type
       result = false
-      obj = self.bindableWidget(type)
-      unless obj.nil?
-        result = obj.binding_list.include?(key)
-      end
 
-      return result
+      obj = self.bindable_widget type
+
+      unless obj.nil?
+        result = obj.binding_list.include? key
+      end
+      result
     end
 
     # Allows the user to move the Widget around
@@ -567,7 +604,7 @@ module RNDK
     # and returns the result, capped to sane values.
     def getc
       rndktype = self.widget_type
-      test   = self.bindableWidget rndktype
+      test   = self.bindable_widget rndktype
       result = Ncurses.wgetch @input_window
 
       if (result >= 0) and

@@ -166,7 +166,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.checkBind(:BUTTONBOX, input)
+        if self.check_bind(:BUTTONBOX, input)
           complete = true
         else
           case input
@@ -259,7 +259,7 @@ module RNDK
       end
 
       # Draw in the title if there is one.
-      self.drawTitle @win
+      self.draw_title @win
 
       # Draw in the buttons.
       self.drawButtons
@@ -316,7 +316,7 @@ module RNDK
 
     # This destroys the widget
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       RNDK.window_delete @shadow_win
       RNDK.window_delete @win

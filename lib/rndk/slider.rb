@@ -396,7 +396,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.checkBind(:slider, input)
+        if self.check_bind(:slider, input)
           complete = true
         else
           case input
@@ -487,7 +487,7 @@ module RNDK
       # Box the widget if asked.
       Draw.drawObjBox(@win, self) if box
 
-      self.drawTitle @win
+      self.draw_title @win
 
       # Draw the label.
       unless @label_win.nil?
@@ -533,7 +533,7 @@ module RNDK
 
     # @see Widget#destroy
     def destroy
-      self.cleanTitle
+      self.clean_title
       @label = []
 
       # Clean up the windows.

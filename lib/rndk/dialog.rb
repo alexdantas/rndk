@@ -172,7 +172,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.checkBind(:DIALOG, input)
+        if self.check_bind(:DIALOG, input)
           complete = true
         else
           case input

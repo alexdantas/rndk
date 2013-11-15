@@ -158,7 +158,7 @@ module RNDK
       return -1
     end
 
-    def drawTitle(item)
+    def draw_title(item)
       Draw.writeChtype(@title_win[item],
                        0,
                        0,
@@ -255,7 +255,7 @@ module RNDK
 
       if pp_return
         # Check for key bindings.
-        if self.checkBind(:MENU, input)
+        if self.check_bind(:MENU, input)
           complete = true
         else
           case input
@@ -352,7 +352,7 @@ module RNDK
       RNDK.window_erase(@pull_win[@current_title])
 
       # Redraw the sub-menu title.
-      self.drawTitle(@current_title)
+      self.draw_title(@current_title)
       Ncurses.wrefresh @title_win[@current_title]
     end
 
@@ -360,7 +360,7 @@ module RNDK
     def draw(box)
       # Draw in the menu titles.
       (0...@menu_items).each do |x|
-        self.drawTitle(x)
+        self.draw_title(x)
         Ncurses.wrefresh @title_win[x]
       end
     end

@@ -353,7 +353,7 @@ module RNDK
         refresh = false
 
         input = self.getch([])
-        if !self.checkBind(:VIEWER, input)
+        if !self.check_bind(:VIEWER, input)
           case input
           when RNDK::KEY_TAB
             if @button_count > 1
@@ -697,7 +697,7 @@ module RNDK
     # This function destroys the viewer widget.
     def destroy
       self.destroyInfo
-      self.cleanTitle
+      self.clean_title
 
       # Clean up the windows.
       RNDK.window_delete @shadow_win
@@ -726,7 +726,7 @@ module RNDK
       # Clear the window.
       Ncurses.werase(@win)
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # Draw in the current line at the top.
       if @show_line_info == true

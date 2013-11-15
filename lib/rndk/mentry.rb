@@ -256,7 +256,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding...
-        if self.checkBind(:MEntry, input)
+        if self.check_bind(:MEntry, input)
           complete = true
         else
           moved = false
@@ -442,7 +442,7 @@ module RNDK
     def drawField
       currchar = @field_width * @top_row
 
-      self.drawTitle @win
+      self.draw_title @win
       Ncurses.wrefresh @win
 
       lastpos = @info.size
@@ -510,7 +510,7 @@ module RNDK
 
     # This function destroys a multiple line entry field widget.
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       # Clean up the windows.
       RNDK.window_delete(@field_win)

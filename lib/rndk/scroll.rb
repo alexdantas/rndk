@@ -274,7 +274,7 @@ module RNDK
       if pp_return
 
         # Check for a predefined key binding.
-        if self.checkBind(:scroll, input) != false
+        if self.check_bind(:scroll, input) != false
           #self.checkEarlyExit
           complete = true
 
@@ -343,7 +343,7 @@ module RNDK
         Draw.drawShadow(@shadow_win)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # Draw in the scrolling list items.
       self.draw_list(box)
@@ -361,7 +361,7 @@ module RNDK
 
     # This function destroys
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       # Clean up the windows.
       RNDK.window_delete(@scrollbar_win)

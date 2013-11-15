@@ -343,7 +343,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check the key bindings.
-        if self.checkBind(:MATRIX, input)
+        if self.check_bind(:MATRIX, input)
           complete = true
         else
           case input
@@ -375,7 +375,7 @@ module RNDK
 
                 # Redraw the column titles.
                 if @rows > @vrows
-                  self.redrawTitles(false, true)
+                  self.redraw_titles(false, true)
                 end
                 refresh_cells = true
                 moved_cell = true
@@ -398,7 +398,7 @@ module RNDK
                     @row += 1
                     @trow += 1
                   end
-                  self.redrawTitles(true, true)
+                  self.redraw_titles(true, true)
                   refresh_cells = true
                   moved_cell = true
                 end
@@ -418,7 +418,7 @@ module RNDK
 
                 # Redraw the column titles.
                 if @cols > @vcols
-                  self.redrawTitles(false, true)
+                  self.redraw_titles(false, true)
                 end
                 refresh_cells = true
                 moved_cell = true
@@ -440,7 +440,7 @@ module RNDK
                     @row -= 1
                     @trow -= 1
                   end
-                  self.redrawTitles(true, true)
+                  self.redraw_titles(true, true)
                   refresh_cells = true
                   moved_cell = true
                 end
@@ -458,7 +458,7 @@ module RNDK
 
                 # Redraw the row titles.
                 if @rows > @vrows
-                  self.redrawTitles(true, false)
+                  self.redraw_titles(true, false)
                 end
                 refresh_cells = true
                 moved_cell = true
@@ -478,7 +478,7 @@ module RNDK
 
                 # Redraw the titles.
                 if @rows > @vrows
-                  self.redrawTitles(true, false)
+                  self.redraw_titles(true, false)
                 end
                 refresh_cells = true
                 moved_cell = true
@@ -491,7 +491,7 @@ module RNDK
               if @trow + (@vrows - 1) * 2 <= @rows
                 @trow += @vrows - 1
                 @row += @vrows - 1
-                self.redrawTitles(true, false)
+                self.redraw_titles(true, false)
                 refresh_cells = true
                 moved_cell = true
               else
@@ -505,7 +505,7 @@ module RNDK
               if @trow - (@vrows - 1) * 2 >= 1
                 @trow -= @vrows - 1
                 @row -= @vrows - 1
-                self.redrawTitles(true, false)
+                self.redraw_titles(true, false)
                 refresh_cells = true
                 moved_cell = true
               else
@@ -863,7 +863,7 @@ module RNDK
         Draw.drawObjBox(@win, self)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       Ncurses.wrefresh @win
 
@@ -875,7 +875,7 @@ module RNDK
 
     # This function destroys the matrix widget.
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       # Clear the matrix windows.
       RNDK.window_delete(@cell[0][0])
@@ -1094,7 +1094,7 @@ module RNDK
     end
 
     # This redraws the titles indicated...
-    def redrawTitles(row_titles, col_titles)
+    def redraw_titles(row_titles, col_titles)
       # Redraw the row titles.
       if row_titles
         self.drawEachRowTitle

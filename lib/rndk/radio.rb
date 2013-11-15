@@ -185,7 +185,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a predefined key binding.
-        if self.checkBind(:RADIO, input)
+        if self.check_bind(:RADIO, input)
           complete = true
         else
           case input
@@ -258,7 +258,7 @@ module RNDK
         Draw.drawShadow(@shadow_win)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       # Draw in the radio list.
       self.drawList(@box)
@@ -350,7 +350,7 @@ module RNDK
 
     # This function destroys the radio widget.
     def destroy
-      self.cleanTitle
+      self.clean_title
       self.destroyInfo
 
       # Clean up the windows.

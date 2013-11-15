@@ -239,7 +239,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding
-        if self.checkBind(:TEMPLATE, input)
+        if self.check_bind(:TEMPLATE, input)
           complete = true
         else
           case input
@@ -397,7 +397,7 @@ module RNDK
         Draw.drawObjBox(@win, self)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       Ncurses.wrefresh @win
 
@@ -458,7 +458,7 @@ module RNDK
 
     # Destroy this widget.
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       # Delete the windows
       RNDK.window_delete(@field_win)

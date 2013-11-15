@@ -330,7 +330,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding
-        if self.checkBind(:calendar, char)
+        if self.check_bind(:calendar, char)
 
           ## FIXME What the heck? Missing method?
           #self.checkEarlyExit
@@ -404,7 +404,7 @@ module RNDK
       # Box the widget if asked.
       Draw.drawObjBox(@win, self) if box
 
-      self.drawTitle @win
+      self.draw_title @win
 
       # Draw in the day-of-the-week header.
       (0...7).each do |col|
@@ -577,7 +577,7 @@ module RNDK
 
     # @see Widget#destroy
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       RNDK.window_delete @label_win
       RNDK.window_delete @field_win

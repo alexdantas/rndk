@@ -350,7 +350,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.checkBind(:swindow, input)
+        if self.check_bind(:swindow, input)
           complete = true
         else
           case input
@@ -458,7 +458,7 @@ module RNDK
         Draw.drawObjBox(@win, self)
       end
 
-      self.drawTitle(@win)
+      self.draw_title(@win)
 
       Ncurses.wrefresh @win
 
@@ -514,7 +514,7 @@ module RNDK
     def destroy
       self.destroyInfo
 
-      self.cleanTitle
+      self.clean_title
 
       # Delete the windows.
       RNDK.window_delete(@shadow_win)

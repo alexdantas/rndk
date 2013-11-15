@@ -331,7 +331,7 @@ module RNDK
       if pp_return
 
         # Check a predefined binding
-        if self.checkBind(:entry, input)
+        if self.check_bind(:entry, input)
           complete = true
 
         else
@@ -519,7 +519,7 @@ module RNDK
       # Box the widget if asked.
       Draw.drawObjBox(@win, self) if box
 
-      self.drawTitle @win
+      self.draw_title @win
       Ncurses.wrefresh @win
 
       # Draw in the label to the widget.
@@ -550,7 +550,7 @@ module RNDK
 
     # @see Widget#destroy
     def destroy
-      self.cleanTitle
+      self.clean_title
 
       RNDK.window_delete(@field_win)
       RNDK.window_delete(@label_win)
