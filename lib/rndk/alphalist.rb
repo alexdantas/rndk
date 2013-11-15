@@ -66,6 +66,9 @@ module RNDK
       super()
       @widget_type  = :alphalist
 
+      # This is UGLY AS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
       x           = 0
       y           = 0
       width       = 0
@@ -77,6 +80,20 @@ module RNDK
       highlight   = Ncurses::A_REVERSE
       box         = false
       shadow      = false
+
+      config.each do |key, val|
+        x           = val if key == :x
+        y           = val if key == :y
+        width       = val if key == :width
+        height      = val if key == :height
+        title       = val if key == :title
+        label       = val if key == :label
+        list        = val if key == :list
+        filler_char = val if key == :filler_char
+        highlight   = val if key == :highlight
+        box         = val if key == :box
+        shadow      = val if key == :shadow
+      end
 
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window

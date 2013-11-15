@@ -1,11 +1,11 @@
 require 'rndk/fscale'
 
 module RNDK
-  class DSCALE < FSCALE
+  class DScale < Fscale
     # The original DScale handled unsigned values.
-    # Since Ruby's typing is different this is really just FSCALE
+    # Since Ruby's typing is different this is really just Fscale
     # but is nice it's nice to have this for compatibility/completeness
     # sake.
-    @widget_type = :DSCALE
+    @widget_type = :DScale
   end
 end

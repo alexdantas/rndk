@@ -75,6 +75,20 @@ module RNDK
       box       = true
       shadow    = false
 
+      config.each do |key, val|
+        x         = val if key == :x
+        y         = val if key == :y
+        splace    = val if key == :splace
+        width     = val if key == :width
+        height    = val if key == :height
+        title     = val if key == :title
+        list      = val if key == :list
+        numbers   = val if key == :numbers
+        highlight = val if key == :highlight
+        box       = val if key == :box
+        shadow    = val if key == :shadow
+      end
+
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
 

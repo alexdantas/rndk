@@ -52,7 +52,11 @@ module RNDK
       return if message.class != Array or message.empty?
 
       self.cleanly do
-        popup = RNDK::Label.new(self, CENTER, CENTER, message, true, false)
+        popup = RNDK::Label.new(self, {
+                                  :x => CENTER,
+                                  :y => CENTER,
+                                  :text => message
+                                })
         popup.draw true
 
         # Wait for some input.
@@ -104,7 +108,7 @@ module RNDK
 
       choice = 0
       self.cleanly do
-        popup = RNDK::DIALOG.new(self,
+        popup = RNDK::Dialog.new(self,
                                  RNDK::CENTER,
                                  RNDK::CENTER,
                                  message,

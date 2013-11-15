@@ -1,9 +1,9 @@
 require 'rndk/scale'
 
 module RNDK
-  class FSCALE < SCALE
+  class Fscale < Scale
     def initialize(screen, config={})
-      @widget_type = :FSCALE
+      @widget_type = :Fscale
 
       x           = 0
       y           = 0
@@ -19,6 +19,23 @@ module RNDK
       digits      = 3
       box         = true
       shadow      = false
+
+      config.each do |key, val|
+        x           = val if key == :x
+        y           = val if key == :y
+        title       = val if key == :title
+        label       = val if key == :label
+        field_attr  = val if key == :field_attr
+        field_width = val if key == :field_width
+        start       = val if key == :start
+        low         = val if key == :low
+        high        = val if key == :high
+        inc         = val if key == :inc
+        fast_inc    = val if key == :fast_inc
+        digits      = val if key == :digits
+        box         = val if key == :box
+        shadow      = val if key == :shadow
+      end
 
       @digits = digits
       super(screen, x, y, title, label, field_attr, field_width, start, low, high, inc, fast_inc, box, shadow)

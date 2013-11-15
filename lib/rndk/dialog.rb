@@ -1,27 +1,45 @@
 require 'rndk'
 
 module RNDK
-  class DIALOG < Widget
+
+  class Dialog < Widget
+
     attr_reader :current_button
+
     MIN_DIALOG_WIDTH = 10
 
     def initialize(screen, config={})
       super()
-      @widget_type = :DIALOG
+      @widget_type = :dialog
 
       x            = 0
       y            = 0
-      mesg         = "dialog"
-      rows         = 0
-      buttons      = []
+      text         = "dialog"
+      buttons      = ["button"]
       highlight    = Ncurses::A_REVERSE
       separator    = true
       box          = true
       shadow       = false
 
+      config.each do |key, val|
+        x            = val if key == :x
+        y            = val if key == :y
+        text         = val if key == :text
+        buttons      = val if key == :buttons
+        highlight    = val if key == :highlight
+        separator    = val if key == :separator
+        box          = val if key == :box
+        shadow       = val if key == :shadow
+      end
+
+      # Adjusting if the user sent us a String
+      text = [text] if text.class == String
+      return nil if text.class != Array or text.empty?
+      rows = text.size
+
       button_count = buttons.size
 
-      box_width = DIALOG::MIN_DIALOG_WIDTH
+      box_width = Dialog::MIN_DIALOG_WIDTH
       max_message_width = -1
       button_width = 0
       xpos = x
@@ -35,12 +53,15 @@ module RNDK
       @button_len = []
       @button_pos = []
 
+      @screen = screen
+      @parent = screen.window
+
       if rows <= 0 || button_count <= 0
         self.destroy
         return nil
       end
 
-      self.set_box(box)
+      self.set_box box
       box_height = if separator then 1 else 0 end
       box_height += rows + 2 * @border_size + 1
 
@@ -48,7 +69,7 @@ module RNDK
       (0...rows).each do |x|
         info_len = []
         info_pos = []
-        @info << RNDK.char2Chtype(mesg[x], info_len, info_pos)
+        @info << RNDK.char2Chtype(text[x], info_len, info_pos)
         @info_len << info_len[0]
         @info_pos << info_pos[0]
         max_message_width = [max_message_width, info_len[0]].max
@@ -76,8 +97,6 @@ module RNDK
       ypos = ytmp[0]
 
       # Set up the dialog box attributes.
-      @screen = screen
-      @parent = screen.window
       @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
       @shadow_win = nil
       @button_count = button_count
@@ -118,11 +137,11 @@ module RNDK
       end
 
       # Register this baby.
-      screen.register(:DIALOG, self)
+      screen.register(@widget_type, self)
     end
 
     # This lets the user select the button.
-    def activate(actions)
+    def activate(actions=[])
       input = 0
 
       # Draw the dialog box.
@@ -176,7 +195,7 @@ module RNDK
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:DIALOG,
+        pp_return = @pre_process_func.call(@widget_type,
                                            self,
                                            @pre_process_data,
                                            input)
@@ -220,8 +239,10 @@ module RNDK
 
         # Should we call a post_process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:DIALOG, self,
-              @post_process_data, input)
+          @post_process_func.call(@widget_type,
+                                  self,
+                                  @post_process_data,
+                                  input)
         end
       end
 

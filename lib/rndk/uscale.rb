@@ -1,12 +1,12 @@
 require 'rndk/scale'
 
 module RNDK
-  class USCALE < SCALE
+  class UScale < Scale
     # The original UScale handled unsigned values.
-    # Since Ruby's typing is different this is really just SCALE
+    # Since Ruby's typing is different this is really just Scale
     # but is nice it's nice to have this for compatibility/completeness
     # sake.
 
-    @widget_type = :USCALE
+    @widget_type = :UScale
   end
 end

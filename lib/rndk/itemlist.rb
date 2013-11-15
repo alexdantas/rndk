@@ -15,6 +15,17 @@ module RNDK
       box          = true
       shadow       = false
 
+      config.each do |key, val|
+        x            = val if key == :x
+        y            = val if key == :y
+        title        = val if key == :title
+        label        = val if key == :label
+        item         = val if key == :item
+        default_item = val if key == :default_item
+        box          = val if key == :box
+        shadow       = val if key == :shadow
+      end
+
       count = item.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
@@ -118,7 +129,7 @@ module RNDK
     end
 
     # This allows the user to play with the widget.
-    def activate(actions)
+    def activate(actions=[])
       ret = false
 
       # Draw the widget.

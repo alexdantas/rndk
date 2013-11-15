@@ -15,6 +15,17 @@ module RNDK
       box     = true
       shadow  = false
 
+      config.each do |key, val|
+        x       = val if key == :x
+        y       = val if key == :y
+        title   = val if key == :title
+        label   = val if key == :label
+        plate   = val if key == :plate
+        overlay = val if key == :overlay
+        box     = val if key == :box
+        shadow  = val if key == :shadow
+      end
+
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
@@ -201,7 +212,7 @@ module RNDK
     end
 
     # This actually manages the tempalte widget
-    def activate(actions)
+    def activate(actions=[])
       self.draw(@box)
 
       if actions.nil? || actions.size == 0

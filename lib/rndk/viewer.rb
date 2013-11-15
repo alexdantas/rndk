@@ -18,6 +18,17 @@ module RNDK
       box              = true
       shadow           = false
 
+      config.each do |key, val|
+        x                = val if key == :x
+        y                = val if key == :y
+        width            = val if key == :width
+        height           = val if key == :height
+        buttons          = val if key == :buttons
+        button_highlight = val if key == :button_highlight
+        box              = val if key == :box
+        shadow           = val if key == :shadow
+      end
+
       button_count     = buttons.size
       parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
@@ -338,7 +349,7 @@ module RNDK
     end
 
     # This function actually controls the viewer...
-    def activate(actions)
+    def activate(actions=[])
       refresh = false
       # Create the information about the file stats.
       file_info = [
@@ -615,7 +626,7 @@ module RNDK
 
     # This allows us to 'jump' to a given line in the file.
     def jumpToLine
-      newline = RNDK::SCALE.new(@screen, RNDK::CENTER, RNDK::CENTER,
+      newline = RNDK::Scale.new(@screen, RNDK::CENTER, RNDK::CENTER,
           '<C>Jump To Line', '</5>Line :', Ncurses::A_BOLD,
           @list_size.size + 1, @current_top + 1, 0, @max_top_line + 1,
           1, 10, true, true)

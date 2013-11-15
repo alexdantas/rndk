@@ -19,6 +19,21 @@ module RNDK
       box         = true
       shadow      = false
 
+      config.each do |key, val|
+        x           = val if key == :x
+        y           = val if key == :y
+        splace      = val if key == :splace
+        width       = val if key == :width
+        height      = val if key == :height
+        title       = val if key == :title
+        list        = val if key == :list
+        choice_char = val if key == :choice_char
+        def_item    = val if key == :def_item
+        highlight   = val if key == :highlight
+        box         = val if key == :box
+        shadow      = val if key == :shadow
+      end
+
       list_size    = list.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
@@ -149,7 +164,7 @@ module RNDK
     end
 
     # This actually manages the radio widget.
-    def activate(actions)
+    def activate(actions=[])
       # Draw the radio list.
       self.draw(@box)
 

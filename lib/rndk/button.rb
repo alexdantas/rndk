@@ -13,6 +13,15 @@ module RNDK
       box      = 0
       shadow   = 0
 
+      config.each do |key, val|
+        x        = val if key == :x
+        y        = val if key == :y
+        text     = val if key == :text
+        action   = val if key == :action
+        box      = val if key == :box
+        shadow   = val if key == :shadow
+      end
+
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
@@ -84,7 +93,7 @@ module RNDK
     end
 
     # This was added for the builder.
-    def activate(actions)
+    def activate(actions=[])
       self.draw(@box)
       ret = false
 

@@ -31,7 +31,7 @@ module RNDK
       x      = 0
       y      = 0
       text   = "label"
-      box    = false
+      box    = true
       shadow = false
 
       config.each do |key, val|

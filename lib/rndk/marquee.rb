@@ -12,6 +12,14 @@ module RNDK
       box    = true
       shadow = false
 
+      config.each do |key, val|
+        x      = val if key == :x
+        y      = val if key == :y
+        width  = val if key == :width
+        box    = val if key == :box
+        shadow = val if key == :shadow
+      end
+
       @screen = screen
       @parent = screen.window
       @win = Ncurses.newwin(1, 1, y, x)

@@ -19,6 +19,23 @@ module RNDK
       box         = true
       shadow      = false
 
+      config.each do |key, val|
+        x           = val if key == :x
+        y           = val if key == :y
+        title       = val if key == :title
+        label       = val if key == :label
+        filler      = val if key == :filler
+        field_width = val if key == :field_width
+        start       = val if key == :start
+        low         = val if key == :low
+        high        = val if key == :high
+        inc         = val if key == :inc
+        fast_inc    = val if key == :fast_inc
+        digits      = val if key == :digits
+        box         = val if key == :box
+        shadow      = val if key == :shadow
+      end
+
       @digits = digits
       super(screen, x, y, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
       @widget_type = :FSLIDER

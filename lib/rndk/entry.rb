@@ -103,7 +103,7 @@ module RNDK
     #   empty spaces in the entry field.
     # * `disp_type` tells how the entry field will behave.
     #   _See main Entry documentation_.
-    # * `f_width` is the width of the field. It it's 0,
+    # * `field_width` is the width of the field. It it's 0,
     #   will be created with full width of the screen.
     #   If it's a negative value, will create with full width
     #   minus that value.
@@ -125,16 +125,31 @@ module RNDK
       field_attr = Ncurses::A_NORMAL
       filler     = '.'
       disp_type  = :MIXED
-      f_width    = 0
+      field_width    = 0
       min        = 0
       max        = 100
       box        = true
       shadow     = false
 
+      config.each do |key, val|
+        x          = val if key == :x
+        y          = val if key == :y
+        title      = val if key == :title
+        label      = val if key == :label
+        field_attr = val if key == :field_attr
+        filler     = val if key == :filler
+        disp_type  = val if key == :disp_type
+        field_width    = val if key == :field_width
+        min        = val if key == :min
+        max        = val if key == :max
+        box        = val if key == :box
+        shadow     = val if key == :shadow
+      end
+
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
 
-      field_width = f_width
+      field_width = field_width
       box_width   = 0
 
       xpos = x

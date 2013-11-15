@@ -8,8 +8,8 @@ module RNDK
       super()
       @widget_type = :BUTTONBOX
 
-      x_pos        = 0
-      y_pos        = 0
+      x            = 0
+      y            = 0
       width        = 0
       height       = 0
       title        = "buttonbox"
@@ -19,6 +19,20 @@ module RNDK
       highlight    = Ncurses::A_REVERSE
       box          = false
       shadow       = false
+
+      config.each do |key, val|
+        x            = val if key == :x
+        y            = val if key == :y
+        width        = val if key == :width
+        height       = val if key == :height
+        title        = val if key == :title
+        rows         = val if key == :rows
+        cols         = val if key == :cols
+        buttons      = val if key == :buttons
+        highlight    = val if key == :highlight
+        box          = val if key == :box
+        shadow       = val if key == :shadow
+      end
 
       button_count = buttons.size
       parent_width = Ncurses.getmaxx(screen.window)
@@ -81,8 +95,8 @@ module RNDK
       box_height = [box_height, parent_height].min
 
       # Now we have to readjust the x and y positions
-      xtmp = [x_pos]
-      ytmp = [y_pos]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -132,7 +146,7 @@ module RNDK
     end
 
     # This activates the widget.
-    def activate(actions)
+    def activate(actions=[])
       # Draw the buttonbox box.
       self.draw(@box)
 
@@ -362,11 +376,12 @@ module RNDK
       self.draw(@box)
     end
 
-
-
-
     def position
       super(@win)
     end
+
+    protected
+
+
   end
 end

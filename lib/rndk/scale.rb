@@ -1,10 +1,14 @@
 require 'rndk'
 
 module RNDK
-  class SCALE < Widget
+
+  #
+  #
+  class Scale < Widget
+
     def initialize(screen, config={})
       super()
-      @widget_type = :SCALE
+      @widget_type = :scale
 
       x           = 0
       y           = 0
@@ -20,6 +24,22 @@ module RNDK
       box         = true
       shadow      = false
 
+      config.each do |key, val|
+        x           = val if key == :x
+        y           = val if key == :y
+        title       = val if key == :title
+        label       = val if key == :label
+        field_attr  = val if key == :field_attr
+        field_width = val if key == :field_width
+        start       = val if key == :start
+        low         = val if key == :low
+        high        = val if key == :high
+        inc         = val if key == :inc
+        fast_inc    = val if key == :fast_inc
+        box         = val if key == :box
+        shadow      = val if key == :shadow
+      end
+
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       bindings = {
@@ -33,7 +53,7 @@ module RNDK
           '$'           => Ncurses::KEY_END,
       }
 
-      self.set_box(box)
+      self.set_box box
 
       box_height = @border_size * 2 + 1
       box_width = field_width + 2 * @border_size
@@ -145,14 +165,14 @@ module RNDK
 
       # Setup the key bindings.
       bindings.each do |from, to|
-        self.bind(self.widget_type, from, :getc, to)
+        self.bind(from, :getc, to)
       end
 
       screen.register(self.widget_type, self)
     end
 
     # This allows the person to use the widget's data field.
-    def activate(actions)
+    def activate(actions=[])
       ret = false
       # Draw the widget.
       self.draw(@box)
@@ -196,7 +216,7 @@ module RNDK
 
     # Move the cursor to the given edit-position
     def moveToEditPosition(new_position)
-      return Ncurses.wmove(@field_win, 0, @field_width - new_position - 1)
+      Ncurses.wmove(@field_win, 0, @field_width - new_position - 1)
     end
 
     # Check if the cursor is on a valid edit-position. This must be one of
@@ -269,10 +289,10 @@ module RNDK
         temp[col] = input.chr
       elsif input == Ncurses::KEY_BACKSPACE
         # delete the char before the cursor
-        modify = RNDK::SCALE.removeChar(temp, col - 1)
+        modify = RNDK::Scale.removeChar(temp, col - 1)
       elsif input == Ncurses::KEY_DC
         # delete the char at the cursor
-        modify = RNDK::SCALE.removeChar(temp, col)
+        modify = RNDK::Scale.removeChar(temp, col)
       else
         modify = false
       end
@@ -325,7 +345,7 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key bindings.
-        if self.check_bind(self.widget_type, input)
+        if self.check_bind input
           complete = true
         else
           case input
@@ -334,13 +354,13 @@ module RNDK
           when Ncurses::KEY_RIGHT
             self.setEditPosition(@field_edit - 1)
           when Ncurses::KEY_DOWN
-            @current = RNDK::SCALE.Decrement(@current, @inc)
+            @current = RNDK::Scale.Decrement(@current, @inc)
           when Ncurses::KEY_UP
-            @current = RNDK::SCALE.Increment(@current, @inc)
+            @current = RNDK::Scale.Increment(@current, @inc)
           when Ncurses::KEY_PPAGE
-            @current = RNDK::SCALE.Increment(@current, @fastinc)
+            @current = RNDK::Scale.Increment(@current, @fastinc)
           when Ncurses::KEY_NPAGE
-            @current = RNDK::SCALE.Decrement(@current, @fastinc)
+            @current = RNDK::Scale.Decrement(@current, @fastinc)
           when Ncurses::KEY_HOME
             @current = @low
           when Ncurses::KEY_END

@@ -29,6 +29,24 @@ module RNDK
       box             = true
       shadow          = false
 
+      config.each do |key, val|
+        x               = val if key == :x
+        y               = val if key == :y
+        width           = val if key == :width
+        height          = val if key == :height
+        title           = val if key == :title
+        label           = val if key == :label
+        field_attribute = val if key == :field_attribute
+        filler_char     = val if key == :filler_char
+        highlight       = val if key == :highlight
+        d_attribute     = val if key == :d_attribute
+        f_attribute     = val if key == :f_attribute
+        l_attribute     = val if key == :l_attribute
+        s_attribute     = val if key == :s_attribute
+        box             = val if key == :box
+        shadow          = val if key == :shadow
+      end
+
       parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
 
@@ -314,7 +332,7 @@ module RNDK
         ]
 
         # Create the dialog box.
-        question = RNDK::DIALOG.new(fselect.screen, RNDK::CENTER, RNDK::CENTER,
+        question = RNDK::Dialog.new(fselect.screen, RNDK::CENTER, RNDK::CENTER,
             mesg, 2, buttons, 2, Ncurses::A_REVERSE, true, true, false)
 
         # If the said yes then try to nuke it.
@@ -478,7 +496,7 @@ module RNDK
     # This means you want to use the given file selector. It takes input
     # from the keyboard and when it's done it fills the entry info element
     # of the structure with what was typed.
-    def activate(actions)
+    def activate(actions=[])
       input = 0
       ret = 0
 
