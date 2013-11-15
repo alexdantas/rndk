@@ -44,9 +44,9 @@ module RNDK
 
     # Creates a new Slider Widget.
     #
-    # * `xplace` is the x position - can be an integer or
+    # * `x` is the x position - can be an integer or
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or
+    # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `title` can be more than one line - just split them
     #   with `\n`s.
@@ -66,22 +66,23 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   title,
-                   label,
-                   filler,
-                   field_width,
-                   start,
-                   low,
-                   high,
-                   inc,
-                   fast_inc,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :slider
+
+      x           = 0
+      y           = 0
+      title       = "slider"
+      label       = "label"
+      filler      = ' '.ord | Ncurses::A_REVERSE
+      field_width = 0
+      start       = 0
+      low         = 0
+      high        = 100
+      inc         = 1
+      fast_inc    = 5
+      box         = true
+      shadow      = false
 
       parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
@@ -132,8 +133,8 @@ module RNDK
       field_width = [field_width, box_width - @label_len - high_value_len - 1].min
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -471,10 +472,10 @@ module RNDK
     end
 
     # @see Widget#move
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # Draws the Widget on the Screen.

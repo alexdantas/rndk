@@ -117,9 +117,9 @@ module RNDK
 
     # Creates a Calendar Widget.
     #
-    # * `xplace` is the x position - can be an integer or
+    # * `x` is the x position - can be an integer or
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or
+    # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `day`, `month` and `year` are integers. I suggest
     #   you to use Ruby's `Time.now.gmtime`.
@@ -131,21 +131,41 @@ module RNDK
     #       the current date for it.
     #       If all of them are 0, will use the complete date
     #       of today.
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   title,
-                   day,
-                   month,
-                   year,
-                   day_attrib,
-                   month_attrib,
-                   year_attrib,
-                   highlight,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :calendar
+
+      # This is UGLY AS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
+      x            = 0
+      y            = 0
+      title        = "calendar"
+      day          = 0
+      month        = 0
+      year         = 0
+      day_attrib   = 0
+      month_attrib = 0
+      year_attrib  = 0
+      highlight    = Ncurses::A_REVERSE
+      box          = false
+      shadow       = false
+
+      config.each do |key, val|
+        x            = val if key == :x
+        y            = val if key == :y
+        title        = val if key == :title
+        day          = val if key == :day
+        month        = val if key == :month
+        year         = val if key == :year
+        day_attrib   = val if key == :day
+        month_attrib = val if key == :month
+        year_attrib  = val if key == :year
+        highlight    = val if key == :highlight
+        box          = val if key == :box
+        shadow       = val if key == :shadow
+      end
+
       self.set_date(day, month, year)
       self.set_box box
 
@@ -174,8 +194,8 @@ module RNDK
       box_height = [box_height, parent_height].min
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -385,10 +405,10 @@ module RNDK
     end
 
     # @see Widget#move
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # Draws the Widget on the Screen.
@@ -485,13 +505,45 @@ module RNDK
     # Sets multiple attributes of the Widget.
     #
     # See Calendar#initialize.
-    def set(day, month, year, day_attrib, month_attrib, year_attrib, highlight, box)
-      self.set_date(day, month, yar)
-      self.set_day_attrib(day_attrib)
-      self.set_month_attrib(month_attrib)
-      self.set_year_attrib(year_attrib)
-      self.set_highlight(highlight)
-      self.set_box(box)
+    def set(config)
+      # This is UGLY AS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
+      x            = 0
+      y            = 0
+      title        = "calendar"
+      day          = 0
+      month        = 0
+      year         = 0
+      day_attrib   = 0
+      month_attrib = 0
+      year_attrib  = 0
+      highlight    = Ncurses::A_REVERSE
+      box          = false
+      shadow       = false
+
+      config.each do |key, val|
+        x            = val if key == :x
+        y            = val if key == :y
+        title        = val if key == :title
+        day          = val if key == :day
+        month        = val if key == :month
+        year         = val if key == :year
+        day_attrib   = val if key == :day
+        month_attrib = val if key == :month
+        year_attrib  = val if key == :year
+        highlight    = val if key == :highlight
+        box          = val if key == :box
+        shadow       = val if key == :shadow
+      end
+
+      self.set_date(day, month, year)                if defined? day and defined? month and defined? year
+      self.set_day_attrib(day_attrib)                if defined? day_attrib
+      self.set_month_attrib(month_attrib)            if defined? month_attrib
+      self.set_year_attrib(year_attrib)              if defined? year_attrib
+      self.set_highlight(highlight)                  if defined? highlight
+      self.set_box(box)                              if defined? box
+      @box_width = self.set_title(title, @box_width) if defined? title
     end
 
     # Sets the current date.

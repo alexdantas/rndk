@@ -2,10 +2,24 @@ require 'rndk'
 
 module RNDK
   class SCALE < Widget
-    def initialize(screen, xplace, yplace, title, label, field_attr,
-        field_width, start, low, high, inc, fast_inc, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :SCALE
+
+      x           = 0
+      y           = 0
+      title       = "scale"
+      label       = "label"
+      field_attr  = Ncurses::A_NORMAL
+      field_width = 0
+      start       = 0
+      low         = 0
+      high        = 100
+      inc         = 1
+      fast_inc    = 5
+      box         = true
+      shadow      = false
+
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       bindings = {
@@ -56,8 +70,8 @@ module RNDK
           box_width - @label_len - 2 * @border_size].min
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -386,10 +400,10 @@ module RNDK
     end
 
     # This moves the widget's data field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # This function draws the widget.

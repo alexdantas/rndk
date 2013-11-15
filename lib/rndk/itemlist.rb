@@ -2,11 +2,20 @@ require 'rndk'
 
 module RNDK
   class ITEMLIST < Widget
-    def initialize(screen, xplace, yplace, title, label, item, count,
-        default_item, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :ITEMLIST
 
+      x            = 0
+      y            = 0
+      title        = "itemlist"
+      label        = "label"
+      item         = []
+      default_item = 1
+      box          = true
+      shadow       = false
+
+      count = item.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       field_width = 0
@@ -43,8 +52,8 @@ module RNDK
       self.updateFieldWidth
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -220,9 +229,9 @@ module RNDK
     end
 
     # This moves the itemlist field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
+      self.move_specific(x, y, relative, refresh_flag,
           windows, [])
     end
 

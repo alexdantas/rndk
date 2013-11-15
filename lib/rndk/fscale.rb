@@ -2,24 +2,26 @@ require 'rndk/scale'
 
 module RNDK
   class FSCALE < SCALE
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   title,
-                   label,
-                   field_attr,
-                   field_width,
-                   start,
-                   low,
-                   high,
-                   inc,
-                   fast_inc,
-                   digits,
-                   box,
-                   shadow)
-      @digits = digits
-      super(screen, xplace, yplace, title, label, field_attr, field_width, start, low, high, inc, fast_inc, box, shadow)
+    def initialize(screen, config={})
       @widget_type = :FSCALE
+
+      x           = 0
+      y           = 0
+      title       = "fscale"
+      label       = "label"
+      field_attr  = Ncurses::A_NORMAL
+      field_width = 0
+      start       = 0
+      low         = 0
+      high        = 100
+      inc         = 1
+      fast_inc    = 5
+      digits      = 3
+      box         = true
+      shadow      = false
+
+      @digits = digits
+      super(screen, x, y, title, label, field_attr, field_width, start, low, high, inc, fast_inc, box, shadow)
     end
 
     def drawField

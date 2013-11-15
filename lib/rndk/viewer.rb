@@ -5,11 +5,20 @@ module RNDK
     DOWN = 0
     UP = 1
 
-    def initialize(rndkscreen, xplace, yplace, height, width,
-        buttons, button_count, button_highlight, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :viewer
 
+      x                = 0
+      y                = 0
+      width            = 0
+      height           = 0
+      buttons          = []
+      button_highlight = Ncurses::A_REVERSE
+      box              = true
+      shadow           = false
+
+      button_count     = buttons.size
       parent_width  = Ncurses.getmaxx(rndkscreen.window)
       parent_height = Ncurses.getmaxy(rndkscreen.window)
 
@@ -38,8 +47,8 @@ module RNDK
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -631,7 +640,7 @@ module RNDK
 
     # This moves the viewer field to the given location.
     # Inherited
-    # def move(xplace, yplace, relative, refresh_flag)
+    # def move(x, y, relative, refresh_flag)
     # end
 
     # This function draws the viewer widget.

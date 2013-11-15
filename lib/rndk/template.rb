@@ -2,10 +2,18 @@ require 'rndk'
 
 module RNDK
   class TEMPLATE < Widget
-    def initialize(screen, xplace, yplace, title, label, plate,
-        overlay, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :TEMPLATE
+
+      x       = 0
+      y       = 0
+      title   = "template"
+      label   = "label"
+      plate   = "##/##/####"
+      overlay = "dd/mm/yyyy"
+      box     = true
+      shadow  = false
 
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
@@ -61,8 +69,8 @@ module RNDK
           box_width - @label_len - 2 * @border_size].min
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -381,9 +389,9 @@ module RNDK
     end
 
     # Move the template field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @label_win, @field_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
+      self.move_specific(x, y, relative, refresh_flag,
           windows, [])
     end
 

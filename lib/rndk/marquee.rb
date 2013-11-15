@@ -2,13 +2,19 @@ require 'rndk'
 
 module RNDK
   class MARQUEE < Widget
-    def initialize(screen, xpos, ypos, width, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :MARQUEE
 
+      x      = 0
+      y      = 0
+      width  = 0
+      box    = true
+      shadow = false
+
       @screen = screen
       @parent = screen.window
-      @win = Ncurses.newwin(1, 1, ypos, xpos)
+      @win = Ncurses.newwin(1, 1, y, x)
       @active = true
       @width = width
       @shadow = shadow
@@ -134,7 +140,7 @@ module RNDK
 
     # This moves the marquee field to the given location.
     # Inherited
-    # def move(xplace, yplace, relative, refresh_flag)
+    # def move(x, y, relative, refresh_flag)
     # end
 
     # This draws the marquee widget on the screen.
@@ -179,12 +185,12 @@ module RNDK
 
     # This sets the widgets box attribute.
     def set_box(box)
-      xpos = if @win.nil? then 0 else Ncurses.getbegx(@win) end
-      ypos = if @win.nil? then 0 else Ncurses.getbegy(@win) end
+      x = if @win.nil? then 0 else Ncurses.getbegx(@win) end
+      y = if @win.nil? then 0 else Ncurses.getbegy(@win) end
 
       super
 
-      self.layoutWidget(xpos, ypos)
+      self.layoutWidget(x, y)
     end
 
 
@@ -199,7 +205,7 @@ module RNDK
       Ncurses.wbkgd(@win, attrib)
     end
 
-    def layoutWidget(xpos, ypos)
+    def layoutWidget(x, y)
       screen = @screen
       parent_width = Ncurses.getmaxx(@screen.window)
 
@@ -210,8 +216,8 @@ module RNDK
       box_height = (@border_size * 2) + 1
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xpos]
-      ytmp = [ypos]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(@screen.window, xtmp, ytmp, box_width, box_height)
       window = Ncurses.newwin(box_height, box_width, ytmp[0], xtmp[0])
 

@@ -9,24 +9,25 @@ module RNDK
     attr_reader :sock_attribute, :field_attribute, :filler_character
     attr_reader :dir_contents, :file_counter, :pwd, :pathname
 
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   height,
-                   width,
-                   title,
-                   label,
-                   field_attribute,
-                   filler_char,
-                   highlight,
-                   d_attribute,
-                   f_attribute,
-                   l_attribute,
-                   s_attribute,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :FSELECT
+
+      x               = 0
+      y               = 0
+      width           = 0
+      height          = 0
+      title           = "fselect"
+      label           = "label"
+      field_attribute = Ncurses::A_NORMAL
+      filler_char     = '_'
+      highlight       = Ncurses::A_REVERSE
+      d_attribute     = "</5>"
+      f_attribute     = "</48>"
+      l_attribute     = "</N>"
+      s_attribute     = "</N>"
+      box             = true
+      shadow          = false
 
       parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
@@ -47,8 +48,8 @@ module RNDK
       box_width = RNDK.setWidgetDimension(parent_width, width, 0)
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -426,11 +427,11 @@ module RNDK
     end
 
     # This moves the fselect field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @shadow_win]
       subwidgets = [@entry_field, @scroll_field]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag,
+      self.move_specific(x, y, relative, refresh_flag,
           windows, subwidgets)
     end
 

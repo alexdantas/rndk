@@ -2,10 +2,19 @@ require 'rndk'
 
 module RNDK
   class HISTOGRAM < Widget
-    def initialize(screen, xplace, yplace, height, width, orient,
-        title, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :HISTOGRAM
+
+      x      = 0
+      y      = 0
+      width  = 0
+      height = 0
+      orient = RNDK::HORIZONTAL
+      title  = "histogram"
+      box    = true
+      shadow = false
+
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
 
@@ -33,8 +42,8 @@ module RNDK
                   end
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -315,7 +324,7 @@ module RNDK
 
     # Move the histogram field to the given location.
     # Inherited
-    # def move(xplace, yplace, relative, refresh_flag)
+    # def move(x, y, relative, refresh_flag)
     # end
 
     # Draw the widget.

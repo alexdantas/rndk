@@ -11,9 +11,9 @@ module RNDK
 
     # Creates a Label Widget.
     #
-    # * `xplace` is the x position - can be an integer or `RNDK::LEFT`,
+    # * `x` is the x position - can be an integer or `RNDK::LEFT`,
     #   `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or `RNDK::TOP`,
+    # * `y` is the y position - can be an integer or `RNDK::TOP`,
     #   `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `message` is an Array of Strings with all the lines you'd want
     #   to show. RNDK markup applies (see RNDK#Markup).
@@ -21,23 +21,39 @@ module RNDK
     # * `shadow` turns on/off the shadow around the Widget.
     #
     # If the Widget cannot be created, returns `nil`.
-    def initialize(screen, xplace, yplace, mesg, box, shadow)
-
-      # Adjusting if the user sent us a String
-      mesg = [mesg] if mesg.class == String
-
-      return nil if mesg.class != Array or mesg.empty?
-
+    def initialize(screen, config={})
       super()
       @widget_type = :label
-      rows = mesg.size
+
+      # This is UGLY AS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
+      x      = 0
+      y      = 0
+      text   = "label"
+      box    = false
+      shadow = false
+
+      config.each do |key, val|
+        x      = val if key == :x
+        y      = val if key == :y
+        text   = val if key == :text
+        box    = val if key == :box
+        shadow = val if key == :shadow
+      end
+      # End of darkness
+
+      # Adjusting if the user sent us a String
+      text = [text] if text.class == String
+      return nil if text.class != Array or text.empty?
+      rows = text.size
 
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
       box_width  = -2**30  # -INFINITY
       box_height = 0
-      xpos = [xplace]
-      ypos = [yplace]
+      xpos = [x]
+      ypos = [y]
       x = 0
 
       self.set_box box
@@ -53,7 +69,7 @@ module RNDK
         # Translate the string to a chtype array
         info_len = []
         info_pos = []
-        @info << RNDK.char2Chtype(mesg[x], info_len, info_pos)
+        @info << RNDK.char2Chtype(text[x], info_len, info_pos)
         @info_len << info_len[0]
         @info_pos << info_pos[0]
 
@@ -121,9 +137,26 @@ module RNDK
     # Sets multiple attributes of the Widget.
     #
     # See Label#initialize.
-    def set(mesg, box)
-      self.set_message mesg
-      self.set_box box
+    def set(text, box)
+      # This is UGLY ATTRIBUTESS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
+      x      = 0
+      y      = 0
+      text   = "label"
+      box    = false
+      shadow = false
+
+      config.each do |key, val|
+        x      = val if key == :x
+        y      = val if key == :y
+        text   = val if key == :text
+        box    = val if key == :box
+        shadow = val if key == :shadow
+      end
+
+      self.set_message text if defined? text
+      self.set_box box      if defined? box
     end
 
     # Sets the contents of the Label Widget.

@@ -2,10 +2,24 @@ require 'rndk/scroller'
 
 module RNDK
   class RADIO < SCROLLER
-    def initialize(screen, xplace, yplace, splace, height, width, title,
-        list, list_size, choice_char, def_item, highlight, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :RADIO
+
+      x           = 0
+      y           = 0
+      splace      = RNDK::RIGHT
+      width       = 0
+      height      = 0
+      title       = "radio"
+      list        = []
+      choice_char = '#'.ord | Ncurses::A_REVERSE
+      def_item    = 0
+      highlight   = Ncurses::A_REVERSE
+      box         = true
+      shadow      = false
+
+      list_size    = list.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = width
@@ -63,8 +77,8 @@ module RNDK
       end
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, @box_width, @box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -246,9 +260,9 @@ module RNDK
     end
 
     # This moves the radio field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @scrollbar_win, @shadow_win]
-      self.move_specific(xplace, yplace, relative, refresh_flag,
+      self.move_specific(x, y, relative, refresh_flag,
           windows, subwidgets)
     end
 

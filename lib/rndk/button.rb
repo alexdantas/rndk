@@ -2,15 +2,22 @@ require 'rndk'
 
 module RNDK
   class BUTTON < Widget
-    def initialize(screen, xplace, yplace, text, callback, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :BUTTON
+
+      x        = 0
+      y        = 0
+      text     = "button"
+      action   = nil
+      box      = 0
+      shadow   = 0
 
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       self.set_box(box)
       box_height = 1 + 2 * @border_size
@@ -54,7 +61,7 @@ module RNDK
       @ypos = ypos
       @box_width = box_width
       @box_height = box_height
-      @callback = callback
+      @action = action
       @input_window = @win
       @accepts_focus = true
       @shadow = shadow
@@ -180,17 +187,17 @@ module RNDK
     end
 
     # @see Widget#move
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       current_x = Ncurses.getbegx(@win)
       current_y = Ncurses.getbegy(@win)
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       # If this is a relative move, then we will adjust where we want
       # to move to.
       if relative
-        xpos = Ncurses.getbegx(@win) + xplace
-        ypos = Ncurses.getbegy(@win) + yplace
+        xpos = Ncurses.getbegx(@win) + x
+        ypos = Ncurses.getbegy(@win) + y
       end
 
       # Adjust the window if we need to.
@@ -333,8 +340,8 @@ module RNDK
           self.set_exit_type(input)
           complete = true
         when ' '.ord, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-          unless @callback.nil?
-            @callback.call(self)
+          unless @action.nil?
+            @action.call(self)
           end
           self.set_exit_type(Ncurses::KEY_ENTER)
           ret = 0

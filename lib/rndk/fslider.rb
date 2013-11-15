@@ -2,24 +2,25 @@ require 'rndk/slider'
 
 module RNDK
   class FSLIDER < Slider
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   title,
-                   label,
-                   filler,
-                   field_width,
-                   start,
-                   low,
-                   high,
-                   inc,
-                   fast_inc,
-                   digits,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
+
+      x           = 0
+      y           = 0
+      title       = "fslider"
+      label       = "label"
+      filler      = ' '.ord | Ncurses::A_REVERSE
+      field_width = 0
+      start       = 0
+      low         = 0
+      high        = 100
+      inc         = 1
+      fast_inc    = 5
+      digits      = 3
+      box         = true
+      shadow      = false
 
       @digits = digits
-      super(screen, xplace, yplace, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
+      super(screen, x, y, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
       @widget_type = :FSLIDER
     end
 

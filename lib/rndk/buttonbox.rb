@@ -4,10 +4,23 @@ module RNDK
   class BUTTONBOX < Widget
     attr_reader :current_button
 
-    def initialize(screen, x_pos, y_pos, height, width, title, rows, cols,
-        buttons, button_count, highlight, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :BUTTONBOX
+
+      x_pos        = 0
+      y_pos        = 0
+      width        = 0
+      height       = 0
+      title        = "buttonbox"
+      rows         = 0
+      cols         = 0
+      buttons      = []
+      highlight    = Ncurses::A_REVERSE
+      box          = false
+      shadow       = false
+
+      button_count = buttons.size
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       col_width = 0

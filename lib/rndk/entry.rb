@@ -89,9 +89,9 @@ module RNDK
     #
     # ## Arguments
     #
-    # * `xplace` is the x position - can be an integer or
+    # * `x` is the x position - can be an integer or
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or
+    # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `title` can be more than one line - just split them
     #   with `\n`s.
@@ -114,21 +114,22 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   title,
-                   label,
-                   field_attr,
-                   filler,
-                   disp_type,
-                   f_width,
-                   min,
-                   max,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :entry
+
+      x          = 0
+      y          = 0
+      title      = "entry"
+      label      = "label"
+      field_attr = Ncurses::A_NORMAL
+      filler     = '.'
+      disp_type  = :MIXED
+      f_width    = 0
+      min        = 0
+      max        = 100
+      box        = true
+      shadow     = false
 
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
@@ -136,8 +137,8 @@ module RNDK
       field_width = f_width
       box_width   = 0
 
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       self.set_box box
       box_height = @border_size*2 + 1
@@ -487,10 +488,10 @@ module RNDK
     end
 
     # @see Widget#move
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # Clears the text from the entry field.

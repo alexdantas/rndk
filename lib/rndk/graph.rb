@@ -2,16 +2,18 @@ require 'rndk'
 
 module RNDK
   class GRAPH < Widget
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   height,
-                   width,
-                   title,
-                   xtitle,
-                   ytitle)
+    def initialize(screen, config={})
       super()
       @widget_type = :GRAPH
+
+      x      = 0
+      y      = 0
+      width  = 0
+      height = 0
+      title  = "graph"
+      xtitle = "x"
+      ytitle = "y"
+
       parent_width = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
 
@@ -25,8 +27,8 @@ module RNDK
       box_height = [parent_height, box_height].min
 
       # Rejustify the x and y positions if we need to
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -242,17 +244,17 @@ module RNDK
     end
 
     # Move the graph field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       current_x = Ncurses.getbegx(@win)
       current_y = Ncurses.getbegy(@win)
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       # If this is a relative move, then we will adjust where we want
       # to move to
       if relative
-        xpos = Ncurses.getbegx(@win) + xplace
-        ypos = Ncurses.getbegy(@win) + yplace
+        xpos = Ncurses.getbegx(@win) + x
+        ypos = Ncurses.getbegy(@win) + y
       end
 
       # Adjust the window if we need to.

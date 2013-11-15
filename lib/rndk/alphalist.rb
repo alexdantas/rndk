@@ -39,9 +39,9 @@ module RNDK
 
     # Creates an Alphalist Widget.
     #
-    # * `xplace` is the x position - can be an integer or `RNDK::LEFT`,
+    # * `x` is the x position - can be an integer or `RNDK::LEFT`,
     #   `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or `RNDK::TOP`,
+    # * `y` is the y position - can be an integer or `RNDK::TOP`,
     #   `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `width`/`height` are integers - if either are 0, Widget
     #   will be created with full width/height of the screen.
@@ -62,20 +62,22 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize(screen,
-                   xplace,
-                   yplace,
-                   width,
-                   height,
-                   title,
-                   label,
-                   list,
-                   filler_char,
-                   highlight,
-                   box,
-                   shadow)
+    def initialize(screen, config={})
       super()
       @widget_type  = :alphalist
+
+      x           = 0
+      y           = 0
+      width       = 0
+      height      = 0
+      title       = "alphalist"
+      label       = "label"
+      list        = []
+      filler_char = '.'
+      highlight   = Ncurses::A_REVERSE
+      box         = false
+      shadow      = false
+
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
 
@@ -112,8 +114,8 @@ module RNDK
       end
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xplace]
-      ytmp = [yplace]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
@@ -397,10 +399,10 @@ module RNDK
     end
 
     # @see Widget#move
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @shadow_win]
       subwidgets = [@entry_field, @scroll_field]
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
+      self.move_specific(x, y, relative, refresh_flag, windows, subwidgets)
     end
 
     # The alphalist's focus resides in the entry widget. But the scroll widget

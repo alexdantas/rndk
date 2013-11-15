@@ -8,6 +8,5 @@ module RNDK
     # sake.
 
     @widget_type = :USCALE
-
   end
 end

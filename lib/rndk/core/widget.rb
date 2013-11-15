@@ -96,19 +96,19 @@ module RNDK
 
     # Moves the Widget to the given position.
     #
-    # * `xplace` and `yplace` are the new position of the Widget.
+    # * `x` and `y` are the new position of the Widget.
     #
-    # * `xplace` may be an integer or one of the pre-defined
+    # * `x` may be an integer or one of the pre-defined
     #   values `RNDK::TOP`, `RNDK::BOTTOM`, and `RNDK::CENTER`.
     #
-    # * `yplace` may be an integer or one of the pre-defined
+    # * `y` may be an integer or one of the pre-defined
     #   values `RNDK::LEFT`, `RNDK::RIGHT`, and `RNDK::CENTER`.
     #
-    # * `relative` states whether the `xplace`/`yplace` pair is a
+    # * `relative` states whether the `x`/`y` pair is a
     #   relative move over it's current position or an absolute move
     #   over the Screen's top.
     #
-    # For example, if `xplace = 1` and `yplace = 2` and `relative = true`,
+    # For example, if `x = 1` and `y = 2` and `relative = true`,
     # the Widget would move one row down and two columns right.
     #
     # If the value of relative was `false` then the widget would move to
@@ -120,8 +120,8 @@ module RNDK
     # * `refresh_flag` is a boolean value which states whether the
     #   Widget will get refreshed after the move.
     #
-    def move(xplace, yplace, relative, refresh_flag)
-      self.move_specific(xplace, yplace, relative, refresh_flag, [@win, @shadow_win], [])
+    def move(x, y, relative, refresh_flag)
+      self.move_specific(x, y, relative, refresh_flag, [@win, @shadow_win], [])
     end
 
     # Set the widget's title.
@@ -560,17 +560,17 @@ module RNDK
     protected
 
     # Actually moves the widget.
-    def move_specific(xplace, yplace, relative, refresh_flag, windows, subwidgets)
+    def move_specific(x, y, relative, refresh_flag, windows, subwidgets)
       current_x = Ncurses.getbegx @win
       current_y = Ncurses.getbegy @win
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       # If this is a relative move, then we will adjust where we want
       # to move to.
       if relative
-        xpos = Ncurses.getbegx(@win) + xplace
-        ypos = Ncurses.getbegy(@win) + yplace
+        xpos = Ncurses.getbegx(@win) + x
+        ypos = Ncurses.getbegy(@win) + y
       end
 
       # Adjust the window if we need to
@@ -590,7 +590,7 @@ module RNDK
       end
 
       subwidgets.each do |subwidget|
-        subwidget.move(xplace, yplace, relative, false)
+        subwidget.move(x, y, relative, false)
       end
 
       # Touch the windows so they 'move'

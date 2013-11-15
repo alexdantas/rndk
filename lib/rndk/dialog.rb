@@ -5,21 +5,33 @@ module RNDK
     attr_reader :current_button
     MIN_DIALOG_WIDTH = 10
 
-    def initialize(screen, xplace, yplace, mesg, rows, button_label,
-        button_count, highlight, separator, box, shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :DIALOG
+
+      x            = 0
+      y            = 0
+      mesg         = "dialog"
+      rows         = 0
+      buttons      = []
+      highlight    = Ncurses::A_REVERSE
+      separator    = true
+      box          = true
+      shadow       = false
+
+      button_count = buttons.size
+
       box_width = DIALOG::MIN_DIALOG_WIDTH
       max_message_width = -1
       button_width = 0
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
       temp = 0
       buttonadj = 0
       @info = []
       @info_len = []
       @info_pos = []
-      @button_label = []
+      @buttons = []
       @button_len = []
       @button_pos = []
 
@@ -45,7 +57,7 @@ module RNDK
       # Translate the button label string to a chtype array
       (0...button_count).each do |x|
         button_len = []
-        @button_label << RNDK.char2Chtype(button_label[x], button_len, [])
+        @buttons << RNDK.char2Chtype(buttons[x], button_len, [])
         @button_len << button_len[0]
         button_width += button_len[0] + 1
       end
@@ -119,7 +131,7 @@ module RNDK
       # Lets move to the first button.
       Draw.writeChtypeAttrib(@win,
                              @button_pos[@current_button],
-                             @box_height - 1 - @border_size, @button_label[@current_button],
+                             @box_height - 1 - @border_size, @buttons[@current_button],
                              @highlight,
                              RNDK::HORIZONTAL,
                              0,
@@ -309,7 +321,7 @@ module RNDK
         Draw.writeChtype(@win,
                          @button_pos[x],
                          @box_height -1 - @border_size,
-                         @button_label[x],
+                         @buttons[x],
                          RNDK::HORIZONTAL,
                          0,
                          @button_len[x])
@@ -338,7 +350,7 @@ module RNDK
       Draw.writeChtypeAttrib(@win,
                              @button_pos[@current_button],
                              @box_height - 1 - @border_size,
-                             @button_label[@current_button],
+                             @buttons[@current_button],
                              @highlight,
                              RNDK::HORIZONTAL,
                              0,

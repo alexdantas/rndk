@@ -38,9 +38,9 @@ module RNDK
 
     # Creates a Scroll Widget.
     #
-    # * `xplace` is the x position - can be an integer or
+    # * `x` is the x position - can be an integer or
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
-    # * `yplace` is the y position - can be an integer or
+    # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
     # * `splace` is where the scrollbar will be placed.
     #   It can be only `RNDK::LEFT`, `RNDK::RIGHT` or
@@ -59,20 +59,21 @@ module RNDK
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
-    def initialize (screen,
-                    xplace,
-                    yplace,
-                    splace,
-                    width,
-                    height,
-                    title,
-                    list,
-                    numbers,
-                    highlight,
-                    box,
-                    shadow)
+    def initialize(screen, config={})
       super()
       @widget_type = :scroll
+
+      x         = 0
+      y         = 0
+      splace    = RNDK::RIGHT
+      width     = 0
+      height    = 0
+      title     = "scroll"
+      list      = []
+      numbers   = false
+      highlight = Ncurses::A_REVERSE
+      box       = true
+      shadow    = false
 
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
@@ -80,8 +81,8 @@ module RNDK
       box_width  = width
       box_height = height
 
-      xpos = xplace
-      ypos = yplace
+      xpos = x
+      ypos = y
 
       scroll_adjust = 0
 
@@ -330,10 +331,10 @@ module RNDK
     end
 
     # This moves the scroll field to the given location.
-    def move(xplace, yplace, relative, refresh_flag)
+    def move(x, y, relative, refresh_flag)
       windows = [@win, @list_win, @shadow_win, @scrollbar_win]
 
-      self.move_specific(xplace, yplace, relative, refresh_flag, windows, [])
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # This function draws the scrolling list widget.
