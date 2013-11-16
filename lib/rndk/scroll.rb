@@ -42,7 +42,7 @@ module RNDK
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
     # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
-    # * `splace` is where the scrollbar will be placed.
+    # * `scroll_bar` is where the scrollbar will be placed.
     #   It can be only `RNDK::LEFT`, `RNDK::RIGHT` or
     #   `RNDK::NONE`, for no scrollbar.
     # * `width`/`height` are integers - if either are 0, Widget
@@ -65,7 +65,7 @@ module RNDK
 
       x         = 0
       y         = 0
-      splace    = RNDK::RIGHT
+      scroll_bar    = RNDK::RIGHT
       width     = 0
       height    = 0
       title     = "scroll"
@@ -78,7 +78,7 @@ module RNDK
       config.each do |key, val|
         x         = val if key == :x
         y         = val if key == :y
-        splace    = val if key == :splace
+        scroll_bar    = val if key == :scroll_bar
         width     = val if key == :width
         height    = val if key == :height
         title     = val if key == :title
@@ -128,7 +128,7 @@ module RNDK
       end
 
       # Adjust the box width if there is a scroll bar
-      if splace == RNDK::LEFT || splace == RNDK::RIGHT
+      if scroll_bar == RNDK::LEFT || scroll_bar == RNDK::RIGHT
         @scrollbar = true
         box_width += 1
       else
@@ -166,13 +166,13 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the scrollbar window.
-      if splace == RNDK::RIGHT
+      if scroll_bar == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win,
                                         self.max_view_size,
                                         1,
                                         self.Screen_YPOS(ypos),
                                         xpos + box_width - @border_size - 1)
-      elsif splace == RNDK::LEFT
+      elsif scroll_bar == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win,
                                         self.max_view_size,
                                         1,
@@ -187,13 +187,13 @@ module RNDK
                                  self.max_view_size,
                                  box_width - (2 * @border_size) - scroll_adjust,
                                  self.Screen_YPOS(ypos),
-                                 self.Screen_XPOS(xpos) + (if splace == RNDK::LEFT then 1 else 0 end))
+                                 self.Screen_XPOS(xpos) + (if scroll_bar == RNDK::LEFT then 1 else 0 end))
 
       # Set the rest of the variables
       @screen = screen
       @parent = screen.window
       @shadow_win = nil
-      @scrollbar_placement = splace
+      @scrollbar_placement = scroll_bar
       @max_left_char = 0
       @left_char = 0
       @highlight = highlight

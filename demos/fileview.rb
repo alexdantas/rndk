@@ -27,7 +27,7 @@ begin
   if filename == ''
     title = '<C>Pick a file.'
     label = 'File: '
-    fselect = RNDK::FSELECT.new(screen,
+    fselect = RNDK::Fselect.new(screen,
                                 RNDK::CENTER,
                                 RNDK::CENTER,
                                 20,

@@ -2,7 +2,7 @@ require 'rndk'
 
 module RNDK
 
-  class FSELECT < Widget
+  class Fselect < Widget
 
     attr_reader :scroll_field, :entry_field
     attr_reader :dir_colorute, :file_colorute, :link_colorute, :highlight
@@ -11,7 +11,7 @@ module RNDK
 
     def initialize(screen, config={})
       super()
-      @widget_type = :FSELECT
+      @widget_type = :fselect
 
       x               = 0
       y               = 0
@@ -116,7 +116,7 @@ module RNDK
       RNDK.char2Chtype(label, label_len, [])
       label_len = label_len[0]
 
-      temp_width = if RNDK::FSELECT.isFullWidth(width)
+      temp_width = if RNDK::Fselect.isFullWidth(width)
                    then RNDK::FULL
                    else box_width - 2 - label_len
                    end
@@ -212,7 +212,7 @@ module RNDK
         end
 
         # Try to expand the filename if it starts with a ~
-        unless (new_filename = RNDK::FSELECT.expandTilde(filename)).nil?
+        unless (new_filename = RNDK::Fselect.expandTilde(filename)).nil?
           filename = new_filename
           entry.set_text(filename)
           entry.draw(entry.box)
@@ -375,7 +375,7 @@ module RNDK
           #current = RNDK.chtype2String(scrollp.item[scrollp.current_item])
           current = current[0...-1]
 
-          temp = RNDK::FSELECT.make_pathname(fselect.pwd, current)
+          temp = RNDK::Fselect.make_pathname(fselect.pwd, current)
 
           # Set the value in the entry field.
           entry.set_text(temp)
@@ -400,7 +400,7 @@ module RNDK
 
       # Create the scrolling list in the selector.
       temp_height = Ncurses.getmaxy(@entry_field.win) - @border_size
-      temp_width = if RNDK::FSELECT.isFullWidth(width)
+      temp_width = if RNDK::Fselect.isFullWidth(width)
                    then RNDK::FULL
                    else box_width - 1
                    end
@@ -432,7 +432,7 @@ module RNDK
         self.bind(from, :getc, to)
       end
 
-      screen.register(:FSELECT, self)
+      screen.register(@widget_type, self)
     end
 
     # This erases the file selector from the screen.
@@ -595,7 +595,7 @@ module RNDK
       # Only do the directory stuff if the directory is not nil.
       if !(directory.nil?) && directory.size > 0
         # Try to expand the directory if it starts with a ~
-        if (temp_dir = RNDK::FSELECT.expandTilde(directory)).size > 0
+        if (temp_dir = RNDK::Fselect.expandTilde(directory)).size > 0
           new_directory = temp_dir
         else
           new_directory = directory.clone
@@ -917,7 +917,7 @@ module RNDK
       temp_char = temp_char[0..-1]
 
       # Create the pathname.
-      result = RNDK::FSELECT.make_pathname(@pwd, temp_char)
+      result = RNDK::Fselect.make_pathname(@pwd, temp_char)
 
       return result
     end

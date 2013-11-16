@@ -46,15 +46,10 @@ module RNDK
     #
     # @note: `message` must be a String or an Array of Strings.
     def popup_label message
-      # Adjusting if the user sent us a String
-      message = [message] if message.class == String
-
-      return if message.class != Array or message.empty?
-
       self.cleanly do
         popup = RNDK::Label.new(self, {
-                                  :x => CENTER,
-                                  :y => CENTER,
+                                  :x => RNDK::CENTER,
+                                  :y => RNDK::CENTER,
                                   :text => message
                                 })
         popup.draw true
@@ -71,20 +66,19 @@ module RNDK
     #
     # @note: `message` must be an array of strings.
     def popup_label_color(message, attrib)
-      # Adjusting if the user sent us a String
-      message = [message] if message.class == String
-
-      return if message.class != Array or message.empty?
-
       self.cleanly do
-        popup = RNDK::Label.new(self, CENTER, CENTER, message, true, false)
-        popup.setBackgroundAttrib attrib
+        popup = RNDK::Label.new(self, {
+                                  :x => RNDK::CENTER,
+                                  :y => RNDK::CENTER,
+                                  :text => message
+                                })
+
+        popup.set_bg_color attrib
         popup.draw(true)
 
         # Wait for some input
         Ncurses.keypad(popup.win, true)
-        popup.getch([])
-
+        popup.getch
         popup.destroy
       end
     end
@@ -97,28 +91,19 @@ module RNDK
     #
     # @note: `message` and `buttons` must be Arrays of Strings.
     def popup_dialog(message, buttons)
-      # Adjusting if the user sent us a String
-      message = [message] if message.class == String
-
-      # Adjusting if the user sent us a String
-      buttons = [buttons] if buttons.class == String
-
-      return nil if message.class != Array or message.empty?
-      return nil if buttons.class != Array or buttons.empty?
+      return nil if message.empty? or buttons.empty?
 
       choice = 0
       self.cleanly do
-        popup = RNDK::Dialog.new(self,
-                                 RNDK::CENTER,
-                                 RNDK::CENTER,
-                                 message,
-                                 message.size,
-                                 buttons,
-                                 buttons.size,
-                                 Ncurses::A_REVERSE,
-                                 true, true, false)
-        popup.draw(true)
-        choice = popup.activate('')
+        popup = RNDK::Dialog.new(self, {
+                                   :x => RNDK::CENTER,
+                                   :y => RNDK::CENTER,
+                                   :text => message,
+                                   :buttons => buttons
+                                 })
+
+        popup.draw true
+        choice = popup.activate
         popup.destroy
       end
       choice
@@ -140,25 +125,21 @@ module RNDK
       selected = -1
 
       # Create the file viewer to view the file selected.
-      viewer = RNDK::Viewer.new(self,
-                                RNDK::CENTER,
-                                RNDK::CENTER,
-                                -6,
-                                -16,
-                                buttons,
-                                buttons.size,
-                                Ncurses::A_REVERSE,
-                                true,
-                                true)
+      viewer = RNDK::Viewer.new(self, {
+                                  :x => RNDK::CENTER,
+                                  :y => RNDK::CENTER,
+                                  :width => -6,
+                                  :height => -16,
+                                  :buttons => buttons,
+                                  :shadow => true
+                                })
 
       # Set up the viewer title, and the contents of the widget.
-      viewer.set(title,
-                 info,
-                 info.size,
-                 Ncurses::A_REVERSE,
-                 hide_control_chars,
-                 true,
-                 true)
+      viewer.set({
+                   :title => title,
+                   :items => info,
+                   :hide_control_chars => hide_control_chars
+                 })
 
       selected = viewer.activate([])
 
@@ -210,24 +191,16 @@ module RNDK
     #
     def select_file title
 
-      fselect = RNDK::FSELECT.new(self,
-                                  RNDK::CENTER,
-                                  RNDK::CENTER,
-                                  -4,
-                                  -20,
-                                  title,
-                                  'File: ',
-                                  Ncurses::A_NORMAL,
-                                  '_',
-                                  Ncurses::A_REVERSE,
-                                  '</5>',
-                                  '</48>',
-                                  '</N>',
-                                  '</N>',
-                                  true,
-                                  false)
+      fselect = RNDK::Fselect.new(self, {
+                                    :x => RNDK::CENTER,
+                                    :y => RNDK::CENTER,
+                                    :width =>-20,
+                                    :height => -4,
+                                    :title => title,
+                                    :label => 'File: '
+                                  })
 
-      filename = fselect.activate([])
+      filename = fselect.activate
 
       # Check the way the user exited the selector.
       if fselect.exit_type != :NORMAL
@@ -270,24 +243,21 @@ module RNDK
       width = [width, title.size].max
       width += 5
 
-      scrollp = RNDK::Scroll.new(self,
-                                 RNDK::CENTER,
-                                 RNDK::CENTER,
-                                 RNDK::RIGHT,
-                                 width,
-                                 height,
-                                 title,
-                                 list,
-                                 numbers,
-                                 Ncurses::A_REVERSE,
-                                 true,
-                                 false)
+      scrollp = RNDK::Scroll.new(self, {
+                                   :x => RNDK::CENTER,
+                                   :y => RNDK::CENTER,
+                                   :width => width,
+                                   :height => height,
+                                   :title => title,
+                                   :items => list,
+                                   :numbers => numbers
+                                 })
       if scrollp.nil?
         self.refresh
         return -1
       end
 
-      selected = scrollp.activate([])
+      selected = scrollp.activate
 
       # Check how they exited.
       if scrollp.exit_type != :NORMAL
@@ -306,23 +276,16 @@ module RNDK
     # `title`, `label` and `initial_text` are passed to the Widget.
     def get_string(title, label, initial_text="")
 
-      widget = RNDK::Entry.new(self,
-                               RNDK::CENTER,
-                               RNDK::CENTER,
-                               title,
-                               label,
-                               Ncurses::A_NORMAL,
-                               '.',
-                               :MIXED,
-                               40,
-                               0,
-                               5000,
-                               true,
-                               false)
+      widget = RNDK::Entry.new(self, {
+                                 :x => RNDK::CENTER,
+                                 :y => RNDK::CENTER,
+                                 :title => title,
+                                 :label => label,
+                                 :field_width => 40,
+                                 :initial_text => initial_text
+                               })
 
-      widget.set_text(initial_text)
-
-      value = widget.activate([])
+      value = widget.activate
 
       # Make sure they exited normally.
       if widget.exit_type != :NORMAL

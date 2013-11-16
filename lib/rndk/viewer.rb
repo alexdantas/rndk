@@ -118,7 +118,7 @@ module RNDK
       @max_left_char = 0
       @max_top_line = 0
       @characters = 0
-      @list_size = -1
+      @items_size = -1
       @show_line_info = 1
       @exit_type = :EARLY_EXIT
 
@@ -145,13 +145,40 @@ module RNDK
     end
 
     # This function sets various attributes of the widget.
-    def set(title, list, list_size, button_highlight,
-        attr_interp, show_line_info, box)
-      self.set_title(title)
-      self.set_highlight(button_highlight)
+    def set(config)
+      x                = 0
+      y                = 0
+      width            = 0
+      height           = 0
+      items            = []
+      hide_control_chars = true
+      show_line_info   = true
+      title            = "viewer"
+      buttons          = []
+      button_highlight = Ncurses::A_REVERSE
+      box              = true
+      shadow           = false
+
+      config.each do |key, val|
+        x                = val if key == :x
+        y                = val if key == :y
+        width            = val if key == :width
+        height           = val if key == :height
+        title            = val if key == :title
+        items            = val if key == :items
+        hide_control_chars = val if key == :hide_control_chars
+        show_line_info   = val if key == :show_line_info
+        buttons          = val if key == :buttons
+        button_highlight = val if key == :button_highlight
+        box              = val if key == :box
+        shadow           = val if key == :shadow
+      end
+
+      self.set_title(title)                  if title != "viewer"
+      self.set_highlight(button_highlight)   if button_highlight != Ncurses::A_REVERSE
       self.set_info_line(show_line_info)
-      self.set_box(box)
-      return self.set_info(list, list_size, attr_interp)
+      self.set_box(box)                      if box
+      self.set_info(items, hide_control_chars) if not items.empty?
     end
 
     # This sets the title of the viewer. (A nil title is allowed.
@@ -168,60 +195,60 @@ module RNDK
       @title
     end
 
-    def setup_line(interpret, list, x)
+    def setup_line(interpret, items, x)
       # Did they ask for attribute interpretation?
       if interpret
-        list_len = []
-        list_pos = []
-        @list[x] = RNDK.char2Chtype(list, list_len, list_pos)
-        @list_len[x] = list_len[0]
-        @list_pos[x] = RNDK.justifyString(@box_width, @list_len[x], list_pos[0])
+        items_len = []
+        items_pos = []
+        @items[x] = RNDK.char2Chtype(items, items_len, items_pos)
+        @items_len[x] = items_len[0]
+        @items_pos[x] = RNDK.justifyString(@box_width, @items_len[x], items_pos[0])
       else
         # We must convert tabs and other nonprinting characters. The curses
         # library normally does this, but we are bypassing it by writing
         # chtypes directly.
         t = ''
         len = 0
-        (0...list.size).each do |y|
-          if list[y] == "\t".ord
+        (0...items.size).each do |y|
+          if items[y] == "\t".ord
             begin
               t  << ' '
               len += 1
             end while (len & 7) != 0
-          elsif RNDK.CharOf(list[y].ord).match(/^[[:print:]]$/)
-            t << RNDK.CharOf(list[y].ord)
+          elsif RNDK.CharOf(items[y].ord).match(/^[[:print:]]$/)
+            t << RNDK.CharOf(items[y].ord)
             len += 1
           else
-            t << Ncurses.unctrl(list[y].ord)
+            t << Ncurses.unctrl(items[y].ord)
             len += 1
           end
         end
-        @list[x] = t
-        @list_len[x] = t.size
-        @list_pos[x] = 0
+        @items[x] = t
+        @items_len[x] = t.size
+        @items_pos[x] = 0
       end
-      @widest_line = [@widest_line, @list_len[x]].max
+      @widest_line = [@widest_line, @items_len[x]].max
     end
 
     def free_line(x)
-      @list[x] = '' if x < @list_size
+      @items[x] = '' if x < @items_size
     end
 
     # This function sets the contents of the viewer.
-    def set_info(list, list_size, interpret)
+    def set_info(items, interpret)
       current_line = 0
-      viewer_size = list_size
+      viewer_size = items.size
 
-      if list_size < 0
-        list_size = list.size
+      if items.size < 0
+        items.size = items.size
       end
 
       # Compute the size of the resulting display
-      viewer_size = list_size
-      if list.size > 0 && interpret
-        (0...list_size).each do |x|
+      viewer_size = items.size
+      if items.size > 0 && interpret
+        (0...items.size).each do |x|
           filename = ''
-          if RNDK.checkForLink(list[x], filename) == 1
+          if RNDK.checkForLink(items[x], filename) == 1
             file_contents = []
             file_len = RNDK.read_file(filename, file_contents)
 
@@ -235,7 +262,7 @@ module RNDK
       # Clean out the old viewer info. (if there is any)
       @in_progress = true
       self.clean
-      self.create_list(viewer_size)
+      self.create_items(viewer_size)
 
       # Keep some semi-permanent info
       @interpret = interpret
@@ -243,16 +270,16 @@ module RNDK
       # Copy the information given.
       current_line = 0
       x = 0
-      while x < list_size && current_line < viewer_size
-        if list[x].size == 0
-          @list[current_line] = ''
-          @list_len[current_line] = 0
-          @list_pos[current_line] = 0
+      while x < items.size && current_line < viewer_size
+        if items[x].size == 0
+          @items[current_line] = ''
+          @items_len[current_line] = 0
+          @items_pos[current_line] = 0
           current_line += 1
         else
           # Check if we have a file link in this line.
           filename = []
-          if RNDK.checkForLink(list[x], filename) == 1
+          if RNDK.checkForLink(items[x], filename) == 1
             # We have a link, open the file.
             file_contents = []
             file_len = 0
@@ -275,13 +302,13 @@ module RNDK
                   break
                 end
                 self.setup_line(false, file_contents[file_line], current_line)
-                @characters += @list_len[current_line]
+                @characters += @items_len[current_line]
                 current_line += 1
               end
             end
           elsif current_line < viewer_size
-            self.setup_line(@interpret, list[x], current_line)
-            @characters += @list_len[current_line]
+            self.setup_line(@interpret, items[x], current_line)
+            @characters += @items_len[current_line]
             current_line += 1
           end
         end
@@ -296,20 +323,20 @@ module RNDK
         @max_left_char = 0
       end
 
-      # Set up the needed vars for the viewer list.
+      # Set up the needed vars for the viewer items.
       @in_progress = false
-      @list_size = viewer_size
-      if @list_size <= @view_size
+      @items_size = viewer_size
+      if @items_size <= @view_size
         @max_top_line = 0
       else
-        @max_top_line = @list_size - 1
+        @max_top_line = @items_size - 1
       end
-      return @list_size
+      return @items_size
     end
 
     def get_info(size)
-      size << @list_size
-      @list
+      size << @items_size
+      @items
     end
 
     # This function sets the highlight type of the buttons.
@@ -334,12 +361,12 @@ module RNDK
     # This removes all the lines inside the scrolling window.
     def clean
       # Clean up the memory used...
-      (0...@list_size).each do |x|
+      (0...@items_size).each do |x|
         self.free_line(x)
       end
 
       # Reset some variables.
-      @list_size = 0
+      @items_size = 0
       @max_left_char = 0
       @widest_line = 0
       @current_top = 0
@@ -364,7 +391,7 @@ module RNDK
           '</5>      </U>File Statistics<!U>     <!5>',
           '</5>                          <!5>',
           '</5/R>Character Count:<!R> %-4d     <!5>' % @characters,
-          '</5/R>Line Count     :<!R> %-4d     <!5>' % @list_size,
+          '</5/R>Line Count     :<!R> %-4d     <!5>' % @items_size,
           '</5>                          <!5>',
           '<C></5>Press Any Key To Continue.<!5>'
       ]
@@ -374,7 +401,7 @@ module RNDK
       # Set the current button.
       @current_button = 0
 
-      # Draw the widget list.
+      # Draw the widget items.
       self.draw(@box)
 
       # Do this until KEY_ENTER is hit.
@@ -470,7 +497,7 @@ module RNDK
             @current_top = @max_top_line
             refresh = true
           when 'L'.ord
-            x = (@list_size + @current_top) / 2
+            x = (@items_size + @current_top) / 2
             if x < @max_top_line
               @current_top = x
               refresh = true
@@ -565,11 +592,11 @@ module RNDK
       end
 
       # Activate this baby.
-      list = get_pattern.activate([])
+      items = get_pattern.activate([])
 
-      # Save teh list.
-      if list.size != 0
-        @search_pattern = list
+      # Save teh items.
+      if items.size != 0
+        @search_pattern = items
       end
 
       # Clean up.
@@ -586,11 +613,11 @@ module RNDK
         if direction == RNDK::Viewer::DOWN
           # Start looking from 'here' down.
           x = @current_top + 1
-          while !found && x < @list_size
+          while !found && x < @items_size
             pos = 0
             y = 0
-            while y < @list[x].size
-              plain_char = RNDK.CharOf(@list[x][y])
+            while y < @items[x].size
+              plain_char = RNDK.CharOf(@items[x][y])
 
               pos += 1
               if @RNDK.CharOf(pattern[pos-1]) != plain_char
@@ -612,8 +639,8 @@ module RNDK
           while ! found && x >= 0
             y = 0
             pos = 0
-            while y < @list[x].size
-              plain_char = RNDK.CharOf(@list[x][y])
+            while y < @items[x].size
+              plain_char = RNDK.CharOf(@items[x][y])
 
               pos += 1
               if RNDK.CharOf(pattern[pos-1]) != plain_char
@@ -636,7 +663,7 @@ module RNDK
     def jump_to_line
       newline = RNDK::Scale.new(@screen, RNDK::CENTER, RNDK::CENTER,
           '<C>Jump To Line', '</5>Line :', Ncurses::A_BOLD,
-          @list_size.size + 1, @current_top + 1, 0, @max_top_line + 1,
+          @items_size.size + 1, @current_top + 1, 0, @max_top_line + 1,
           1, 10, true, true)
       line = newline.activate([])
       newline.destroy
@@ -717,9 +744,9 @@ module RNDK
     end
 
     def destroy_info
-      @list = []
-      @list_pos = []
-      @list_len = []
+      @items = []
+      @items_pos = []
+      @items_len = []
     end
 
     # This function destroys the viewer widget.
@@ -761,23 +788,23 @@ module RNDK
         # Set up the info line and draw it.
         if @in_progress
           temp = 'processing...'
-        elsif @list_size != 0
-          temp = '%d/%d %2.0f%%' % [@current_top + 1, @list_size,
-              ((1.0 * @current_top + 1) / (@list_size)) * 100]
+        elsif @items_size != 0
+          temp = '%d/%d %2.0f%%' % [@current_top + 1, @items_size,
+              ((1.0 * @current_top + 1) / (@items_size)) * 100]
         else
           temp = '%d/%d %2.0f%%' % [0, 0, 0.0]
         end
 
-        # The list_adjust variable tells us if we have to shift down one line
+        # The items_adjust variable tells us if we have to shift down one line
         # because the person asked for the line X of Y line at the top of the
         # screen. We only want to set this to true if they asked for the info
         # line and there is no title or if the two items overlap.
         if @title_lines == '' || @title_pos[0] < temp.size + 2
-          list_adjust = true
+          items_adjust = true
         end
         Draw.writeChar(@win,
                        1,
-                       if list_adjust then @title_lines else 0 end + 1,
+                       if items_adjust then @title_lines else 0 end + 1,
                        temp,
                        RNDK::HORIZONTAL,
                        0,
@@ -785,24 +812,24 @@ module RNDK
       end
 
       # Determine the last line to draw.
-      last_line = [@list_size, @view_size].min
-      last_line -= if list_adjust then 1 else 0 end
+      last_line = [@items_size, @view_size].min
+      last_line -= if items_adjust then 1 else 0 end
 
-      # Redraw the list.
+      # Redraw the items.
       (0...last_line).each do |x|
-        if @current_top + x < @list_size
-          screen_pos = @list_pos[@current_top + x] + 1 - @left_char
+        if @current_top + x < @items_size
+          screen_pos = @items_pos[@current_top + x] + 1 - @left_char
 
           Draw.writeChtype(@win,
                            if screen_pos >= 0 then screen_pos else 1 end,
-                           x + @title_lines + if list_adjust then 1 else 0 end + 1,
-                           @list[x + @current_top],
+                           x + @title_lines + if items_adjust then 1 else 0 end + 1,
+                           @items[x + @current_top],
                            RNDK::HORIZONTAL,
                            if screen_pos >= 0
                            then 0
-                           else @left_char - @list_pos[@current_top + x]
+                           else @left_char - @items_pos[@current_top + x]
                            end,
-                           @list_len[x + @current_top])
+                           @items_len[x + @current_top])
         end
       end
 
@@ -828,18 +855,18 @@ module RNDK
       self.draw_buttons
     end
 
-    # The list_size may be negative, to assign no definite limit.
-    def create_list(list_size)
+    # The items_size may be negative, to assign no definite limit.
+    def create_items(items_size)
       status = false
 
       self.destroy_info
 
-      if list_size >= 0
+      if items_size >= 0
         status = true
 
-        @list = []
-        @list_pos = []
-        @list_len = []
+        @items = []
+        @items_pos = []
+        @items_len = []
       end
       return status
     end

@@ -84,7 +84,6 @@ module RNDK
     attr_reader :win, :box_height, :box_width, :max, :field_width
     attr_reader :min, :max
 
-
     # Creates an Entry Widget.
     #
     # ## Arguments
@@ -118,18 +117,19 @@ module RNDK
       super()
       @widget_type = :entry
 
-      x          = 0
-      y          = 0
-      title      = "entry"
-      label      = "label"
-      field_attr = Ncurses::A_NORMAL
-      filler     = '.'
-      disp_type  = :MIXED
-      field_width    = 0
-      min        = 0
-      max        = 100
-      box        = true
-      shadow     = false
+      x           = 0
+      y           = 0
+      title       = "entry"
+      label       = "label"
+      field_attr  = Ncurses::A_NORMAL
+      filler      = '.'
+      disp_type   = :MIXED
+      field_width = 0
+      initial_text = ""
+      min         = 0
+      max         = 9001
+      box         = true
+      shadow      = false
 
       config.each do |key, val|
         x          = val if key == :x
@@ -140,6 +140,7 @@ module RNDK
         filler     = val if key == :filler
         disp_type  = val if key == :disp_type
         field_width    = val if key == :field_width
+        initial_text = val if key == :initial_text
         min        = val if key == :min
         max        = val if key == :max
         box        = val if key == :box
@@ -271,6 +272,8 @@ module RNDK
           entry.drawField
         end
       end
+
+      self.set_text initial_text
 
       # Do we want a shadow?
       if shadow

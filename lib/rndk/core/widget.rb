@@ -321,7 +321,7 @@ module RNDK
       return nil if rndktype != self.widget_type
 
 
-      if [:FSELECT, :alphalist].include? self.widget_type
+      if [:Fselect, :alphalist].include? self.widget_type
         return @entry_field
 
       else

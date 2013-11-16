@@ -57,12 +57,12 @@ begin
   msg << "<C>All RNDK color pairs (press 'q' to quit)"
 
   # Show label with that huge message.
-  label = RNDK::Label.new(screen,
-                          RNDK::CENTER, # x
-                          1,            # y
-                          msg,          # message
-                          true,         # has box?
-                          true)         # has shadow?
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => 1,
+                            :text => msg,
+                            :shadow => true
+                          })
 
   screen.refresh
   label.wait('q') # wait for key to be pressed

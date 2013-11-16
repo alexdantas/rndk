@@ -537,13 +537,13 @@ module RNDK
         shadow       = val if key == :shadow
       end
 
-      self.set_date(day, month, year)                if defined? day and defined? month and defined? year
-      self.set_day_color(day_color)                if defined? day_color
-      self.set_month_color(month_color)            if defined? month_color
-      self.set_year_color(year_color)              if defined? year_color
-      self.set_highlight(highlight)                  if defined? highlight
-      self.set_box(box)                              if defined? box
-      @box_width = self.set_title(title, @box_width) if defined? title
+      self.set_date(day, month, year)                if not day.zero? and month.zero? and year.zero?
+      self.set_day_color(day_color)                if not day_color.zero?
+      self.set_month_color(month_color)            if not month_color.zero?
+      self.set_year_color(year_color)              if not year_color.zero?
+      self.set_highlight(highlight)                  if highlight != Ncurses::A_REVERSE
+      self.set_box(box)                              if box
+      @box_width = self.set_title(title, @box_width) if title != "calendar"
     end
 
     # Sets the current date.

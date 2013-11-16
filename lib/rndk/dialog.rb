@@ -32,11 +32,14 @@ module RNDK
         shadow       = val if key == :shadow
       end
 
-      # Adjusting if the user sent us a String
+      # Adjusting if the user sent us a String as text
       text = [text] if text.class == String
       return nil if text.class != Array or text.empty?
       rows = text.size
 
+      # Adjusting if the user sent us a String as buttons
+      buttons = [buttons] if buttons.class == String
+      return nil if buttons.class != Array or buttons.empty?
       button_count = buttons.size
 
       box_width = Dialog::MIN_DIALOG_WIDTH
