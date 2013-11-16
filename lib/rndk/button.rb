@@ -49,13 +49,13 @@ module RNDK
         shadow   = val if key == :shadow
       end
 
-      parent_width  = Ncurses.getmaxx(screen.window)
-      parent_height = Ncurses.getmaxy(screen.window)
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
       box_width = 0
       x = x
       y = y
 
-      self.set_box(box)
+      self.set_box box
       box_height = 1 + 2 * @border_size
 
       # Translate the string to a chtype array.
@@ -199,16 +199,15 @@ module RNDK
     end
 
     # This draws the button widget
-    def draw(box)
+    def draw
       # Is there a shadow?
       unless @shadow_win.nil?
         Draw.drawShadow(@shadow_win)
       end
 
       # Box the widget if asked.
-      if @box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if @box
+
       self.draw_label
       Ncurses.wrefresh @win
     end
@@ -255,7 +254,7 @@ module RNDK
 
       # Redraw the window, if they asked for it.
       if refresh_flag
-        self.draw(@box)
+        self.draw
       end
     end
 
@@ -276,7 +275,7 @@ module RNDK
     #
     # @return `true` if pressed, `false` elsewhere.
     def activate(actions=[])
-      self.draw(@box)
+      self.draw
       ret = false
 
       if actions.nil? || actions.size == 0
@@ -310,8 +309,9 @@ module RNDK
       self.set_exit_type(0)
 
       # Check a predefined binding.
-      if self.check_bind(input)
-        complete = true
+      if self.is_bound? input
+        self.run_binding input
+        #complete = true
 
       else
         case input

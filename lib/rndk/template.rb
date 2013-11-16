@@ -57,7 +57,7 @@ module RNDK
         overlay_len = []
         @overlay = RNDK.char2Chtype(overlay, overlay_len, [])
         @overlay_len = overlay_len[0]
-        @field_attr = @overlay[0] & Ncurses::A_COLORUTES
+        @field_attr = @overlay[0] & Ncurses::A_ATTRIBUTES
       else
         @overlay = []
         @overlay_len = 0
@@ -213,7 +213,7 @@ module RNDK
 
     # This actually manages the tempalte widget
     def activate(actions=[])
-      self.draw(@box)
+      self.draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -260,8 +260,9 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
         else
           case input
           when RNDK::ERASE
@@ -447,7 +448,7 @@ module RNDK
         pos = 0
         (0...[@field_width, @plate.size].min).each do |x|
           if RNDK::TEMPLATE.isPlateChar(@plate[x]) && pos < @info.size
-            field_color = @overlay[x] & Ncurses::A_COLORUTES
+            field_color = @overlay[x] & Ncurses::A_ATTRIBUTES
             Ncurses.mvwaddch(@field_win, 0, x, @info[pos].ord | field_color)
             pos += 1
           end
@@ -559,11 +560,11 @@ module RNDK
     end
 
     def focus
-      self.draw(@box)
+      self.draw
     end
 
     def unfocus
-      self.draw(@box)
+      self.draw
     end
 
     def self.isPlateChar(c)

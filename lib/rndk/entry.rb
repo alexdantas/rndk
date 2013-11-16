@@ -300,7 +300,7 @@ module RNDK
       ret = 0
 
       # Draw the widget.
-      self.draw(@box)
+      self.draw
 
       if actions.nil? or actions.size == 0
         while true
@@ -351,8 +351,9 @@ module RNDK
       if pp_return
 
         # Check a predefined binding
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
 
         else
           curr_pos = @screen_col + @left_char
@@ -532,7 +533,7 @@ module RNDK
     # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw box
+    def draw(box=false)
       # Did we ask for a shadow?
       Draw.drawShadow @shadow_win unless @shadow_win.nil?
 

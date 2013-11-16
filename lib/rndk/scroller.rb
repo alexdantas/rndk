@@ -7,13 +7,13 @@ module RNDK
   #
   # @note Do **not** instantiate this class!
   #       Use it's subclasses.
-  class SCROLLER < Widget
+  class Scroller < Widget
 
     def initialize
       super()
     end
 
-    def KEY_UP
+    def scroll_up
       if @list_size > 0
         if @current_item > 0
           if @current_high == 0
@@ -35,7 +35,7 @@ module RNDK
       end
     end
 
-    def KEY_DOWN
+    def scroll_down
       if @list_size > 0
         if @current_item < @list_size - 1
           if @current_high == @view_size - 1
@@ -57,7 +57,7 @@ module RNDK
       end
     end
 
-    def KEY_LEFT
+    def scroll_left
       if @list_size > 0
         if @left_char == 0
           RNDK.beep
@@ -69,7 +69,7 @@ module RNDK
       end
     end
 
-    def KEY_RIGHT
+    def scroll_right
       if @list_size > 0
         if @left_char >= @max_left_char
           RNDK.beep
@@ -81,14 +81,14 @@ module RNDK
       end
     end
 
-    def KEY_PPAGE
+    def scroll_page_up
       if @list_size > 0
         if @current_top > 0
           if @current_top >= @view_size - 1
             @current_top -= @view_size - 1
             @current_item -= @view_size - 1
           else
-            self.KEY_HOME
+            self.scroll_begin
           end
         else
           RNDK.beep
@@ -98,7 +98,7 @@ module RNDK
       end
     end
 
-    def KEY_NPAGE
+    def scroll_page_down
       if @list_size > 0
         if @current_top < @max_top_item
           if @current_top + @view_size - 1 <= @max_top_item
@@ -117,13 +117,13 @@ module RNDK
       end
     end
 
-    def KEY_HOME
+    def scroll_begin
       @current_top = 0
       @current_item = 0
       @current_high = 0
     end
 
-    def KEY_END
+    def scroll_end
       if @max_top_item == -1
         @current_top = 0
         @current_item = @last_item - 1
@@ -164,7 +164,7 @@ module RNDK
 
     def set_position(item)
       if item <= 0
-        self.KEY_HOME
+        self.scroll_begin
       elsif item > @list_size - 1
         @current_top = @max_top_item
         @current_item = @list_size - 1

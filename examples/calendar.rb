@@ -16,17 +16,15 @@ begin
   title = "<C></U>RNDK Calendar Widget\n<C>Demo"
 
   # Declare the calendar widget.
-  calendar = RNDK::Calendar.new(screen,
-                                RNDK::CENTER, # x
-                                RNDK::CENTER, # y
-                                title,
-                                0, 0, 0, # current date
-                                RNDK::Color[:red_black] | Ncurses::A_BOLD,
-                                RNDK::Color[:green_black] | Ncurses::A_BOLD,
-                                RNDK::Color[:yellow_black] | Ncurses::A_BOLD,
-                                RNDK::Color[:blue_black] | Ncurses::A_REVERSE,
-                                true,
-                                false)
+  calendar = RNDK::Calendar.new(screen, {
+                                  :x => RNDK::CENTER,
+                                  :y => RNDK::CENTER,
+                                  :title => title,
+                                  :day_color => RNDK::Color[:red_black] | Ncurses::A_BOLD,
+                                  :month_color => RNDK::Color[:green_black] | Ncurses::A_BOLD,
+                                  :yeah_color => RNDK::Color[:yellow_black] | Ncurses::A_BOLD,
+                                  :highlight => RNDK::Color[:blue_black] | Ncurses::A_REVERSE,
+                                })
 
   if calendar.nil?
     RNDK::Screen.finish
@@ -37,36 +35,26 @@ begin
 
   # Here we define the functions that will be
   # executed when the user presses a key.
-  #
-  # They must be lambdas.
+  # Also, binding the keys to actions.
 
   # This adds a marker ot the calendar.
-  create_calendar_mark = lambda do |widget_type, calendar, client_data, key|
+  calendar.bind_key('m') do |widget_type, calendar, client_data, key|
     calendar.setMarker(calendar.day, calendar.month, calendar.year)
     calendar.draw(calendar.box)
     return false
   end
 
   # This removes a marker from the calendar.
-  remove_calendar_mark = lambda do |widget_type, calendar, client_data, key|
+  calendar.bind_key('r') do |widget_type, calendar, client_data, key|
     calendar.removeMarker(calendar.day, calendar.month, calendar.year)
     calendar.draw(calendar.box)
     return false
   end
 
-  # Here we bind the keys to the actions.
-  #
-  # They must be lambdas.
-
-  calendar.bind('m', create_calendar_mark, calendar)
-  calendar.bind('M', create_calendar_mark, calendar)
-  calendar.bind('r', remove_calendar_mark, calendar)
-  calendar.bind('R', remove_calendar_mark, calendar)
-
   calendar.week_base = 0
 
   # Let the user play with the widget.
-  ret_val = calendar.activate([])
+  ret_val = calendar.activate
 
   # Check which day they selected.
   if calendar.exit_type == :ESCAPE_HIT

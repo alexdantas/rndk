@@ -176,14 +176,6 @@ module RNDK
       box_height = 11
 
       dayname = 'Su Mo Tu We Th Fr Sa '
-      bindings = {
-          'T'            => Ncurses::KEY_HOME,
-          't'            => Ncurses::KEY_HOME,
-          'n'            => Ncurses::KEY_NPAGE,
-          RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          'p'            => Ncurses::KEY_PPAGE,
-          RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-      }
 
       box_width   = self.set_title(title, box_width)
       box_height += @title_lines
@@ -276,17 +268,16 @@ module RNDK
                                      xpos + 1)
       end
 
-      # Setup the key bindings.
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
+      self.bind_key('t') { self.set_date(0, 0, 0)        }
+      self.bind_key('T') { self.set_date(0, 0, 0)        }
+      self.bind_key('n') { self.incrementCalendarMonth 1 }
+      self.bind_key('p') { self.decrementCalendarMonth 1 }
+      self.bind_key('N') { self.incrementCalendarMonth 6 }
+      self.bind_key('P') { self.decrementCalendarMonth 6 }
+      self.bind_key('-') { self.decrementCalendarYear 1  }
+      self.bind_key('+') { self.incrementCalendarYear 1  }
 
       screen.register(:calendar, self)
-    end
-
-    # Returns the specific internal index of `d`/`m`/`y`.
-    def self.calendar_index(d, m, y)
-      (y * Calendar::MAX_MONTHS + m) * Calendar::MAX_DAYS + d
     end
 
     # Sets `d`/`m`/`y` cell to have `value`.
@@ -307,7 +298,7 @@ module RNDK
     # @return The date or `nil` if something bad happened.
     def activate(actions=[])
       ret = nil
-      self.draw @box
+      self.draw
 
       if actions.nil? || actions.size == 0
         # Interacting with the user
@@ -341,7 +332,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Refresh the widget field.
-      self.drawField
+      self.draw_field
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
@@ -350,26 +341,28 @@ module RNDK
 
       # Should we continue?
       if pp_return
+
         # Check a predefined binding
-        if self.check_bind(char)
+        if self.is_bound? char
+          self.run_binding char
 
           ## FIXME What the heck? Missing method?
           #self.checkEarlyExit
 
-          complete = true
+          #complete = true
 
         else
           case char
-          when Ncurses::KEY_UP    then self.decrementCalendarDay 7
-          when Ncurses::KEY_DOWN  then self.incrementCalendarDay 7
-          when Ncurses::KEY_LEFT  then self.decrementCalendarDay 1
-          when Ncurses::KEY_RIGHT then self.incrementCalendarDay 1
+          when Ncurses::KEY_UP,    RNDK::PREV
+            self.decrementCalendarDay 7
+          when Ncurses::KEY_DOWN,  RNDK::NEXT
+            self.incrementCalendarDay 7
+          when Ncurses::KEY_LEFT,  RNDK::BACKCHAR
+            self.decrementCalendarDay 1
+          when Ncurses::KEY_RIGHT, RNDK::FORCHAR
+            self.incrementCalendarDay 1
           when Ncurses::KEY_NPAGE then self.incrementCalendarMonth 1
           when Ncurses::KEY_PPAGE then self.decrementCalendarMonth 1
-          when 'N'.ord then self.incrementCalendarMonth 6
-          when 'P'.ord then self.decrementCalendarMonth 6
-          when '-'.ord then self.decrementCalendarYear 1
-          when '+'.ord then self.incrementCalendarYear 1
 
           when Ncurses::KEY_HOME
             self.set_date(0, 0, 0)
@@ -441,65 +434,7 @@ module RNDK
       end
 
       Ncurses.wrefresh @win
-      self.drawField
-    end
-
-    # Draws the month field.
-    def drawField
-      month_name = @month_name[@month]
-      month_length = Calendar.days_in_month(@year, @month)
-      year_index = Calendar.global_year_index(@year)
-      year_len = 0
-      save_y = -1
-      save_x = -1
-
-      day = (1 - @week_day + (@week_base % 7))
-      if day > 0
-        day -= 7
-      end
-
-      (1..6).each do |row|
-        (0...7).each do |col|
-          if day >= 1 && day <= month_length
-            xpos = col * 3
-            ypos = row
-
-            marker = @day_color
-            temp = '%02d' % day
-
-            if @day == day
-              marker = @highlight
-              save_y = ypos + Ncurses.getbegy(@field_win) - Ncurses.getbegy(@input_window)
-              save_x = 1
-            else
-              marker |= self.getMarker(day, @month, year_index)
-            end
-            Draw.writeCharAttrib(@field_win, xpos, ypos, temp, marker, RNDK::HORIZONTAL, 0, 2)
-          end
-          day += 1
-        end
-      end
-      Ncurses.wrefresh @field_win
-
-      # Draw the month in.
-      if !(@label_win.nil?)
-        temp = '%s %d,' % [month_name, @day]
-        Draw.writeChar(@label_win, 0, 0, temp, RNDK::HORIZONTAL, 0, temp.size)
-        Ncurses.wclrtoeol @label_win
-
-        # Draw the year in.
-        temp = '%d' % [@year]
-        year_len = temp.size
-        Draw.writeChar(@label_win, @field_width - year_len, 0, temp,
-            RNDK::HORIZONTAL, 0, year_len)
-
-        Ncurses.wmove(@label_win, 0, 0)
-        Ncurses.wrefresh @label_win
-
-      elsif save_y >= 0
-        Ncurses.wmove(@input_window, save_y, save_x)
-        Ncurses.wrefresh @input_window
-      end
+      self.draw_field
     end
 
     # Sets multiple attributes of the Widget.
@@ -678,7 +613,6 @@ module RNDK
       end
     end
 
-
     # Sets the names of the days of the week.
     #
     # `days` is a String listing the 2-character
@@ -710,6 +644,42 @@ module RNDK
       @day = month_length if @day > month_length
     end
 
+    # This returns what day of the week the month starts on.
+    def getCurrentTime
+      # Determine the current time and determine if we are in DST.
+      return Time.mktime(@year, @month, @day, 0, 0, 0).gmtime
+    end
+
+    def focus
+      # Original: drawRNDKFscale(widget, ObjOf (widget)->box);
+      self.draw
+    end
+
+    def unfocus
+      # Original: drawRNDKFscale(widget, ObjOf (widget)->box);
+      self.draw
+    end
+
+    # @see Widget#position
+    def position
+      super(@win)
+    end
+
+    protected
+
+    # Returns the internal widget `year` index.
+    # Minimum year is 1900.
+    def self.global_year_index year
+      return (year - 1900) if year >= 1900
+
+      year
+    end
+
+    # Returns the specific internal index of `d`/`m`/`y`.
+    def self.calendar_index(d, m, y)
+      (y * Calendar::MAX_MONTHS + m) * Calendar::MAX_DAYS + d
+    end
+
     # This increments the current day by the given value.
     def incrementCalendarDay(adjust)
       month_length = Calendar.days_in_month(@year, @month)
@@ -721,7 +691,7 @@ module RNDK
         self.incrementCalendarMonth(1)
       else
         @day += adjust
-        self.drawField
+        self.draw_field
       end
     end
 
@@ -752,7 +722,7 @@ module RNDK
         self.decrementCalendarMonth(1)
       else
         @day -= adjust
-        self.drawField
+        self.draw_field
       end
     end
 
@@ -777,7 +747,7 @@ module RNDK
 
       # Redraw the calendar.
       self.erase
-      self.draw(@box)
+      self.draw
     end
 
     # This decrements the current month by the given value.
@@ -811,7 +781,7 @@ module RNDK
 
       # Redraw the calendar.
       self.erase
-      self.draw(@box)
+      self.draw
     end
 
     # This increments the current year by the given value.
@@ -832,7 +802,7 @@ module RNDK
 
       # Redraw the calendar.
       self.erase
-      self.draw(@box)
+      self.draw
     end
 
     # This decrements the current year by the given value.
@@ -864,42 +834,65 @@ module RNDK
 
       # Redraw the calendar.
       self.erase
-      self.draw(@box)
+      self.draw
     end
 
-    # This returns what day of the week the month starts on.
-    def getCurrentTime
-      # Determine the current time and determine if we are in DST.
-      return Time.mktime(@year, @month, @day, 0, 0, 0).gmtime
-    end
+    # Draws the month field.
+    def draw_field
+      month_name = @month_name[@month]
+      month_length = Calendar.days_in_month(@year, @month)
+      year_index = Calendar.global_year_index(@year)
+      year_len = 0
+      save_y = -1
+      save_x = -1
 
-    def focus
-      # Original: drawRNDKFscale(widget, ObjOf (widget)->box);
-      self.draw(@box)
-    end
+      day = (1 - @week_day + (@week_base % 7))
+      if day > 0
+        day -= 7
+      end
 
-    def unfocus
-      # Original: drawRNDKFscale(widget, ObjOf (widget)->box);
-      self.draw(@box)
-    end
+      (1..6).each do |row|
+        (0...7).each do |col|
+          if day >= 1 && day <= month_length
+            xpos = col * 3
+            ypos = row
 
-    # @see Widget#position
-    def position
-      super(@win)
-    end
+            marker = @day_color
+            temp = '%02d' % day
 
+            if @day == day
+              marker = @highlight
+              save_y = ypos + Ncurses.getbegy(@field_win) - Ncurses.getbegy(@input_window)
+              save_x = 1
+            else
+              marker |= self.getMarker(day, @month, year_index)
+            end
+            Draw.writeCharAttrib(@field_win, xpos, ypos, temp, marker, RNDK::HORIZONTAL, 0, 2)
+          end
+          day += 1
+        end
+      end
+      Ncurses.wrefresh @field_win
 
+      # Draw the month in.
+      if !(@label_win.nil?)
+        temp = '%s %d,' % [month_name, @day]
+        Draw.writeChar(@label_win, 0, 0, temp, RNDK::HORIZONTAL, 0, temp.size)
+        Ncurses.wclrtoeol @label_win
 
+        # Draw the year in.
+        temp = '%d' % [@year]
+        year_len = temp.size
+        Draw.writeChar(@label_win, @field_width - year_len, 0, temp,
+            RNDK::HORIZONTAL, 0, year_len)
 
+        Ncurses.wmove(@label_win, 0, 0)
+        Ncurses.wrefresh @label_win
 
-    private
-
-    # Returns the internal widget `year` index.
-    # Minimum year is 1900.
-    def self.global_year_index year
-      return (year - 1900) if year >= 1900
-
-      year
+      elsif save_y >= 0
+        Ncurses.wmove(@input_window, save_y, save_x)
+        Ncurses.wrefresh @input_window
+      end
     end
 
   end

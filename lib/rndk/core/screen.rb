@@ -234,7 +234,7 @@ module RNDK
           obj.has_focus = (x == focused)
 
           if obj.is_visible
-            obj.draw(obj.box)
+            obj.draw
           end
         end
       end

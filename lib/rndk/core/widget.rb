@@ -525,7 +525,7 @@ module RNDK
 
       # Redraw the window, if they asked for it
       if refresh_flag
-        self.draw(@box)
+        self.draw
       end
     end
 

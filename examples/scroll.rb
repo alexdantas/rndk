@@ -18,7 +18,7 @@ begin
   RNDK::Color.init
 
   # Turning off the blinking cursor
-  Ncurses.curs_set 0
+  RNDK::blink_cursor false
 
   # Use the current directory list to fill the radio list
   item = RNDK.get_directory_contents '.'
@@ -29,27 +29,21 @@ begin
   # See example 'markup.rb' for more details.
   title = <<END
 <C></77>Pick a file
-</77>Press 'a' to append an item
-</77>Press 'i' to insert an item
-</77>Press 'd' to delete current item
-</77>(don't worry, won't delete your files)
 </77>Press 'enter' or 'tab' to select item
 ------------------------------------------------
 END
 
   # Create the scrolling list.
-  scroll_list = RNDK::Scroll.new(screen,
-                                 RNDK::CENTER,      # x
-                                 RNDK::CENTER,      # y
-                                 RNDK::RIGHT,       # scrollbar position
-                                 50,                # width
-                                 24,                # height
-                                 title,             # title
-                                 item,              # items on the list
-                                 true,              # show numbers
-                                 RNDK::Color[:red], # highlight color
-                                 true,              # box
-                                 false)             # shadow
+  scroll_list = RNDK::Scroll.new(screen, {
+                                   :x => RNDK::CENTER,
+                                   :y => RNDK::CENTER,
+                                   :width => 50,
+                                   :height => 24,
+                                   :title => title,
+                                   :items => item,
+                                   :numbers => true,
+                                   :highlight => RNDK::Color[:red]
+                                 })
 
   if scroll_list.nil?
     RNDK::Screen.finish
@@ -57,44 +51,6 @@ END
     puts "Cannot make scrolling list.  Is the window too small?"
     exit 1
   end
-
-  # These are the functions that will modify the
-  # Scroll List at runtime.
-  #
-  # The arguments to the block are provided by
-  # default, you can ignore them right now.
-  #
-  # The only thing you need to know is that `widget` is
-  # the scroll - widget that we attach the callback to.
-  $counter = 0
-
-  add_item_callback = lambda do |type, widget, client_data, input|
-    widget.addItem "add_#{$counter}"
-    $counter += 1
-    widget.screen.refresh
-    return true
-  end
-
-  insert_item_callback = lambda do |type, widget, client_data, input|
-    widget.insertItem "insert_#{$counter}"
-    $counter += 1
-    widget.screen.refresh
-    return true
-  end
-
-  delete_item_callback = lambda do |type, widget, client_data, input|
-    widget.deleteItem widget.getCurrentItem
-    widget.screen.refresh
-    return true
-  end
-
-  # And this is how we bind keys to actions.
-  #
-  # It only accepts lambdas.
-
-  scroll_list.bind('a', add_item_callback, nil)
-  scroll_list.bind('i', insert_item_callback, nil)
-  scroll_list.bind('d', delete_item_callback, nil)
 
   # Activate the scrolling list.
   selection = scroll_list.activate

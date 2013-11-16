@@ -235,12 +235,17 @@ module RNDK
     end
   end
 
+  # Sets on/off the blinking cursor.
+  # @return The cursor's previous state.
   def RNDK.blink_cursor option
+    ret = false
     if option
-      Ncurses.curs_set 1
+      ret = Ncurses.curs_set 1
     else
-      Ncurses.curs_set 0
+      ret = Ncurses.curs_set 0
     end
+
+    if ret == 1 then true else false end
   end
 
 end

@@ -148,7 +148,7 @@ module RNDK
       input = 0
 
       # Draw the dialog box.
-      self.draw(@box)
+      self.draw
 
       # Lets move to the first button.
       Draw.writeChtypeAttrib(@win,
@@ -207,8 +207,10 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
+
         else
           case input
           when Ncurses::KEY_LEFT, Ncurses::KEY_BTAB, Ncurses::KEY_BACKSPACE
@@ -260,16 +262,14 @@ module RNDK
     end
 
     # This function draws the dialog widget.
-    def draw(box)
+    def draw
       # Is there a shadow?
       unless @shadow_win.nil?
         Draw.drawShadow(@shadow_win)
       end
 
       # Box the widget if they asked.
-      if box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if @box
 
       # Draw in the message.
       (0...@message_rows).each do |x|
@@ -382,15 +382,12 @@ module RNDK
     end
 
     def focus
-      self.draw @box
+      self.draw
     end
 
     def unfocus
-      self.draw @box
+      self.draw
     end
-
-
-
 
     def position
       super(@win)

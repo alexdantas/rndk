@@ -148,7 +148,7 @@ module RNDK
     # This activates the widget.
     def activate(actions=[])
       # Draw the buttonbox box.
-      self.draw(@box)
+      self.draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -196,8 +196,9 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a key binding.
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
         else
           case input
           when Ncurses::KEY_LEFT, Ncurses::KEY_BTAB, Ncurses::KEY_BACKSPACE
@@ -373,11 +374,11 @@ module RNDK
     end
 
     def focus
-      self.draw(@box)
+      self.draw
     end
 
     def unfocus
-      self.draw(@box)
+      self.draw
     end
 
     def position

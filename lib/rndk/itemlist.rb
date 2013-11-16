@@ -135,7 +135,7 @@ module RNDK
       ret = false
 
       # Draw the widget.
-      self.draw(@box)
+      self.draw
       self.drawField(true)
 
       if actions.nil? || actions.size == 0
@@ -186,8 +186,9 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check a predefined binding.
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
         else
           case input
           when Ncurses::KEY_UP, Ncurses::KEY_RIGHT, ' '.ord, '+'.ord, 'n'.ord
@@ -249,11 +250,9 @@ module RNDK
     end
 
     # This draws the widget on the screen.
-    def draw(box)
+    def draw
       # Did we ask for a shadow?
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       self.draw_title(@win)
 
@@ -264,9 +263,7 @@ module RNDK
       end
 
       # Box the widget if asked.
-      if box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if @box
 
       Ncurses.wrefresh @win
 
@@ -365,7 +362,7 @@ module RNDK
 
         # Draw the field.
         self.erase
-        self.draw(@box)
+        self.draw
       end
     end
 

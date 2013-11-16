@@ -13,10 +13,10 @@ module RNDK
 
       case key_code
       when Ncurses::KEY_BTAB
-        switchFocus(set_previous_focus(screen), curobj)
+        switch_focus(set_previous_focus(screen), curobj)
 
       when RNDK::KEY_TAB
-        switchFocus(set_next_focus(screen), curobj)
+        switch_focus(set_next_focus(screen), curobj)
 
       when RNDK.KEY_F(10)
         # save data and exit
@@ -28,12 +28,12 @@ module RNDK
       when RNDK.CTRL('R')
         # reset data to defaults
         reset(screen)
-        setFocus(curobj)
+        set_focus(curobj)
 
       when RNDK::REFRESH
         # redraw screen
         screen.refresh
-        setFocus(curobj)
+        set_focus(curobj)
 
       else
         # not everyone wants menus, so we make them optional here
@@ -144,7 +144,7 @@ module RNDK
         end
       end
 
-      setFocusIndex(screen, if !(result.nil?) then n else -1 end)
+      set_focusIndex(screen, if !(result.nil?) then n else -1 end)
       return result
     end
 
@@ -169,7 +169,7 @@ module RNDK
         end
       end
 
-      setFocusIndex(screen, if !(result.nil?) then n else -1 end)
+      set_focusIndex(screen, if !(result.nil?) then n else -1 end)
       return result
     end
 
@@ -196,20 +196,20 @@ module RNDK
         end
       end
 
-      setFocusIndex(screen, if !(result.nil?) then n else -1 end)
+      set_focusIndex(screen, if !(result.nil?) then n else -1 end)
       return result
     end
 
     # Set focus to the first widget in the screen.
     def Traverse.set_first_focus(screen)
-      setFocusIndex(screen, screen.widget_count - 1)
-      return switchFocus(set_next_focus(screen), nil)
+      set_focusIndex(screen, screen.widget_count - 1)
+      return switch_focus(set_next_focus(screen), nil)
     end
 
     # Set focus to the last widget in the screen.
     def Traverse.set_last_focus(screen)
-      setFocusIndex(screen, 0)
-      return switchFocus(set_previous_focus(screen), nil)
+      set_focusIndex(screen, 0)
+      return switch_focus(set_previous_focus(screen), nil)
     end
 
     private
@@ -226,30 +226,30 @@ module RNDK
       return limitFocusIndex(screen, screen.widget_focus)
     end
 
-    def Traverse.setFocusIndex(screen, value)
+    def Traverse.set_focusIndex(screen, value)
       screen.widget_focus = limitFocusIndex(screen, value)
     end
 
-    def Traverse.unsetFocus(obj)
-      Ncurses.curs_set(0)
+    def Traverse.unset_focus(obj)
+      RNDK::blink_cursor false
       unless obj.nil?
         obj.has_focus = false
         obj.unfocus
       end
     end
 
-    def Traverse.setFocus(obj)
+    def Traverse.set_focus(obj)
       unless obj.nil?
         obj.has_focus = true
         obj.focus
       end
-      Ncurses.curs_set(1)
+      RNDK::blink_cursor true
     end
 
-    def Traverse.switchFocus(newobj, oldobj)
+    def Traverse.switch_focus(newobj, oldobj)
       if oldobj != newobj
-        Traverse.unsetFocus(oldobj)
-        Traverse.setFocus(newobj)
+        Traverse.unset_focus(oldobj)
+        Traverse.set_focus(newobj)
       end
       return newobj
     end
@@ -261,7 +261,7 @@ module RNDK
     def Traverse.handleMenu(screen, menu, oldobj)
       done = false
 
-      switchFocus(menu, oldobj)
+      switch_focus(menu, oldobj)
       while !done
         key = menu.getch
 
@@ -281,7 +281,7 @@ module RNDK
         newobj = Traverse.set_next_focus(screen)
       end
 
-      return switchFocus(newobj, menu)
+      return switch_focus(newobj, menu)
     end
 
     # Calls Widget#save_data on all widgets of `screen`.

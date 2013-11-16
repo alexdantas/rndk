@@ -49,18 +49,6 @@ module RNDK
       button_adj = 0
       button_pos = 1
 
-      bindings = {
-          RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-          'b'            => Ncurses::KEY_PPAGE,
-          'B'            => Ncurses::KEY_PPAGE,
-          RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          ' '            => Ncurses::KEY_NPAGE,
-          'f'            => Ncurses::KEY_NPAGE,
-          'F'            => Ncurses::KEY_NPAGE,
-          '|'            => Ncurses::KEY_HOME,
-          '$'            => Ncurses::KEY_END,
-      }
-
       self.set_box box
 
       box_width  = RNDK.set_widget_dimension(parent_width, width, 0)
@@ -140,9 +128,13 @@ module RNDK
       end
 
       # Setup the key bindings.
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
+      self.bind_key('b') { self.scroll_page_up   }
+      self.bind_key('B') { self.scroll_page_up   }
+      self.bind_key(' ') { self.scroll_page_down }
+      self.bind_key('f') { self.scroll_page_down }
+      self.bind_key('F') { self.scroll_page_down }
+      self.bind_key('|') { self.scroll_begin     }
+      self.bind_key('$') { self.scroll_end       }
 
       screen.register(@widget_type, self)
     end
@@ -376,7 +368,7 @@ module RNDK
       @max_top_line = 0
 
       # Redraw the window.
-      self.draw @box
+      self.draw
     end
 
     def PatternNotFound(pattern)
@@ -405,7 +397,7 @@ module RNDK
       @current_button = 0
 
       # Draw the widget items.
-      self.draw(@box)
+      self.draw
 
       # Do this until KEY_ENTER is hit.
       while true
@@ -413,7 +405,11 @@ module RNDK
         refresh = false
 
         input = self.getch
-        if !self.check_bind(input)
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
+
+        else
           case input
           when RNDK::KEY_TAB
             if @button_count > 1
@@ -437,62 +433,17 @@ module RNDK
               # Redraw the buttons.
               self.draw_buttons
             end
-          when Ncurses::KEY_UP
-            if @current_top > 0
-              @current_top -= 1
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_DOWN
-            if @current_top < @max_top_line
-              @current_top += 1
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_RIGHT
-            if @left_char < @max_left_char
-              @left_char += 1
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_LEFT
-            if @left_char > 0
-              @left_char -= 1
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_PPAGE
-            if @current_top > 0
-              if @current_top - (@view_size - 1) > 0
-                @current_top = @current_top - (@view_size - 1)
-              else
-                @current_top = 0
-              end
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_NPAGE
-            if @current_top < @max_top_line
-              if @current_top + @view_size < @max_top_line
-                @current_top = @current_top + (@view_size - 1)
-              else
-                @current_top = @max_top_line
-              end
-              refresh = true
-            else
-              RNDK.beep
-            end
-          when Ncurses::KEY_HOME
-            @left_char = 0
-            refresh = true
-          when Ncurses::KEY_END
-            @left_char = @max_left_char
-            refresh = true
+          when Ncurses::KEY_UP    then self.scroll_up
+          when Ncurses::KEY_DOWN  then self.scroll_down
+          when Ncurses::KEY_RIGHT then self.scroll_right
+          when Ncurses::KEY_LEFT  then self.scroll_left
+          when Ncurses::KEY_HOME  then self.scroll_begin
+          when Ncurses::KEY_END   then self.scroll_end
+          when Ncurses::KEY_PPAGE, RNDK::BACKCHAR
+            self.scroll_page_up
+          when Ncurses::KEY_NPAGE, RNDK::FORCHAR
+            self.scroll_page_down
+
           when 'g'.ord, '1'.ord, '<'.ord
             @current_top = 0
             refresh = true
@@ -693,7 +644,7 @@ module RNDK
     # end
 
     # This function draws the viewer widget.
-    def draw box
+    def draw(box=false)
       # Do we need to draw in the shadow?
       unless @shadow_win.nil?
         Draw.drawShadow @shadow_win
@@ -876,6 +827,87 @@ module RNDK
 
     def position
       super(@win)
+    end
+
+    def scroll_up
+      if @current_top > 0
+        @current_top -= 1
+        refresh = true
+      else
+        RNDK.beep
+      end
+    end
+
+    def scroll_down
+      if @current_top < @max_top_line
+        @current_top += 1
+        refresh = true
+      else
+        RNDK.beep
+      end
+    end
+
+    def scroll_right
+      if @left_char < @max_left_char
+        @left_char += 1
+        refresh = true
+      else
+        RNDK.beep
+      end
+    end
+
+    def scroll_left
+      if @left_char > 0
+        @left_char -= 1
+        refresh = true
+      else
+        RNDK.beep
+      end
+    end
+
+    def scroll_page_up
+      if @current_top > 0
+        if @current_top - (@view_size - 1) > 0
+          @current_top = @current_top - (@view_size - 1)
+        else
+          @current_top = 0
+        end
+        refresh = true
+      else
+        RNDK.beep
+      end
+
+    end
+
+    def scroll_page_down
+      if @current_top < @max_top_line
+        if @current_top + @view_size < @max_top_line
+          @current_top = @current_top + (@view_size - 1)
+        else
+          @current_top = @max_top_line
+        end
+        refresh = true
+      else
+        RNDK.beep
+      end
+    end
+
+    def scroll_begin
+      @left_char = 0
+      refresh = true
+    end
+
+    def scroll_end
+      @left_char = @max_left_char
+      refresh = true
+    end
+
+    def focus
+      self.draw
+    end
+
+    def unfocus
+      self.draw
     end
 
   end

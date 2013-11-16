@@ -450,7 +450,7 @@ module RNDK
     # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw box
+    def draw
       Draw.drawShadow @shadow_win unless @shadow_win.nil?
 
       # Draw in the entry field.
@@ -474,7 +474,7 @@ module RNDK
       ret = 0
 
       # Draw the widget.
-      self.draw(@box)
+      self.draw
 
       # Activate the widget.
       ret = @entry_field.activate actions
@@ -500,7 +500,7 @@ module RNDK
     def inject char
       ret = false
 
-      self.draw @box
+      self.draw
 
       # Inject a character into the widget.
       ret = @entry_field.inject char
@@ -539,7 +539,7 @@ module RNDK
 
       # Redraw the widget.
       self.erase
-      self.draw @box
+      self.draw
     end
 
     # This returns the contents of the widget.

@@ -2,7 +2,7 @@ require 'rndk/scroller'
 
 module RNDK
 
-  class Radio < SCROLLER
+  class Radio < Scroller
 
     def initialize(screen, config={})
       super()
@@ -43,17 +43,7 @@ module RNDK
       box_height = height
       widest_item = 0
 
-      bindings = {
-        RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-        RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-        'g'           => Ncurses::KEY_HOME,
-        '1'           => Ncurses::KEY_HOME,
-        'G'           => Ncurses::KEY_END,
-        '<'           => Ncurses::KEY_HOME,
-        '>'           => Ncurses::KEY_END,
-      }
-
-      self.set_box(box)
+      self.set_box box
 
       # If the height is a negative value, height will be ROWS-height,
       # otherwise the height will be the given height.
@@ -148,9 +138,11 @@ module RNDK
       end
 
       # Setup the key bindings
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
+      self.bind_key('g') { self.scroll_begin }
+      self.bind_key('1') { self.scroll_begin }
+      self.bind_key('G') { self.scroll_end   }
+      self.bind_key('<') { self.scroll_begin }
+      self.bind_key('>') { self.scroll_end   }
 
       screen.register(@widget_type, self)
     end
@@ -168,7 +160,7 @@ module RNDK
     # This actually manages the radio widget.
     def activate(actions=[])
       # Draw the radio items.
-      self.draw(@box)
+      self.draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -217,26 +209,21 @@ module RNDK
       # Should we continue?
       if pp_return
         # Check for a predefined key binding.
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
         else
           case input
-          when Ncurses::KEY_UP
-            self.KEY_UP
-          when Ncurses::KEY_DOWN
-            self.KEY_DOWN
-          when Ncurses::KEY_RIGHT
-            self.KEY_RIGHT
-          when Ncurses::KEY_LEFT
-            self.KEY_LEFT
-          when Ncurses::KEY_PPAGE
-            self.KEY_PPAGE
-          when Ncurses::KEY_NPAGE
-            self.KEY_NPAGE
-          when Ncurses::KEY_HOME
-            self.KEY_HOME
-          when Ncurses::KEY_END
-            self.KEY_END
+          when Ncurses::KEY_UP    then self.scroll_up
+          when Ncurses::KEY_DOWN  then self.scroll_down
+          when Ncurses::KEY_RIGHT then self.scroll_right
+          when Ncurses::KEY_LEFT  then self.scroll_left
+          when Ncurses::KEY_HOME  then self.scroll_begin
+          when Ncurses::KEY_END   then self.scroll_end
+          when Ncurses::KEY_PPAGE, RNDK::BACKCHAR
+            self.scroll_page_up
+          when Ncurses::KEY_NPAGE, RNDK::FORCHAR
+            self.scroll_page_down
           when '$'.ord
             @left_char = @max_left_char
           when '|'.ord
@@ -284,16 +271,14 @@ module RNDK
     end
 
     # This function draws the radio widget.
-    def draw(box)
+    def draw
       # Do we need to draw in the shadow?
-      if !(@shadow_win.nil?)
-        Draw.drawShadow(@shadow_win)
-      end
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
-      self.draw_title(@win)
+      self.draw_title @win
 
       # Draw in the radio items.
-      self.drawItems(@box)
+      self.drawItems @box
     end
 
     # This redraws the radio items.

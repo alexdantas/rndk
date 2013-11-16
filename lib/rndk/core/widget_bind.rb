@@ -12,10 +12,10 @@ module RNDK
     # and Entry), we bind keys to the Entry, not Scroll.
     #
     def bindable_widget rndktype
-      return nil if rndktype != self.widget_type
+      return nil if rndktype != @widget_type
 
 
-      if [:Fselect, :alphalist].include? self.widget_type
+      if [:Fselect, :alphalist].include? @widget_type
         return @entry_field
 
       else
@@ -25,15 +25,17 @@ module RNDK
 
     # Binds a `function` to a `key`.
     #
-    def bind(key, function, data)
+    def bind_key(key, data=nil, &action)
       obj = self.bindable_widget @widget_type
 
-      return if (key.ord >= Ncurses::KEY_MAX) or (key.ord.zero?) or (obj.nil?)
+      if (key.ord >= Ncurses::KEY_MAX) or (key.ord.zero?) or (obj.nil?)
+        return
+      end
 
-      obj.binding_list[key.ord] = [function, data]
+      obj.binding_list[key.ord] = [action, data]
     end
 
-    def unbind key
+    def unbind_key key
       obj = self.bindable_widget @widget_type
 
       obj.binding_list.delete(key) unless obj.nil?
@@ -47,17 +49,12 @@ module RNDK
       end
     end
 
-    # Checks to see if some binding for `key` exists and runs it.
+    # Runs any binding that's set for `key`.
     #
-    # * If binding for `key` exists, runs the command it is bound
-    #   to and returns it's value (normally `true`)
-    # * If binding for `key` doesn't exist, returns `false`.
-    #
-    # This functions is used to see if there's a predefined
-    # default keybinding for `key`.
-    # If not, then we run our customs. See the widgets for details.
-    #
-    def check_bind key
+    # @return The binding's return value or `false`, if no
+    #         keybinding for `key` exists.
+
+    def run_binding key
       obj = self.bindable_widget @widget_type
 
       return false if obj.nil? or (not obj.binding_list.include? key)
@@ -65,23 +62,18 @@ module RNDK
       function = obj.binding_list[key][0]
       data     = obj.binding_list[key][1]
 
-      if function == :getc
-        return data
-      else
-        return function.call(obj, data, key)
-      end
+      # What the heck is this?
+      return data if function == :getc
+
+      function.call data
     end
 
     # Tells if the key binding for the key exists.
     def is_bound? key
-      result = false
-
       obj = self.bindable_widget @widget_type
+      return false if obj.nil?
 
-      unless obj.nil?
-        result = obj.binding_list.include? key
-      end
-      result
+      obj.binding_list.include? key
     end
 
     def when(signal, &action)

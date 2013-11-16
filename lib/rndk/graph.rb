@@ -108,7 +108,7 @@ module RNDK
 
     # This was added for the builder.
     def activate(actions=[])
-      self.draw(@box)
+      self.draw
     end
 
     # Set multiple attributes of the widget
@@ -295,12 +295,12 @@ module RNDK
 
       # Reraw the windowk if they asked for it
       if refresh_flag
-        self.draw @box
+        self.draw
       end
     end
 
     # Draw the graph widget
-    def draw box
+    def draw(box=false)
       adj = 2 + (if @xtitle.nil? || @xtitle.size == 0 then 0 else 1 end)
       spacing = 0
       attrib = ' '.ord | Ncurses::A_REVERSE

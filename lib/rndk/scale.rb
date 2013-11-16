@@ -42,16 +42,6 @@ module RNDK
 
       parent_width = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
-      bindings = {
-          'u'           => Ncurses::KEY_UP,
-          'U'           => Ncurses::KEY_PPAGE,
-          RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-          RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          'g'           => Ncurses::KEY_HOME,
-          '^'           => Ncurses::KEY_HOME,
-          'G'           => Ncurses::KEY_END,
-          '$'           => Ncurses::KEY_END,
-      }
 
       self.set_box box
 
@@ -164,9 +154,13 @@ module RNDK
       end
 
       # Setup the key bindings.
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
+
+      self.bind_key('u') { self.increment @inc     }
+      self.bind_key('U') { self.increment @fastinc }
+      self.bind_key('g') { @current = @low         }
+      self.bind_key('^') { @current = @low         }
+      self.bind_key('G') { @current = @high        }
+      self.bind_key('$') { @current = @high        }
 
       screen.register(self.widget_type, self)
     end
@@ -175,7 +169,7 @@ module RNDK
     def activate(actions=[])
       ret = false
       # Draw the widget.
-      self.draw(@box)
+      self.draw
 
       if actions.nil? || actions.size == 0
         input = 0
@@ -289,10 +283,10 @@ module RNDK
         temp[col] = input.chr
       elsif input == Ncurses::KEY_BACKSPACE
         # delete the char before the cursor
-        modify = RNDK::Scale.removeChar(temp, col - 1)
+        modify = Scale.removeChar(temp, col - 1)
       elsif input == Ncurses::KEY_DC
         # delete the char at the cursor
-        modify = RNDK::Scale.removeChar(temp, col)
+        modify = Scale.removeChar(temp, col)
       else
         modify = false
       end
@@ -307,20 +301,12 @@ module RNDK
       return result
     end
 
-    def self.Decrement(value, by)
-      if value - by < value
-        value - by
-      else
-        value
-      end
+    def decrement by
+      @current = @current - by if (@current - by) < @current
     end
 
-    def self.Increment(value, by)
-      if value + by > value
-        value + by
-      else
-        value
-      end
+    def increment by
+      @current = @current + by if (@current + by) > @current
     end
 
     # This function injects a single character into the widget.
@@ -333,7 +319,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Draw the field.
-      self.drawField
+      self.draw_field
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
@@ -344,27 +330,27 @@ module RNDK
 
       # Should we continue?
       if pp_return
+
         # Check for a key bindings.
-        if self.check_bind input
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
+
         else
           case input
           when Ncurses::KEY_LEFT
             self.setEditPosition(@field_edit + 1)
           when Ncurses::KEY_RIGHT
             self.setEditPosition(@field_edit - 1)
-          when Ncurses::KEY_DOWN
-            @current = RNDK::Scale.Decrement(@current, @inc)
-          when Ncurses::KEY_UP
-            @current = RNDK::Scale.Increment(@current, @inc)
-          when Ncurses::KEY_PPAGE
-            @current = RNDK::Scale.Increment(@current, @fastinc)
-          when Ncurses::KEY_NPAGE
-            @current = RNDK::Scale.Decrement(@current, @fastinc)
-          when Ncurses::KEY_HOME
-            @current = @low
-          when Ncurses::KEY_END
-            @current = @high
+
+          when Ncurses::KEY_DOWN  then self.decrement @inc
+          when Ncurses::KEY_UP    then self.increment @inc
+          when Ncurses::KEY_HOME  then @current = @low
+          when Ncurses::KEY_END   then @current = @high
+          when Ncurses::KEY_PPAGE, RNDK::BACKCHAR
+            self.increment @fastinc
+          when Ncurses::KEY_NPAGE, RNDK::FORCHAR
+            self.decrement @fastinc
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             self.set_exit_type(input)
             ret = @current
@@ -411,7 +397,7 @@ module RNDK
       end
 
       if !complete
-        self.drawField
+        self.draw_field
         self.set_exit_type(0)
       end
 
@@ -427,16 +413,10 @@ module RNDK
     end
 
     # This function draws the widget.
-    def draw(box)
-      # Draw the shadow.
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
+    def draw
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
-      # Box the widget if asked.
-      if box
-        Draw.drawObjBox(@win, self)
-      end
+      Draw.drawObjBox(@win, self) if @box
 
       self.draw_title(@win)
 
@@ -453,11 +433,11 @@ module RNDK
       Ncurses.wrefresh @win
 
       # Draw the field window.
-      self.drawField
+      self.draw_field
     end
 
     # This draws the widget.
-    def drawField
+    def draw_field
       Ncurses.werase(@field_win)
 
       # Draw the value in the field.
@@ -551,11 +531,11 @@ module RNDK
     end
 
     def focus
-      self.draw(@box)
+      self.draw
     end
 
     def unfocus
-      self.draw(@box)
+      self.draw
     end
 
     def position
@@ -565,8 +545,6 @@ module RNDK
     def SCAN_FMT
       '%d%c'
     end
-
-
 
   end
 end

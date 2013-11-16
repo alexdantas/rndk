@@ -103,17 +103,7 @@ module RNDK
       parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
 
-      bindings = {
-          'u'           => Ncurses::KEY_UP,
-          'U'           => Ncurses::KEY_PPAGE,
-          RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-          RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-          'g'           => Ncurses::KEY_HOME,
-          '^'           => Ncurses::KEY_HOME,
-          'G'           => Ncurses::KEY_END,
-          '$'           => Ncurses::KEY_END,
-      }
-      self.set_box(box)
+      self.set_box box
       box_height = @border_size * 2 + 1
 
       # Set some basic values of the widget's data field.
@@ -227,11 +217,14 @@ module RNDK
       end
 
       # Setup the key bindings.
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
+      self.bind_key('u') { self.increment @increment      }
+      self.bind_key('U') { self.increment @fast_increment }
+      self.bind_key('g') { @current = @minimum            }
+      self.bind_key('^') { @current = @minimum            }
+      self.bind_key('G') { @current = @maximum            }
+      self.bind_key('$') { @current = @maximum            }
 
-      screen.register(:slider, self)
+      screen.register(@widget_type, self)
     end
 
     # Activates the Widget, letting the user interact with it.
@@ -241,7 +234,7 @@ module RNDK
     #
     # @return The current value of the slider.
     def activate(actions=[])
-      self.draw @box
+      self.draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -370,7 +363,7 @@ module RNDK
       if modify &&
           ((value, test) = temp.scanf(self.SCAN_FMT)).size == 2 &&
           test == ' ' && value >= @minimum && value <= @maximum
-        self.setValue(value)
+        self.set_value(value)
         result = true
       end
       return result
@@ -402,20 +395,25 @@ module RNDK
       self.set_exit_type(0)
 
       # Draw the field.
-      self.drawField
+      self.draw_field
 
       # Check if there is a pre-process function to be called.
       unless @pre_process_func.nil?
         # Call the pre-process function.
-        pp_return = @pre_process_func.call(:slider, self,
-            @pre_process_data, input)
+        pp_return = @pre_process_func.call(@widget_type,
+                                           self,
+                                           @pre_process_data,
+                                           input)
       end
 
       # Should we continue?
       if pp_return
+
         # Check for a key binding.
-        if self.check_bind(input)
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
+          #complete = true
+
         else
           case input
           when Ncurses::KEY_LEFT
@@ -423,13 +421,13 @@ module RNDK
           when Ncurses::KEY_RIGHT
             self.setEditPosition(@field_edit - 1)
           when Ncurses::KEY_DOWN
-            @current = RNDK::Slider.Decrement(@current, @increment)
+            self.decrement @increment
           when Ncurses::KEY_UP
-            @current = RNDK::Slider.Increment(@current, @increment)
-          when Ncurses::KEY_PPAGE
-            @current = RNDK::Slider.Increment(@current, @fast_increment)
-          when Ncurses::KEY_NPAGE
-            @current = RNDK::Slider.Decrement(@current, @fast_increment)
+            self.increment @increment
+          when Ncurses::KEY_PPAGE, RNDK::BACKCHAR
+            self.increment @fast_increment
+          when Ncurses::KEY_NPAGE, RNDK::FORCHAR
+            self.decrement @fast_increment
           when Ncurses::KEY_HOME
             @current = @minimum
           when Ncurses::KEY_END
@@ -474,12 +472,15 @@ module RNDK
 
         # Should we call a post-process?
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:slider, self, @post_process_data, input)
+          @post_process_func.call(@widget_type,
+                                  self,
+                                  @post_process_data,
+                                  input)
         end
       end
 
       if !complete
-        self.drawField
+        self.draw_field
         self.set_exit_type(0)
       end
 
@@ -497,13 +498,13 @@ module RNDK
     # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw box
+    def draw
 
       # Draw the shadow.
       Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if box
+      Draw.drawObjBox(@win, self) if @box
 
       self.draw_title @win
 
@@ -516,11 +517,11 @@ module RNDK
       Ncurses.wrefresh @win
 
       # Draw the field window.
-      self.drawField
+      self.draw_field
     end
 
     # This draws the widget.
-    def drawField
+    def draw_field
       step = 1.0 * @field_width / (@maximum - @minimum)
 
       # Determine how many filler characters need to be drawn.
@@ -584,17 +585,17 @@ module RNDK
     # This function sets the minimum/maximum/current values of the widget.
     def set(minimum, maximum, value, box)
       self.setMinimumMaximum(minimum, maximum)
-      self.setValue(value)
+      self.set_value(value)
       self.set_box(box)
     end
 
     # This sets the widget's value.
-    def setValue(value)
+    def set_value(value)
       @current = value
       self.limitCurrentValue
     end
 
-    def getValue
+    def get_value
       return @current
     end
 
@@ -622,11 +623,11 @@ module RNDK
     end
 
     def focus
-      self.draw(@box)
+      self.draw
     end
 
     def unfocus
-      self.draw(@box)
+      self.draw
     end
 
     def SCAN_FMT
@@ -635,6 +636,14 @@ module RNDK
 
     def position
       super(@win)
+    end
+
+    def decrement by
+      @current = @current - by if (@current - by) < @current
+    end
+
+    def increment by
+      @current = @current + by if (@current + by) > @current
     end
 
   end

@@ -501,7 +501,7 @@ module RNDK
       ret = 0
 
       # Draw the widget.
-      self.draw(@box)
+      self.draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -618,7 +618,7 @@ module RNDK
 
           # Get out of here.
           self.erase
-          self.draw(@box)
+          self.draw
           return
         end
       end
@@ -823,7 +823,7 @@ module RNDK
 
       # Redraw the widget.
       self.erase
-      self.draw(@box)
+      self.draw
     end
 
     def getContents(size)

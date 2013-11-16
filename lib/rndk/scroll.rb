@@ -33,7 +33,7 @@ module RNDK
   #               set the widget `exit_type` `:ESCAPE_HIT`.
   # Ctrl-L::      Refreshes the screen.
   #
-  class Scroll < SCROLLER
+  class Scroll < Scroller
     attr_reader :item, :items_size, :current_item, :highlight
 
     # Creates a Scroll Widget.
@@ -99,16 +99,6 @@ module RNDK
       ypos = y
 
       scroll_adjust = 0
-
-      bindings = {
-        RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-        RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-        'g'            => Ncurses::KEY_HOME,
-        '1'            => Ncurses::KEY_HOME,
-        'G'            => Ncurses::KEY_END,
-        '<'            => Ncurses::KEY_HOME,
-        '>'            => Ncurses::KEY_END
-      }
 
       self.set_box box
 
@@ -215,19 +205,15 @@ module RNDK
                                      xpos + 1)
       end
 
-      # Set up the key bindings.
-      bindings.each do |from, to|
-        #self.bind(from, getc_lambda, to)
-        self.bind(from, :getc, to)
-      end
+      self.bind_key('g') { self.scroll_begin }
+      self.bind_key('1') { self.scroll_begin }
+      self.bind_key('G') { self.scroll_end   }
+      self.bind_key('<') { self.scroll_begin }
+      self.bind_key('>') { self.scroll_end   }
 
       screen.register(:scroll, self);
-
       self
     end
-
-
-
 
     # @see Widget#position
     def position
@@ -240,7 +226,7 @@ module RNDK
     # will #inject each char on it into the Widget.
     #
     def activate(actions=[])
-      self.draw @box
+      self.draw
 
       if actions.nil? || actions.size == 0
         loop do
@@ -289,20 +275,22 @@ module RNDK
       if pp_return
 
         # Check for a predefined key binding.
-        if self.check_bind(input) != false
-          #self.checkEarlyExit
-          complete = true
+        if self.is_bound? input
+          self.run_binding input
 
         else
           case input
-          when Ncurses::KEY_UP    then self.KEY_UP
-          when Ncurses::KEY_DOWN  then self.KEY_DOWN
-          when Ncurses::KEY_RIGHT then self.KEY_RIGHT
-          when Ncurses::KEY_LEFT  then self.KEY_LEFT
-          when Ncurses::KEY_PPAGE then self.KEY_PPAGE
-          when Ncurses::KEY_NPAGE then self.KEY_NPAGE
-          when Ncurses::KEY_HOME  then self.KEY_HOME
-          when Ncurses::KEY_END   then self.KEY_END
+          when Ncurses::KEY_UP    then self.scroll_up
+          when Ncurses::KEY_DOWN  then self.scroll_down
+          when Ncurses::KEY_LEFT  then self.scroll_left
+          when Ncurses::KEY_RIGHT then self.scroll_right
+          when Ncurses::KEY_PPAGE then self.scroll_page_up
+          when Ncurses::KEY_NPAGE then self.scroll_page_down
+          when Ncurses::KEY_HOME  then self.scroll_begin
+          when Ncurses::KEY_END   then self.scroll_end
+          when RNDK::BACKCHAR     then self.scroll_page_up
+          when RNDK::FORCHAR      then self.scroll_page_down
+
           when '$'                then @left_char = @max_left_char
           when '|'                then @left_char = 0
 
@@ -352,16 +340,14 @@ module RNDK
     end
 
     # This function draws the scrolling items widget.
-    def draw(box)
+    def draw
       # Draw in the shadow if we need to.
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
-      self.draw_title(@win)
+      self.draw_title @win
 
       # Draw in the scrolling items items.
-      self.draw_items(box)
+      self.draw_items @box
     end
 
     # This sets the background attribute of the widget.
@@ -422,11 +408,11 @@ module RNDK
     end
 
     def get_items(items)
-      (0...@items_size).each do |x|
+      (0...@item.size).each do |x|
         items << RNDK.chtype2Char(@item[x])
       end
 
-      @items_size
+      @item.size
     end
 
     # This sets the highlight of the scrolling items.
@@ -438,72 +424,72 @@ module RNDK
       return @highlight
     end
 
-    # Adds a single item to a scrolling items, at the end of
-    # the items.
-    def add_item(item)
-      item_number = @items_size
-      widest_item = self.widest_item
-      temp = ''
-      have = 0
+    # # Adds a single item to a scrolling items, at the end of
+    # # the items.
+    # def add_item(item)
+    #   item_number = @item.size
+    #   widest_item = self.widest_item
+    #   temp = ''
+    #   have = 0
 
-      if (self.alloc_items_arrays(@items_size, @items_size + 1)) and
-          (self.alloc_items_item(item_number,
-                               temp,
-                               have,
-                               if @numbers then item_number + 1 else 0 end,
-                               item))
-        # Determine the size of the widest item.
-        widest_item = [@item_len[item_number], widest_item].max
+    #   if (self.alloc_items_arrays(@item.size, @item.size + 1)) and
+    #       (self.alloc_items_item(item_number,
+    #                            temp,
+    #                            have,
+    #                            if @numbers then item_number + 1 else 0 end,
+    #                            item))
+    #     # Determine the size of the widest item.
+    #     widest_item = [@item_len[item_number], widest_item].max
 
-        self.update_view_width(widest_item)
-        self.set_view_size(@items_size + 1)
-      end
-    end
+    #     self.update_view_width(widest_item)
+    #     self.set_view_size(@item.size + 1)
+    #   end
+    # end
 
-    # Adds a single item to a scrolling items before the current
-    # item.
-    def insert_item(item)
-      widest_item = self.widest_item
-      temp = ''
-      have = 0
+    # # Adds a single item to a scrolling items before the current
+    # # item.
+    # def insert_item(item)
+    #   widest_item = self.widest_item
+    #   temp = ''
+    #   have = 0
 
-      if self.alloc_items_arrays(@items_size, @items_size + 1) &&
-          self.insert_items_item(@current_item) &&
-          self.alloc_items_item(@current_item,
-                               temp,
-                               have,
-                               if @numbers then @current_item + 1 else 0 end,
-                               item)
+    #   if (self.alloc_items_arrays(@item.size, @item.size + 1)) and
+    #       (self.insert_items_item(@current_item)) and
+    #       (self.alloc_items_item(@current_item,
+    #                            temp,
+    #                            have,
+    #                            if @numbers then @current_item + 1 else 0 end,
+    #                            item))
 
-        # Determine the size of the widest item.
-        widest_item = [@item_len[@current_item], widest_item].max
+    #     # Determine the size of the widest item.
+    #     widest_item = [@item_len[@current_item], widest_item].max
 
-        self.update_view_width(widest_item)
-        self.set_view_size(@items_size + 1)
-        self.resequence
-      end
-    end
+    #     self.update_view_width(widest_item)
+    #     self.set_view_size(@item.size + 1)
+    #     self.resequence
+    #   end
+    # end
 
-    # This removes a single item from a scrolling items.
-    def delete_item(position)
-      if position >= 0 && position < @items_size
-        # Adjust the items
-        @item = @item[0...position] + @item[position+1..-1]
-        @item_len = @item_len[0...position] + @item_len[position+1..-1]
-        @item_pos = @item_pos[0...position] + @item_pos[position+1..-1]
+    # # This removes a single item from a scrolling items.
+    # def delete_item(position)
+    #   if position >= 0 && position < @item.size
+    #     # Adjust the items
+    #     @item = @item[0...position] + @item[position+1..-1]
+    #     @item_len = @item_len[0...position] + @item_len[position+1..-1]
+    #     @item_pos = @item_pos[0...position] + @item_pos[position+1..-1]
 
-        self.set_view_size(@items_size - 1)
+    #     self.set_view_size(@item.size - 1)
 
-        self.resequence if @items_size > 0
+    #     self.resequence if @item.size > 0
 
-        if @items_size < self.max_view_size
-          Ncurses.werase @win  # force the next redraw to be complete
-        end
+    #     if @item.size < self.max_view_size
+    #       Ncurses.werase @win  # force the next redraw to be complete
+    #     end
 
-        # do this to update the view size, etc
-        self.set_position(@current_item)
-      end
-    end
+    #     # do this to update the view size, etc
+    #     self.set_position(@current_item)
+    #   end
+    # end
 
     def focus
       self.draw_current
@@ -569,8 +555,6 @@ module RNDK
       else
         status = true  # null items is ok - for a while
       end
-
-      @items_size = items.size
       status
     end
 
@@ -614,23 +598,23 @@ module RNDK
 
     # Resequence the numbers after an insertion/deletion.
     def resequence
-      if @numbers
-        (0...@items_size).each do |j|
-          target = @item[j]
+      return unless @numbers
 
-          source = "%4d. %s" % [j + 1, ""]
+      (0...@item.size).each do |j|
+        target = @item[j]
 
-          k = 0
-          while k < source.size
-            # handle deletions that change the length of number
-            if source[k] == "." && target[k] != "."
-              source = source[0...k] + source[k+1..-1]
-            end
+        source = "%4d. %s" % [j + 1, ""]
 
-            target[k] &= Ncurses::A_COLORUTES
-            target[k] |= source[k].ord
-            k += 1
+        k = 0
+        while k < source.size
+          # handle deletions that change the length of number
+          if (source[k] == ".") and (target[k] != ".")
+            source = source[0...k] + source[k+1..-1]
           end
+
+          target[k] &= Ncurses::A_ATTRIBUTES
+          target[k] |= source[k].ord
+          k += 1
         end
       end
     end
@@ -662,7 +646,7 @@ module RNDK
     def draw_items box
 
       # If the items is empty, don't draw anything.
-      if @items_size > 0
+      if @item.size > 0
 
         # Redraw the items
         (0...@view_size).each do |j|
@@ -675,16 +659,7 @@ module RNDK
                            @box_width - (2 * @border_size))
 
           # Draw the elements in the scrolling items.
-          if k < @items_size
-            ################################################################################
-            if @item_pos[k].nil?
-              RNDK::Screen.finish
-              puts "lol"
-              puts k
-              puts @items_size
-              puts "lol"
-              exit!
-            end
+          if k < @item.size
 
             screen_pos = @item_pos[k] - @left_char
             ypos = j

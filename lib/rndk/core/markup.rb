@@ -504,9 +504,9 @@ module RNDK
 
     result = if string.nil? then '' else string end
     base_len = result.size
-    tmpattr = oldattr & Ncurses::A_COLORUTES
+    tmpattr = oldattr & Ncurses::A_ATTRIBUTES
 
-    newattr &= Ncurses::A_COLORUTES
+    newattr &= Ncurses::A_ATTRIBUTES
     if tmpattr != newattr
       while tmpattr != newattr
         found = false

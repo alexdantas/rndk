@@ -15,8 +15,8 @@ module RNDK
     #   `RNDK::RIGHT`, `RNDK::CENTER`.
     # * `y` is the y position - can be an integer or `RNDK::TOP`,
     #   `RNDK::BOTTOM`, `RNDK::CENTER`.
-    # * `message` is an Array of Strings with all the lines you'd want
-    #   to show. RNDK markup applies (see RNDK#Markup).
+    # * `message` is an Array of Strings with all the lines you'd
+    #   want to show. RNDK markup applies (see RNDK#Markup).
     # * `box` if the Widget is drawn with a box outside it.
     # * `shadow` turns on/off the shadow around the Widget.
     #
@@ -52,9 +52,8 @@ module RNDK
       parent_height = Ncurses.getmaxy screen.window
       box_width  = -2**30  # -INFINITY
       box_height = 0
-      xpos = [x]
-      ypos = [y]
-      x = 0
+      x = [x]
+      y = [y]
 
       self.set_box box
       box_height = rows + 2*@border_size
@@ -95,14 +94,17 @@ module RNDK
                    end
 
       # Rejustify the x and y positions if we need to
-      RNDK.alignxy(screen.window, xpos, ypos, box_width, box_height)
+      RNDK.alignxy(screen.window, x, y, box_width, box_height)
 
       @screen = screen
       @parent = screen.window
-      @win    = Ncurses.newwin(box_height, box_width, ypos[0], xpos[0])
+      @win    = Ncurses.newwin(box_height,
+                               box_width,
+                               y[0],
+                               x[0])
       @shadow_win = nil
-      @xpos = xpos[0]
-      @ypos = ypos[0]
+      @x = x[0]
+      @y = y[0]
       @rows = rows
       @box_width    = box_width
       @box_height   = box_height
@@ -121,17 +123,17 @@ module RNDK
       if shadow
         @shadow_win = Ncurses.newwin(box_height,
                                      box_width,
-                                     ypos[0] + 1,
-                                     xpos[0] + 1)
+                                     y[0] + 1,
+                                     x[0] + 1)
       end
 
       # Register this
-      screen.register(:label, self)
+      screen.register(@widget_type, self)
     end
 
     # Obsolete entrypoint which calls Label#draw.
     def activate(actions=[])
-      self.draw @box
+      self.draw
     end
 
     # Sets multiple attributes of the Widget.
@@ -161,49 +163,41 @@ module RNDK
 
     # Sets the contents of the Label Widget.
     # @note `info` is an Array of Strings.
-    def set_message info
-      return if info.class != Array or info.empty?
+    def set_message text
+      return if text.class != Array or text.empty?
 
-      info_size = info.size
+      text_size = text.size
       # Clean out the old message.
       (0...@rows).each do |x|
-        @info[x]     = ''
-        @info_pos[x] = 0
-        @info_len[x] = 0
+        @text[x]     = ''
+        @text_pos[x] = 0
+        @text_len[x] = 0
       end
 
-      @rows = if info_size < @rows
-              then info_size
+      @rows = if text_size < @rows
+              then text_size
               else @rows
               end
 
       # Copy in the new message.
       (0...@rows).each do |x|
-        info_len = []
-        info_pos = []
-        @info[x] = RNDK.char2Chtype(info[x], info_len, info_pos)
-        @info_len[x] = info_len[0]
-        @info_pos[x] = RNDK.justifyString(@box_width - 2 * @border_size,
-                                          @info_len[x],
-                                          info_pos[0])
+        text_len = []
+        text_pos = []
+        @text[x] = RNDK.char2Chtype(text[x], text_len, text_pos)
+        @text_len[x] = text_len[0]
+        @text_pos[x] = RNDK.justifyString(@box_width - 2 * @border_size,
+                                          @text_len[x],
+                                          text_pos[0])
       end
 
       # Redraw the label widget.
       self.erase
-      self.draw @box
+      self.draw
     end
 
     # Returns current contents of the Widget.
-    def get_message(size)
-      size << @rows
-      return @info
-    end
-
-
-
-
-    def position
-      super(@win)
+    def get_message
+      @info
     end
 
     # Sets the background attribute/color of the widget.
@@ -270,6 +264,10 @@ module RNDK
         break if code == key.ord
       end
       code
+    end
+
+    def position
+      super(@win)
     end
 
   end
