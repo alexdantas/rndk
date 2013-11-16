@@ -330,7 +330,7 @@ module RNDK
       # Draw in the X axis title.
       if !(@xtitle.nil?) && @xtitle.size > 0
         Draw.writeChtype(@win, 0, @xtitle_pos, @xtitle, RNDK::VERTICAL, 0, @xtitle_len)
-        attrib = @xtitle[0] & Ncurses::A_COLORUTES
+        attrib = @xtitle[0] & Ncurses::A_ATTRIBUTES
       end
 
       # Draw in the X axis high value

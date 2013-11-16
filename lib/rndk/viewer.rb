@@ -119,7 +119,7 @@ module RNDK
       @max_top_line = 0
       @characters = 0
       @items_size = -1
-      @show_line_info = 1
+      @show_line_items = 1
       @exit_type = :EARLY_EXIT
 
       self.set_title title
@@ -152,7 +152,7 @@ module RNDK
       height           = 0
       items            = []
       hide_control_chars = true
-      show_line_info   = true
+      show_line_items   = true
       title            = "viewer"
       buttons          = []
       button_highlight = Ncurses::A_REVERSE
@@ -167,7 +167,7 @@ module RNDK
         title            = val if key == :title
         items            = val if key == :items
         hide_control_chars = val if key == :hide_control_chars
-        show_line_info   = val if key == :show_line_info
+        show_line_items   = val if key == :show_line_items
         buttons          = val if key == :buttons
         button_highlight = val if key == :button_highlight
         box              = val if key == :box
@@ -176,9 +176,9 @@ module RNDK
 
       self.set_title(title)                  if title != "viewer"
       self.set_highlight(button_highlight)   if button_highlight != Ncurses::A_REVERSE
-      self.set_info_line(show_line_info)
+      self.set_items_line(show_line_items)
       self.set_box(box)                      if box
-      self.set_info(items, hide_control_chars) if not items.empty?
+      self.set_items(items, hide_control_chars) if not items.empty?
     end
 
     # This sets the title of the viewer. (A nil title is allowed.
@@ -235,7 +235,7 @@ module RNDK
     end
 
     # This function sets the contents of the viewer.
-    def set_info(items, interpret)
+    def set_items(items, interpret)
       current_line = 0
       viewer_size = items.size
 
@@ -259,15 +259,15 @@ module RNDK
         end
       end
 
-      # Clean out the old viewer info. (if there is any)
+      # Clean out the old viewer items. (if there is any)
       @in_progress = true
       self.clean
       self.create_items(viewer_size)
 
-      # Keep some semi-permanent info
+      # Keep some semi-permanent items
       @interpret = interpret
 
-      # Copy the information given.
+      # Copy the itemsrmation given.
       current_line = 0
       x = 0
       while x < items.size && current_line < viewer_size
@@ -334,7 +334,7 @@ module RNDK
       return @items_size
     end
 
-    def get_info(size)
+    def get_items(size)
       size << @items_size
       @items
     end
@@ -349,13 +349,13 @@ module RNDK
     end
 
     # This sets whether or not you wnat to set the viewer
-    # info line.
-    def set_info_line(show_line_info)
-      @show_line_info = show_line_info
+    # items line.
+    def set_items_line(show_line_items)
+      @show_line_items = show_line_items
     end
 
-    def get_info_line
-      @show_line_info
+    def get_items_line
+      @show_line_items
     end
 
     # This removes all the lines inside the scrolling window.
@@ -377,17 +377,17 @@ module RNDK
     end
 
     def PatternNotFound(pattern)
-      temp_info = [
+      temp_items = [
           "</U/5>Pattern '%s' not found.<!U!5>" % pattern,
       ]
-      self.pop_up_label(temp_info)
+      self.pop_up_label(temp_items)
     end
 
     # This function actually controls the viewer...
     def activate(actions=[])
       refresh = false
-      # Create the information about the file stats.
-      file_info = [
+      # Create the itemsrmation about the file stats.
+      file_items = [
           '</5>      </U>File Statistics<!U>     <!5>',
           '</5>                          <!5>',
           '</5/R>Character Count:<!R> %-4d     <!5>' % @characters,
@@ -396,7 +396,7 @@ module RNDK
           '<C></5>Press Any Key To Continue.<!5>'
       ]
 
-      temp_info = ['<C></5>Press Any Key To Continue.<!5>']
+      temp_items = ['<C></5>Press Any Key To Continue.<!5>']
 
       # Set the current button.
       @current_button = 0
@@ -528,8 +528,8 @@ module RNDK
             refresh = true
           when 'N'.ord, 'n'.ord
             if @search_pattern == ''
-              temp_info[0] = '</5>There is no pattern in the buffer.<!5>'
-              self.pop_up_label(temp_info)
+              temp_items[0] = '</5>There is no pattern in the buffer.<!5>'
+              self.pop_up_label(temp_items)
             elsif !self.search_for_word(@search_pattern,
                 if input == 'n'.ord
                 then @search_direction
@@ -542,7 +542,7 @@ module RNDK
             @current_top = self.jump_to_line
             refresh = true
           when 'i'.ord, 's'.ord, 'S'.ord
-            self.pop_up_label(file_info)
+            self.pop_up_label(file_items)
             refresh = true
           when RNDK::KEY_ESC
             self.set_exit_type(input)
@@ -563,7 +563,7 @@ module RNDK
 
         # Do we need to redraw the screen?
         if refresh
-          self.draw_info
+          self.draw_items
         end
       end
     end
@@ -702,8 +702,8 @@ module RNDK
         Ncurses.wrefresh @win
       end
 
-      # Draw the info in the viewer.
-      self.draw_info
+      # Draw the items in the viewer.
+      self.draw_items
     end
 
     # This redraws the viewer buttons.
@@ -743,7 +743,7 @@ module RNDK
       Ncurses.wbkgd(@win, attrib)
     end
 
-    def destroy_info
+    def destroy_items
       @items = []
       @items_pos = []
       @items_len = []
@@ -751,7 +751,7 @@ module RNDK
 
     # This function destroys the viewer widget.
     def destroy
-      self.destroy_info
+      self.destroy_items
       self.clean_title
 
       # Clean up the windows.
@@ -773,8 +773,8 @@ module RNDK
       end
     end
 
-    # This draws the viewer info lines.
-    def draw_info
+    # This draws the viewer items lines.
+    def draw_items
       temp = ''
       line_adjust = false
 
@@ -784,8 +784,8 @@ module RNDK
       self.draw_title @win
 
       # Draw in the current line at the top.
-      if @show_line_info == true
-        # Set up the info line and draw it.
+      if @show_line_items == true
+        # Set up the items line and draw it.
         if @in_progress
           temp = 'processing...'
         elsif @items_size != 0
@@ -797,7 +797,7 @@ module RNDK
 
         # The items_adjust variable tells us if we have to shift down one line
         # because the person asked for the line X of Y line at the top of the
-        # screen. We only want to set this to true if they asked for the info
+        # screen. We only want to set this to true if they asked for the items
         # line and there is no title or if the two items overlap.
         if @title_lines == '' || @title_pos[0] < temp.size + 2
           items_adjust = true
@@ -859,7 +859,7 @@ module RNDK
     def create_items(items_size)
       status = false
 
-      self.destroy_info
+      self.destroy_items
 
       if items_size >= 0
         status = true

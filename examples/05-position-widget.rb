@@ -33,6 +33,7 @@
 require 'rndk/entry'
 
 begin
+  title = "</77>Entry"
   label = "</U/5>Position me:<!U!5> "
 
   # Set up RNDK
@@ -43,19 +44,13 @@ begin
   RNDK::Color.init
 
   # Create the entry field widget.
-  entry = RNDK::Entry.new(screen,
-                          RNDK::CENTER, # x
-                          RNDK::CENTER, # y
-                          '',
-                          label,
-                          Ncurses::A_NORMAL,
-                          '.',
-                          :MIXED,
-                          30, # w
-                          0,
-                          256,
-                          true,
-                          false)
+  entry = RNDK::Entry.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::CENTER,
+                            :label => label,
+                            :title => title,
+                            :field_width => 30
+                          })
 
   if entry.nil?
     screen.destroy
@@ -70,24 +65,20 @@ begin
   entry.position
 
   # Activate the entry field.
-  info = entry.activate('')
+  info = entry.activate
 
   # Tell them what they typed.
   if entry.exit_type == :ESCAPE_HIT
-    mesg = [
-            "<C>You hit escape. No information passed back.",
+    mesg = ["<C>You hit escape. No information passed back.",
             "",
-            "<C>Press any key to continue."
-           ]
+            "<C>Press any key to continue."]
     screen.popup_label mesg
 
   elsif entry.exit_type == :NORMAL
-    mesg = [
-            "<C>You typed in the following",
-            "<C>%.*s" % [236, info],  # FIXME magic number
+    mesg = ["<C>You typed in the following",
+            "<C></77>#{info}",
             "",
-            "<C>Press any key to continue."
-           ]
+            "<C>Press any key to continue."]
     screen.popup_label mesg
   end
 

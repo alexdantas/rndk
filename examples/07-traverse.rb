@@ -24,31 +24,25 @@ begin
 
   # Creating the two scroll bars.
   # Pay attention to their positioning.
-  scroll_1 = RNDK::Scroll.new(screen,
-                              RNDK::LEFT,
-                              RNDK::CENTER,
-                              RNDK::RIGHT,
-                              RNDK::Screen.width/2 - 1,
-                              20,
-                              "<C>Items",  # centered
-                              items,
-                              false,
-                              RNDK::Color[:red],
-                              true,
-                              false)
+  scroll_1 = RNDK::Scroll.new(screen, {
+                                :x => RNDK::LEFT,
+                                :y => RNDK::CENTER,
+                                :width => RNDK::Screen.width/2 - 1,
+                                :height => 20,
+                                :title => "<C>Items",  # centered
+                                :items => items,
+                                :highlight => RNDK::Color[:red],
+                              })
 
-  scroll_2 = RNDK::Scroll.new(screen,
-                              RNDK::RIGHT,
-                              RNDK::CENTER,
-                              RNDK::RIGHT,
-                              RNDK::Screen.width/2 - 1,
-                              20,
-                              "<C>Descriptions", # centered
-                              descriptions.first,
-                              false,
-                              RNDK::Color[:cyan],
-                              true,
-                              false)
+  scroll_2 = RNDK::Scroll.new(screen, {
+                                :x => RNDK::RIGHT,
+                                :y => RNDK::CENTER,
+                                :width => RNDK::Screen.width/2 - 1,
+                                :height => 20,
+                                :title => "<C>Descriptions", # centered
+                                :items => descriptions.first,
+                                :highlight => RNDK::Color[:cyan]
+                              })
 
   # Here we define what will happen after we scroll the
   # first list.
@@ -68,7 +62,11 @@ begin
 
   # Simple label to tell the user how to quit the example
   msg = "</77>Press F10 to quit"
-  label = RNDK::Label.new(screen, RNDK::CENTER, RNDK::TOP, msg, true, false)
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::TOP,
+                            :text => msg
+                          })
 
   # Finally, activating the widgets and setting them
   # up for traversal.

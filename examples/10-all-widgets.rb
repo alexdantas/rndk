@@ -98,7 +98,8 @@ begin
                      :buttons => ["one", "two", "three"],
                      :width => 24,
                      :height => 15
-                   })
+                   }).set_items(`ls -l`.lines, false)
+
   screen.refresh
   RNDK::Traverse.over screen
   RNDK::Screen.finish

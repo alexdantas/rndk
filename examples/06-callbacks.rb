@@ -20,18 +20,16 @@ begin
   title = "<C></77>Your files"
   list = `ls -l`.lines
 
-  scroll = RNDK::Scroll.new(screen,
-                            RNDK::CENTER,
-                            RNDK::CENTER,
-                            RNDK::LEFT,
-                            RNDK::Screen.width/2,  # nice
-                            RNDK::Screen.height/2, # things
-                            title,
-                            list,
-                            false,
-                            RNDK::Color[:green],
-                            true,
-                            false)
+  scroll = RNDK::Scroll.new(screen, {
+                              :x => RNDK::CENTER,
+                              :y => RNDK::CENTER,
+                              :scroll_bar => RNDK::LEFT,
+                              :width => RNDK::Screen.width/2,
+                              :height => RNDK::Screen.height/2,
+                              :title => title,
+                              :items => list,
+                              :highlight => RNDK::Color[:green]
+                            })
 
   # Here comes the good stuff.
   # We're assigning blocks to run before and after
