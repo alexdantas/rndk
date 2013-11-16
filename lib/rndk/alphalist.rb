@@ -2,7 +2,8 @@ require 'rndk'
 
 module RNDK
 
-  # Allows user to select from a items of alphabetically sorted words.
+  # Allows user to select from a items of alphabetically sorted
+  # words.
   #
   # Use the arrow keys to navigate on the items or type in the
   # beginning of the word and it'll automagically adjust
@@ -34,10 +35,12 @@ module RNDK
   # This widget, like the file selector widget, is a compound widget
   # of both the entry field widget and the scrolling items widget - sorted.
   #
-  class Alphaitems < Widget
+  # @todo Kinda buggy, fix first words, mate
+  #
+  class Alphalist < Widget
     attr_reader :scroll_field, :entry_field, :items
 
-    # Creates an Alphaitems Widget.
+    # Creates an Alphalist Widget.
     #
     # ## Settings
     #
@@ -79,7 +82,7 @@ module RNDK
       items        = []
       filler_char = '.'
       highlight   = Ncurses::A_REVERSE
-      box         = false
+      box         = true
       shadow      = false
 
       config.each do |key, val|
@@ -159,24 +162,20 @@ module RNDK
       end
 
       # Create the entry field.
-      temp_width =  if Alphaitems.isFullWidth(width)
+      temp_width =  if Alphalist.isFullWidth(width)
                     then RNDK::FULL
                     else box_width - 2 - label_len
                     end
 
-      @entry_field = RNDK::Entry.new(screen,
-                                     Ncurses.getbegx(@win),
-                                     Ncurses.getbegy(@win),
-                                     title,
-                                     label,
-                                     Ncurses::A_NORMAL,
-                                     filler_char,
-                                     :MIXED,
-                                     temp_width,
-                                     0,
-                                     512,
-                                     box,
-                                     false)
+      @entry_field = RNDK::Entry.new(screen, {
+                                       :x => Ncurses.getbegx(@win),
+                                       :y => Ncurses.getbegy(@win),
+                                       :title => title,
+                                       :label => label,
+                                       :filler => filler_char,
+                                       :field_width => temp_width,
+                                       :box => box
+                                     })
       if @entry_field.nil?
         self.destroy
         return nil
@@ -191,29 +190,25 @@ module RNDK
       @entry_field.bind_key(Ncurses::KEY_NPAGE) { self.adjust_items }
       @entry_field.bind_key(Ncurses::KEY_PPAGE) { self.adjust_items }
 
-      # Set up the post-process function for the entry field.
-      @entry_field.bind_signal(:before_input) { self.pre_process_entry_field }
+      @entry_field.bind_signal(:before_input) { |char| self.pre_process_entry_field(char) }
 
       # Create the scrolling items.  It overlaps the entry field by one line if
       # we are using box-borders.
       temp_height = Ncurses.getmaxy(@entry_field.win) - @border_size
-      temp_width = if Alphaitems.isFullWidth(width)
+      temp_width = if Alphalist.isFullWidth(width)
                    then RNDK::FULL
                    else box_width - 1
                    end
 
-      @scroll_field = RNDK::Scroll.new(screen,
-                                      Ncurses.getbegx(@win),
-                                      Ncurses.getbegy(@entry_field.win) + temp_height,
-                                      RNDK::RIGHT,
-                                      box_height - temp_height,
-                                      temp_width,
-                                      '',
-                                      items,
-                                      false,
-                                       Ncurses::A_REVERSE,
-                                      box,
-                                      false)
+      @scroll_field = RNDK::Scroll.new(screen, {
+                                         :x => Ncurses.getbegx(@win),
+                                         :y => Ncurses.getbegy(@entry_field.win) + temp_height,
+                                         :width => temp_width,
+                                         :height => box_height - temp_height,
+                                         :title => '',
+                                         :items => items,
+                                         :box => box
+                                       })
 
       @scroll_field.setULchar Ncurses::ACS_LTEE
       @scroll_field.setURchar Ncurses::ACS_RTEE
@@ -252,9 +247,9 @@ module RNDK
       @scroll_field.has_focus = @save
     end
 
-    def drawMyScroller
+    def draw_scroller
       self.saveFocus
-      @scroll_field.draw(@scroll_field.box)
+      @scroll_field.draw
       self.restoreFocus
     end
 
@@ -274,15 +269,15 @@ module RNDK
       @entry_field.draw @entry_field.box
 
       # Draw in the scroll field.
-      self.drawMyScroller
+      self.draw_scroller
     end
 
-    # Activates the Alphaitems Widget, letting the user interact with it.
+    # Activates the Alphalist Widget, letting the user interact with it.
     #
     # `actions` is an Array of characters. If it's non-null,
     # will #inject each char on it into the Widget.
     #
-    # See Alphaitems for keybindings.
+    # See Alphalist for keybindings.
     #
     # @return The text currently inside the entry field (and
     #         `exit_type` will be `:NORMAL`) or `nil` (and
@@ -306,7 +301,7 @@ module RNDK
       return 0
     end
 
-    # Makes the Alphaitems react to `char` just as if the user
+    # Makes the Alphalist react to `char` just as if the user
     # had pressed it.
     #
     # Nice to simulate batch actions on a Widget.
@@ -314,13 +309,13 @@ module RNDK
     # Besides normal keybindings (arrow keys and such), see
     # Widget#set_exit_type to see how the Widget exits.
     #
-    def inject char
+    def inject input
       ret = false
 
       self.draw
 
       # Inject a character into the widget.
-      ret = @entry_field.inject char
+      ret = @entry_field.inject input
 
       # Copy the eixt type from the entry field.
       @exit_type = @entry_field.exit_type
@@ -334,7 +329,7 @@ module RNDK
 
     # Sets multiple attributes of the Widget.
     #
-    # See Alphaitems#initialize.
+    # See Alphalist#initialize.
     def set(items, filler_char, highlight, box)
       self.set_contents   items
       self.set_filler_char filler_char
@@ -539,7 +534,7 @@ module RNDK
       end
 
       # Look for a unique word match.
-      index = RNDK.searchItems(self.items, self.items.size, entry.info)
+      index = RNDK.search_list(self.items, self.items.size, entry.info)
 
       # if the index is less than zero, return we didn't find a match
       if index < 0
@@ -574,18 +569,15 @@ module RNDK
         height = if alt_words.size < 8 then alt_words.size + 3 else 11 end
 
         # Create a scrolling items of close matches.
-        scrollp = RNDK::Scroll.new(entry.screen,
-                                   RNDK::CENTER,
-                                   RNDK::CENTER,
-                                   RNDK::RIGHT,
-                                   height,
-                                   -30,
-                                   "<C></B/5>Possible Matches.",
-                                   alt_words,
-                                   true,
-                                   Ncurses::A_REVERSE,
-                                   true,
-                                   false)
+        scrollp = RNDK::Scroll.new(entry.screen, {
+                                     :x => RNDK::CENTER,
+                                     :y => RNDK::CENTER,
+                                     :width => -30,
+                                     :height => height,
+                                     :title => "<C></B/5>Possible Matches.",
+                                     :items => alt_words,
+                                     :numbers => true
+                                   })
 
         # Allow them to select a close match.
         match = scrollp.activate
@@ -625,14 +617,14 @@ module RNDK
       true
     end
 
-    def pre_process_entry_field
-      scrollp = alphaitems.scroll_field
-      entry = alphaitems.entry_field
+    def pre_process_entry_field(input)
+      scrollp = self.scroll_field
+      entry = self.entry_field
       info_len = entry.info.size
       result = 1
       empty = false
 
-      if alphaitems.is_bound? input
+      if self.is_bound? input
         result = 1  # Don't try to use this key in editing
 
       elsif (RNDK.is_char?(input) &&
@@ -658,13 +650,13 @@ module RNDK
         if pattern.size == 0
           empty = true
 
-        elsif (index = RNDK.searchItems(alphaitems.items,
-                                        alphaitems.items.size,
-                                        pattern)) >= 0
+        elsif (index = RNDK.search_list(self.items,
+                                         self.items.size,
+                                         pattern)) >= 0
 
           # XXX: original uses n scroll downs/ups for <10 positions change
-          scrollp.setPosition(index)
-          alphaitems.drawMyScroller
+          scrollp.set_position(index)
+          self.draw_scroller
 
         else
           RNDK.beep
@@ -673,8 +665,8 @@ module RNDK
       end
 
       if empty
-        scrollp.setPosition(0)
-        alphaitems.drawMyScroller
+        scrollp.set_position(0)
+        self.draw_scroller
       end
 
       result

@@ -240,7 +240,7 @@ module RNDK
     end
 
     # This injects a character into the widget.
-    def inject(input)
+    def inject input
       pp_return = true
       complete = false
       ret = false
@@ -251,7 +251,7 @@ module RNDK
       self.drawField
 
       # Check if there is a pre-process function to be called.
-      keep_going = self.run_signal_binding(:before_input)
+      keep_going = self.run_signal_binding(:before_input, input)
 
       if keep_going
 

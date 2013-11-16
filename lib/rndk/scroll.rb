@@ -64,17 +64,17 @@ module RNDK
       @widget_type = :scroll
       @supported_signals += [:before_input, :after_input]
 
-      x         = 0
-      y         = 0
-      scroll_bar    = RNDK::RIGHT
-      width     = 0
-      height    = 0
-      title     = "scroll"
-      items     = []
-      numbers   = false
-      highlight = Ncurses::A_REVERSE
-      box       = true
-      shadow    = false
+      x          = 0
+      y          = 0
+      scroll_bar = RNDK::RIGHT
+      width      = 0
+      height     = 0
+      title      = "scroll"
+      items      = []
+      numbers    = false
+      highlight  = Ncurses::A_REVERSE
+      box        = true
+      shadow     = false
 
       config.each do |key, val|
         x         = val if key == :x

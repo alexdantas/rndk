@@ -11,7 +11,8 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :dialog
-      @supported_signals += [:before_input, :after_input]
+      @supported_signals += [:before_input, :after_input,
+                             :before_pressing, :after_pressing]
 
       x         = 0
       y         = 0
@@ -187,7 +188,7 @@ module RNDK
     end
 
     # This injects a single character into the dialog widget
-    def inject(input)
+    def inject input
       first_button = 0
       last_button = @button_count - 1
       pp_return = true
@@ -198,7 +199,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Check if there is a pre-process function to be called.
-      keep_going = self.run_signal_binding(:before_input)
+      keep_going = self.run_signal_binding(:before_input, input)
 
       if keep_going
 
@@ -231,10 +232,15 @@ module RNDK
             complete = true
           when Ncurses::ERR
             self.set_exit_type(input)
+
           when Ncurses::KEY_ENTER, RNDK::KEY_RETURN
-            self.set_exit_type(input)
-            ret = @current_button
-            complete = true
+            keep_going = self.run_signal_binding(:before_pressing, @current_button)
+            if keep_going
+              self.set_exit_type(input)
+              ret = @current_button
+              complete = true
+              self.run_signal_binding(:after_pressing, ret)
+            end
           end
         end
 

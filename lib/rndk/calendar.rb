@@ -324,7 +324,7 @@ module RNDK
     end
 
     # @see Widget#inject
-    def inject char
+    def inject input
       pp_return = true
       ret       = nil
       complete  = false
@@ -333,13 +333,13 @@ module RNDK
       self.draw_field
 
       # Check if there is a pre-process function to be called.
-      keep_going = self.run_signal_binding(:before_input)
+      keep_going = self.run_signal_binding(:before_input, input)
 
       if keep_going
 
         # Check a predefined binding
-        if self.is_bound? char
-          self.run_key_binding char
+        if self.is_bound? input
+          self.run_key_binding input
 
           ## FIXME What the heck? Missing method?
           #self.checkEarlyExit
@@ -347,14 +347,14 @@ module RNDK
           #complete = true
 
         else
-          case char
+          case input
           when Ncurses::KEY_UP,    RNDK::PREV
             self.decrementCalendarDay 7
           when Ncurses::KEY_DOWN,  RNDK::NEXT
             self.incrementCalendarDay 7
-          when Ncurses::KEY_LEFT,  RNDK::BACKCHAR
+          when Ncurses::KEY_LEFT,  RNDK::BACKINPUT
             self.decrementCalendarDay 1
-          when Ncurses::KEY_RIGHT, RNDK::FORCHAR
+          when Ncurses::KEY_RIGHT, RNDK::FORINPUT
             self.incrementCalendarDay 1
           when Ncurses::KEY_NPAGE then self.incrementCalendarMonth 1
           when Ncurses::KEY_PPAGE then self.decrementCalendarMonth 1
@@ -363,13 +363,13 @@ module RNDK
             self.set_date(0, 0, 0)
 
           when RNDK::KEY_ESC
-            self.set_exit_type char
+            self.set_exit_type input
             complete = true
           when Ncurses::ERR
-            self.set_exit_type char
+            self.set_exit_type input
             complete = true
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.set_exit_type char
+            self.set_exit_type input
             ret = self.get_current_time
             complete = true
           when RNDK::REFRESH

@@ -21,7 +21,7 @@ module RNDK
   end
 
   # This looks for a subset of a word in the given list
-  def RNDK.searchList(list, list_size, pattern)
+  def RNDK.search_list(list, list_size, pattern)
     index = -1
 
     if pattern.size > 0

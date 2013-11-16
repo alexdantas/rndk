@@ -187,7 +187,7 @@ module RNDK
     # Besides normal keybindings (arrow keys and such), see
     # Widget#set_exit_type to see how the Widget exits.
     #
-    def inject char
+    def inject input
     end
 
     # Makes the widget have a border if `box` is true,

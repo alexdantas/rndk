@@ -345,7 +345,7 @@ module RNDK
       self.drawField
 
       # Check if there is a pre-process function to be called.
-      keep_going = self.run_signal_binding(:before_input)
+      keep_going = self.run_signal_binding(:before_input, input)
 
       if keep_going
 

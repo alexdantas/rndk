@@ -14,11 +14,11 @@ module RNDK
       width        = 0
       height       = 0
       title        = "buttonbox"
-      rows         = 0
-      cols         = 0
       buttons      = []
+      button_rows         = 0
+      button_cols         = 0
       highlight    = Ncurses::A_REVERSE
-      box          = false
+      box          = true
       shadow       = false
 
       config.each do |key, val|
@@ -27,8 +27,8 @@ module RNDK
         width        = val if key == :width
         height       = val if key == :height
         title        = val if key == :title
-        rows         = val if key == :rows
-        cols         = val if key == :cols
+        button_rows         = val if key == :button_rows
+        button_cols         = val if key == :button_cols
         buttons      = val if key == :buttons
         highlight    = val if key == :highlight
         box          = val if key == :box
@@ -57,8 +57,8 @@ module RNDK
       @col_adjust = 0
 
       # If the height is a negative value, the height will be
-      # ROWS-height, otherwise the height will be the given height.
-      box_height = RNDK.set_widget_dimension(parent_height, height, rows + 1)
+      # BUTTON_ROWS-height, otherwise the height will be the given height.
+      box_height = RNDK.set_widget_dimension(parent_height, height, button_rows + 1)
 
       # If the width is a negative value, the width will be
       # COLS-width, otherwise the width will be the given width.
@@ -74,11 +74,11 @@ module RNDK
       end
 
       # Set the button positions.
-      (0...cols).each do |x|
+      (0...button_cols).each do |x|
         max_col_width = -2**31
 
         # Look for the widest item in this column.
-        (0...rows).each do |y|
+        (0...button_rows).each do |y|
           if current_button < button_count
             max_col_width = [@button_len[current_button], max_col_width].max
             current_button += 1
@@ -109,8 +109,8 @@ module RNDK
       @shadow_win = nil
       @button_count = button_count
       @current_button = 0
-      @rows = rows
-      @cols = [button_count, cols].min
+      @button_rows = button_rows
+      @button_cols = [button_count, button_cols].min
       @box_height = box_height
       @box_width = box_width
       @highlight = highlight
@@ -120,13 +120,13 @@ module RNDK
       @button_color = Ncurses::A_NORMAL
 
       # Set up the row adjustment.
-      if box_height - rows - @title_lines > 0
-        @row_adjust = (box_height - rows - @title_lines) / @rows
+      if box_height - button_rows - @title_lines > 0
+        @row_adjust = (box_height - button_rows - @title_lines) / @button_rows
       end
 
       # Set the col adjustment
       if box_width - col_width > 0
-        @col_adjust = ((box_width - col_width) / @cols) - 1
+        @col_adjust = ((box_width - col_width) / @button_cols) - 1
       end
 
       # If we couldn't create the window, we should return a null value.
@@ -187,7 +187,7 @@ module RNDK
       # Set the exit type
       self.set_exit_type(0)
 
-      keep_going = self.run_signal_binding(:before_input)
+      keep_going = self.run_signal_binding(:before_input, input)
 
       # Should we continue?
       if keep_going
@@ -200,16 +200,16 @@ module RNDK
         else
           case input
           when Ncurses::KEY_LEFT, Ncurses::KEY_BTAB, Ncurses::KEY_BACKSPACE
-            if @current_button - @rows < first_button
+            if @current_button - @button_rows < first_button
               @current_button = last_button
             else
-              @current_button -= @rows
+              @current_button -= @button_rows
             end
           when Ncurses::KEY_RIGHT, RNDK::KEY_TAB, ' '.ord
-            if @current_button + @rows > last_button
+            if @current_button + @button_rows > last_button
               @current_button = first_button
             else
-              @current_button += @rows
+              @current_button += @button_rows
             end
           when Ncurses::KEY_UP
             if @current_button -1 < first_button
@@ -356,10 +356,10 @@ module RNDK
 
       # Draw the buttons.
       while current_button < @button_count
-        (0...@cols).each do |x|
+        (0...@button_cols).each do |x|
           row = @title_lines + @border_size
 
-          (0...@rows).each do |y|
+          (0...@button_rows).each do |y|
             attr = @button_color
             if current_button == @current_button
               attr = @highlight

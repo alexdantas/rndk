@@ -308,7 +308,7 @@ module RNDK
     end
 
     # This injects a single character into the widget.
-    def inject(input)
+    def inject input
       ret = false
       complete = false
 

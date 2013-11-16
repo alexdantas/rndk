@@ -15,6 +15,7 @@ require 'rndk/slider'
 require 'rndk/viewer'
 require 'rndk/button'
 require 'rndk/buttonbox'
+require 'rndk/alphalist'
 
 begin
   # All widgets will be attached to this
@@ -34,7 +35,7 @@ begin
                     :x => 24,
                     :field_width => -43,
                     :title => "</77>entry",
-                    :label => "</75>type me something"
+                    :label => "</75>type me something "
                   })
 
   RNDK::Scale.new(screen, {
@@ -45,12 +46,29 @@ begin
                     :field_width => 5
                   })
 
-  RNDK::Dialog.new(screen, {
+  d = RNDK::Dialog.new(screen, {
                      :x => 24,
                      :y => 8,
-                     :text => "Nice dialog",
+                     :text => "</77>dialog",
+                     :highlight => RNDK::Color[:cyan] | Ncurses::A_REVERSE,
                      :buttons => ["Press me", "No, press me!"]
                    })
+
+  # A sample on how easy it is to customize stuff
+  d.bind_signal(:before_pressing) do |button|
+    message = ["Will press button no #{button}",
+               "Are you sure?"]
+    buttons = ["Yes", "No"]
+
+    choice = screen.popup_dialog(message, buttons)
+
+    # When we return false, we stop pressing the button.
+    false if choice == 1
+  end
+
+  d.bind_signal(:after_pressing) do |button|
+    screen.popup_label "Pressed button no #{button}"
+  end
 
   RNDK::Graph.new(screen, {
                     :x => 26,
@@ -83,13 +101,14 @@ begin
                      :title => "</77>scroll",
                      :width => 30,
                      :height => 10,
-                     :items => (0..20).to_a
+                     :items => (100..120).to_a
                    })
 
   RNDK::Slider.new(screen, {
                      :x => 58,
                      :y => 22,
                      :start => 50,
+                     :filler => ' '.ord | RNDK::Color[:cyan] | Ncurses::A_REVERSE,
                      :title => "</77>slider",
                      :field_width => -58
                    })
@@ -97,6 +116,7 @@ begin
   RNDK::Viewer.new(screen, {
                      :x => 0,
                      :y => 16,
+                     :title => "</77>viewer",
                      :buttons => ["one", "two", "three"],
                      :width => 24,
                      :height => 15
@@ -107,6 +127,30 @@ begin
                      :y => 8,
                      :label => "</77>button",
                    }).bind_signal(:pressed) { screen.popup_label "Button pressed" }
+
+  RNDK::Alphalist.new(screen, {
+                        :x => 58,
+                        :y => 26,
+                        :width => 40,
+                        :height => 10,
+                        :title => "</77>Alphalist",
+                        :label => "</75>Type first letters here ",
+                        :items => ["Here", "we", "have", "lots",
+                                   "of", "words", "to", "show",
+                                   "how", "awesome", "this", "is"]
+                      })
+
+  RNDK::Buttonbox.new(screen, {
+                        :x => 84,
+                        :y => 4,
+                        :width => 14,
+                        :height => 5,
+                        :title => "</77>buttonbox",
+                        :buttons => ["one", "two", "three", "four"],
+                        :button_rows => 2,
+                        :button_cols => 2,
+                        :highlight => RNDK::Color[:blue] | Ncurses::A_REVERSE
+                      })
 
   screen.refresh
   RNDK::Traverse.over screen
