@@ -124,7 +124,7 @@ module RNDK
 
       # If the field_width is a negative will be COLS-field_width,
       # otherwise field_width will be the given width.
-      field_width = RNDK.setWidgetDimension(parent_width, field_width, 0)
+      field_width = RNDK.set_widget_dimension(parent_width, field_width, 0)
 
       # Translate the label string to a chtype array.
       if !(label.nil?) && label.size > 0

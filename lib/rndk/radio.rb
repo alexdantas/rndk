@@ -57,11 +57,11 @@ module RNDK
 
       # If the height is a negative value, height will be ROWS-height,
       # otherwise the height will be the given height.
-      box_height = RNDK.setWidgetDimension(parent_height, height, 0)
+      box_height = RNDK.set_widget_dimension(parent_height, height, 0)
 
       # If the width is a negative value, the width will be COLS-width,
       # otherwise the width will be the given width.
-      box_width = RNDK.setWidgetDimension(parent_width, width, 5)
+      box_width = RNDK.set_widget_dimension(parent_width, width, 5)
 
       box_width = self.set_title(title, box_width)
 

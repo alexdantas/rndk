@@ -125,7 +125,7 @@ module RNDK
     end
 
     # Set the widget's title.
-    def set_title (title, box_width)
+    def set_title(title, box_width)
       return if title.nil?
 
       temp = title.split "\n"

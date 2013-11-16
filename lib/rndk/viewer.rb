@@ -1,9 +1,13 @@
 require 'rndk'
 
 module RNDK
-  class VIEWER < Widget
+
+  # TODO THere's something wrong with this widget
+  #      why wont it work with Traverse?
+  class Viewer < Widget
+
     DOWN = 0
-    UP = 1
+    UP   = 1
 
     def initialize(screen, config={})
       super()
@@ -13,6 +17,7 @@ module RNDK
       y                = 0
       width            = 0
       height           = 0
+      title            = "viewer"
       buttons          = []
       button_highlight = Ncurses::A_REVERSE
       box              = true
@@ -23,15 +28,16 @@ module RNDK
         y                = val if key == :y
         width            = val if key == :width
         height           = val if key == :height
+        title            = val if key == :title
         buttons          = val if key == :buttons
         button_highlight = val if key == :button_highlight
         box              = val if key == :box
         shadow           = val if key == :shadow
       end
 
-      button_count     = buttons.size
-      parent_width  = Ncurses.getmaxx(rndkscreen.window)
-      parent_height = Ncurses.getmaxy(rndkscreen.window)
+      button_count  = buttons.size
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       box_width  = width
       box_height = height
@@ -52,15 +58,15 @@ module RNDK
           '$'            => Ncurses::KEY_END,
       }
 
-      self.set_box(box)
+      self.set_box box
 
-      box_height = RNDK.setWidgetDimension(parent_height, height, 0)
-      box_width = RNDK.setWidgetDimension(parent_width, width, 0)
+      box_width  = RNDK.set_widget_dimension(parent_width, width, 0)
+      box_height = RNDK.set_widget_dimension(parent_height, height, 0)
 
       # Rejustify the x and y positions if we need to.
       xtmp = [x]
       ytmp = [y]
-      RNDK.alignxy(rndkscreen.window, xtmp, ytmp, box_width, box_height)
+      RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
       xpos = xtmp[0]
       ypos = ytmp[0]
 
@@ -79,6 +85,7 @@ module RNDK
       @button = []
       @button_len = []
       @button_pos = []
+
       if button_count > 0
         (0...button_count).each do |x|
           button_len = []
@@ -95,8 +102,8 @@ module RNDK
       end
 
       # Set the rest of the variables.
-      @screen = rndkscreen
-      @parent = rndkscreen.window
+      @screen = screen
+      @parent = screen.window
       @shadow_win = nil
       @button_highlight = button_highlight
       @box_height = box_height
@@ -115,6 +122,8 @@ module RNDK
       @show_line_info = 1
       @exit_type = :EARLY_EXIT
 
+      self.set_title title
+
       # Do we need to create a shadow?
       if shadow
         @shadow_win = Ncurses.newwin(box_height,
@@ -132,7 +141,7 @@ module RNDK
         self.bind(from, :getc, to)
       end
 
-      rndkscreen.register(:VIEWER, self)
+      screen.register(@widget_type, self)
     end
 
     # This function sets various attributes of the widget.
@@ -140,14 +149,14 @@ module RNDK
         attr_interp, show_line_info, box)
       self.set_title(title)
       self.set_highlight(button_highlight)
-      self.setInfoLine(show_line_info)
+      self.set_info_line(show_line_info)
       self.set_box(box)
-      return self.setInfo(list, list_size, attr_interp)
+      return self.set_info(list, list_size, attr_interp)
     end
 
     # This sets the title of the viewer. (A nil title is allowed.
     # It just means that the viewer will not have a title when drawn.)
-    def set_title(title)
+    def set_title title
       super(title, -(@box_width + 1))
       @title_adj = @title_lines
 
@@ -155,11 +164,11 @@ module RNDK
       @view_size = @box_height - (@title_lines + 1) - 2
     end
 
-    def getTitle
-      return @title
+    def get_title
+      @title
     end
 
-    def setupLine(interpret, list, x)
+    def setup_line(interpret, list, x)
       # Did they ask for attribute interpretation?
       if interpret
         list_len = []
@@ -194,14 +203,12 @@ module RNDK
       @widest_line = [@widest_line, @list_len[x]].max
     end
 
-    def freeLine(x)
-      if x < @list_size
-        @list[x] = ''
-      end
+    def free_line(x)
+      @list[x] = '' if x < @list_size
     end
 
     # This function sets the contents of the viewer.
-    def setInfo(list, list_size, interpret)
+    def set_info(list, list_size, interpret)
       current_line = 0
       viewer_size = list_size
 
@@ -228,7 +235,7 @@ module RNDK
       # Clean out the old viewer info. (if there is any)
       @in_progress = true
       self.clean
-      self.createList(viewer_size)
+      self.create_list(viewer_size)
 
       # Keep some semi-permanent info
       @interpret = interpret
@@ -258,7 +265,7 @@ module RNDK
                           else '<C></K>Link Failed: Could not open the file %s'
                           end
               temp = fopen_fmt % filename
-              self.setupLine(true, temp, current_line)
+              self.setup_line(true, temp, current_line)
               current_line += 1
             else
               # For each line read, copy it into the viewer.
@@ -267,13 +274,13 @@ module RNDK
                 if current_line >= viewer_size
                   break
                 end
-                self.setupLine(false, file_contents[file_line], current_line)
+                self.setup_line(false, file_contents[file_line], current_line)
                 @characters += @list_len[current_line]
                 current_line += 1
               end
             end
           elsif current_line < viewer_size
-            self.setupLine(@interpret, list[x], current_line)
+            self.setup_line(@interpret, list[x], current_line)
             @characters += @list_len[current_line]
             current_line += 1
           end
@@ -300,9 +307,9 @@ module RNDK
       return @list_size
     end
 
-    def getInfo(size)
+    def get_info(size)
       size << @list_size
-      return @list
+      @list
     end
 
     # This function sets the highlight type of the buttons.
@@ -310,24 +317,25 @@ module RNDK
       @button_highlight = button_highlight
     end
 
-    def getHighlight
-      return @button_highlight
+    def get_highlight
+      @button_highlight
     end
 
-    # This sets whether or not you wnat to set the viewer info line.
-    def setInfoLine(show_line_info)
+    # This sets whether or not you wnat to set the viewer
+    # info line.
+    def set_info_line(show_line_info)
       @show_line_info = show_line_info
     end
 
-    def getInfoLine
-      return @show_line_info
+    def get_info_line
+      @show_line_info
     end
 
     # This removes all the lines inside the scrolling window.
     def clean
       # Clean up the memory used...
       (0...@list_size).each do |x|
-        self.freeLine(x)
+        self.free_line(x)
       end
 
       # Reset some variables.
@@ -345,7 +353,7 @@ module RNDK
       temp_info = [
           "</U/5>Pattern '%s' not found.<!U!5>" % pattern,
       ]
-      self.popUpLabel(temp_info)
+      self.pop_up_label(temp_info)
     end
 
     # This function actually controls the viewer...
@@ -386,7 +394,7 @@ module RNDK
               end
 
               # Redraw the buttons.
-              self.drawButtons
+              self.draw_buttons
             end
           when RNDK::PREV
             if @button_count > 1
@@ -397,7 +405,7 @@ module RNDK
               end
 
               # Redraw the buttons.
-              self.drawButtons
+              self.draw_buttons
             end
           when Ncurses::KEY_UP
             if @current_top > 0
@@ -478,24 +486,24 @@ module RNDK
               RNDK.beep
             end
           when '?'.ord
-            @search_direction = RNDK::VIEWER::UP
-            self.getAndStorePattern(@screen)
-            if !self.searchForWord(@search_pattern, @search_direction)
+            @search_direction = RNDK::Viewer::UP
+            self.get_and_store_pattern(@screen)
+            if !self.search_for_word(@search_pattern, @search_direction)
               self.PatternNotFound(@search_pattern)
             end
             refresh = true
           when '/'.ord
-            @search_direction = RNDK::VIEWER:DOWN
-            self.getAndStorePattern(@screen)
-            if !self.searchForWord(@search_pattern, @search_direction)
+            @search_direction = RNDK::Viewer:DOWN
+            self.get_and_store_pattern(@screen)
+            if !self.search_for_word(@search_pattern, @search_direction)
               self.PatternNotFound(@search_pattern)
             end
             refresh = true
           when 'N'.ord, 'n'.ord
             if @search_pattern == ''
               temp_info[0] = '</5>There is no pattern in the buffer.<!5>'
-              self.popUpLabel(temp_info)
-            elsif !self.searchForWord(@search_pattern,
+              self.pop_up_label(temp_info)
+            elsif !self.search_for_word(@search_pattern,
                 if input == 'n'.ord
                 then @search_direction
                 else 1 - @search_direction
@@ -504,10 +512,10 @@ module RNDK
             end
             refresh = true
           when ':'.ord
-            @current_top = self.jumpToLine
+            @current_top = self.jump_to_line
             refresh = true
           when 'i'.ord, 's'.ord, 'S'.ord
-            self.popUpLabel(file_info)
+            self.pop_up_label(file_info)
             refresh = true
           when RNDK::KEY_ESC
             self.set_exit_type(input)
@@ -528,17 +536,17 @@ module RNDK
 
         # Do we need to redraw the screen?
         if refresh
-          self.drawInfo
+          self.draw_info
         end
       end
     end
 
     # This searches the document looking for the given word.
-    def getAndStorePattern(screen)
+    def get_and_store_pattern(screen)
       temp = ''
 
       # Check the direction.
-      if @search_direction == RNDK::VIEWER::UP
+      if @search_direction == RNDK::Viewer::UP
         temp = '</5>Search Up  : <!5>'
       else
         temp = '</5>Search Down: <!5>'
@@ -570,12 +578,12 @@ module RNDK
 
     # This searches for a line containing the word and realigns the value on
     # the screen.
-    def searchForWord(pattern, direction)
+    def search_for_word(pattern, direction)
       found = false
 
       # If the pattern is empty then return.
       if pattern.size != 0
-        if direction == RNDK::VIEWER::DOWN
+        if direction == RNDK::Viewer::DOWN
           # Start looking from 'here' down.
           x = @current_top + 1
           while !found && x < @list_size
@@ -621,22 +629,22 @@ module RNDK
           end
         end
       end
-      return found
+      found
     end
 
     # This allows us to 'jump' to a given line in the file.
-    def jumpToLine
+    def jump_to_line
       newline = RNDK::Scale.new(@screen, RNDK::CENTER, RNDK::CENTER,
           '<C>Jump To Line', '</5>Line :', Ncurses::A_BOLD,
           @list_size.size + 1, @current_top + 1, 0, @max_top_line + 1,
           1, 10, true, true)
       line = newline.activate([])
       newline.destroy
-      return line - 1
+      line - 1
     end
 
     # This pops a little message up on the screen.
-    def popUpLabel(mesg)
+    def pop_up_label(mesg)
       # Set up variables.
       label = RNDK::Label.new(@screen, RNDK::CENTER, RNDK::CENTER,
           mesg, mesg.size, true, false)
@@ -655,7 +663,7 @@ module RNDK
     # end
 
     # This function draws the viewer widget.
-    def draw(box)
+    def draw box
       # Do we need to draw in the shadow?
       unless @shadow_win.nil?
         Draw.drawShadow @shadow_win
@@ -668,15 +676,13 @@ module RNDK
       end
 
       # Draw the info in the viewer.
-      self.drawInfo
+      self.draw_info
     end
 
     # This redraws the viewer buttons.
-    def drawButtons
+    def draw_buttons
       # No buttons, no drawing
-      if @button_count == 0
-        return
-      end
+      return if @button_count == 0
 
       # Redraw the buttons.
       (0...@button_count).each do |x|
@@ -710,7 +716,7 @@ module RNDK
       Ncurses.wbkgd(@win, attrib)
     end
 
-    def destroyInfo
+    def destroy_info
       @list = []
       @list_pos = []
       @list_len = []
@@ -718,7 +724,7 @@ module RNDK
 
     # This function destroys the viewer widget.
     def destroy
-      self.destroyInfo
+      self.destroy_info
       self.clean_title
 
       # Clean up the windows.
@@ -741,14 +747,14 @@ module RNDK
     end
 
     # This draws the viewer info lines.
-    def drawInfo
+    def draw_info
       temp = ''
       line_adjust = false
 
       # Clear the window.
       Ncurses.werase(@win)
 
-      self.draw_title(@win)
+      self.draw_title @win
 
       # Draw in the current line at the top.
       if @show_line_info == true
@@ -819,14 +825,14 @@ module RNDK
       end
 
       # Draw the buttons. This will call refresh on the viewer win.
-      self.drawButtons
+      self.draw_buttons
     end
 
     # The list_size may be negative, to assign no definite limit.
-    def createList(list_size)
+    def create_list(list_size)
       status = false
 
-      self.destroyInfo
+      self.destroy_info
 
       if list_size >= 0
         status = true
@@ -842,7 +848,6 @@ module RNDK
       super(@win)
     end
 
-
-
   end
 end
+

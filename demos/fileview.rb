@@ -73,7 +73,7 @@ begin
   end
 
   # Create the file viewer to view the file selected.
-  example = RNDK::VIEWER.new(screen,
+  example = RNDK::Viewer.new(screen,
                              RNDK::CENTER,
                              RNDK::CENTER,
                              20,

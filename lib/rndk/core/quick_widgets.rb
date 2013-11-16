@@ -140,7 +140,7 @@ module RNDK
       selected = -1
 
       # Create the file viewer to view the file selected.
-      viewer = RNDK::VIEWER.new(self,
+      viewer = RNDK::Viewer.new(self,
                                 RNDK::CENTER,
                                 RNDK::CENTER,
                                 -6,

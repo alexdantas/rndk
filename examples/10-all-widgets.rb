@@ -12,6 +12,7 @@ require 'rndk/itemlist'
 require 'rndk/radio'
 require 'rndk/scroll'
 require 'rndk/slider'
+require 'rndk/viewer'
 
 begin
   # All widgets will be attached to this
@@ -40,7 +41,7 @@ begin
                     :title => "</77>scale",
                     :label => "move me",
                     :field_width => 5
-                    })
+                  })
 
   RNDK::Dialog.new(screen, {
                      :x => 24,
@@ -50,7 +51,7 @@ begin
                    })
 
   RNDK::Graph.new(screen, {
-                    :x => 24,
+                    :x => 26,
                     :y => 13,
                     :width => 20,
                     :height => 10
@@ -60,6 +61,7 @@ begin
   RNDK::Itemlist.new(screen, {
                        :x => 39,
                        :y => 4,
+                       :title => "</77>itemlist",
                        :label => "up, down: ",
                        :items => ["One", "Two", "Three", "Four"]
                      })
@@ -67,6 +69,7 @@ begin
   RNDK::Radio.new(screen, {
                     :x => 58,
                     :y => 4,
+                    :title => "</77>radio",
                     :width => 20,
                     :height => 8,
                     :items => ["Item1", "Item2", "Item3"]
@@ -83,15 +86,24 @@ begin
 
   RNDK::Slider.new(screen, {
                      :x => 58,
-                     :y => 23,
+                     :y => 22,
                      :start => 50,
                      :title => "</77>slider",
                      :field_width => -58
+                   })
+
+  RNDK::Viewer.new(screen, {
+                     :x => 0,
+                     :y => 16,
+                     :buttons => ["one", "two", "three"],
+                     :width => 24,
+                     :height => 15
                    })
   screen.refresh
   RNDK::Traverse.over screen
   RNDK::Screen.end_rndk
 
+# Just in case something goes wrong.
 rescue Exception => e
   RNDK::Screen.end_rndk
   puts e

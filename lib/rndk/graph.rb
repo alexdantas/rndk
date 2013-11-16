@@ -34,8 +34,8 @@ module RNDK
 
       self.set_box(false)
 
-      box_height = RNDK.setWidgetDimension(parent_height, height, 3)
-      box_width = RNDK.setWidgetDimension(parent_width, width, 0)
+      box_height = RNDK.set_widget_dimension(parent_height, height, 3)
+      box_width = RNDK.set_widget_dimension(parent_width, width, 0)
       box_width = self.set_title(title, box_width)
       box_height += @title_lines
       box_width = [parent_width, box_width].min
