@@ -10,7 +10,7 @@ module RNDK
   # The only methods you should worry about are:
   #
   # * Screen#initialize
-  # * Screen#end_rndk
+  # * Screen#finish
   # * Screen#draw or #refresh
   # * Screen#erase
   #
@@ -96,7 +96,7 @@ module RNDK
 
     # Shuts down RNDK and Ncurses, plus destroying all the
     # widgets ever created.
-    def self.end_rndk
+    def self.finish
 
       ## If I do this it gives me a segmentation fault.
       ## I guess that would happen because of the

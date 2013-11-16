@@ -76,7 +76,7 @@ begin
     elsif scroll.exit_type == :ESCAPE_HIT
 
       # good bye!
-      RNDK::Screen.end_rndk
+      RNDK::Screen.finish
       exit
     end
   end

@@ -132,7 +132,7 @@ class Appointment
 
     # Is the widget nil?
     if calendar.nil?
-      RNDK::Screen.end_rndk
+      RNDK::Screen.finish
 
       puts "Cannot create the calendar. Is the window too small?"
       exit 1
@@ -342,7 +342,7 @@ class Appointment
     Appointment.saveAppointmentFile(filename, appointment_info)
 
     # Clean up.
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
   end
 end
 
@@ -352,7 +352,7 @@ begin
 
 # In case something goes wrong
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

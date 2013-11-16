@@ -257,7 +257,7 @@ module RNDK
     end
 
     # Set the background attribute of the widget.
-    def set_bg_attrib(attrib)
+    def set_bg_color(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -330,7 +330,7 @@ module RNDK
       # Draw in the X axis title.
       if !(@xtitle.nil?) && @xtitle.size > 0
         Draw.writeChtype(@win, 0, @xtitle_pos, @xtitle, RNDK::VERTICAL, 0, @xtitle_len)
-        attrib = @xtitle[0] & Ncurses::A_ATTRIBUTES
+        attrib = @xtitle[0] & Ncurses::A_COLORUTES
       end
 
       # Draw in the X axis high value

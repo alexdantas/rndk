@@ -70,7 +70,7 @@ module RNDK
     # the background of the dialog.
     #
     # @note: `message` must be an array of strings.
-    def popup_label_attrib(message, attrib)
+    def popup_label_color(message, attrib)
       # Adjusting if the user sent us a String
       message = [message] if message.class == String
 

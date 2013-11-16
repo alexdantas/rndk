@@ -25,7 +25,7 @@ begin
                           true)
 
   if label.nil?
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts 'Cannot create the label. Is the window too small?'
     exit 1
@@ -37,11 +37,11 @@ begin
   label.wait(' ')
 
   # Clean up
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # Just in case something bad happens.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

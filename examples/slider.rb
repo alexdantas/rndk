@@ -30,7 +30,7 @@ begin
                             false)
 
   if widget.nil?
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts "Cannot make the widget. Is the window too small?"
     exit 1
@@ -56,11 +56,11 @@ begin
   screen.popup_label mesg
 
   # Clean up
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # Just in case something bad happens.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

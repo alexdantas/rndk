@@ -125,7 +125,7 @@ module RNDK
     #   you to use Ruby's `Time.now.gmtime`.
     # * `title` can be more than one line - just split them
     #   with `\n`s.
-    # * `*_attrib` are specific colors.
+    # * `*_color` are specific colors.
     #
     # @note If `day`, `month` or `year` are zero, we'll use
     #       the current date for it.
@@ -144,11 +144,11 @@ module RNDK
       day          = 0
       month        = 0
       year         = 0
-      day_attrib   = 0
-      month_attrib = 0
-      year_attrib  = 0
+      day_color   = 0
+      month_color = 0
+      year_color  = 0
       highlight    = Ncurses::A_REVERSE
-      box          = false
+      box          = true
       shadow       = false
 
       config.each do |key, val|
@@ -158,9 +158,9 @@ module RNDK
         day          = val if key == :day
         month        = val if key == :month
         year         = val if key == :year
-        day_attrib   = val if key == :day
-        month_attrib = val if key == :month
-        year_attrib  = val if key == :year
+        day_color    = val if key == :day_color
+        month_color  = val if key == :month_color
+        year_color   = val if key == :year_color
         highlight    = val if key == :highlight
         box          = val if key == :box
         shadow       = val if key == :shadow
@@ -229,9 +229,9 @@ module RNDK
       @box_width  = box_width
       @box_height = box_height
 
-      @day_attrib   = day_attrib
-      @month_attrib = month_attrib
-      @year_attrib  = year_attrib
+      @day_color   = day_color
+      @month_color = month_color
+      @year_color  = year_color
       @highlight    = highlight
 
       @accepts_focus = true
@@ -464,7 +464,7 @@ module RNDK
             xpos = col * 3
             ypos = row
 
-            marker = @day_attrib
+            marker = @day_color
             temp = '%02d' % day
 
             if @day == day
@@ -515,9 +515,9 @@ module RNDK
       day          = 0
       month        = 0
       year         = 0
-      day_attrib   = 0
-      month_attrib = 0
-      year_attrib  = 0
+      day_color    = 0
+      month_color  = 0
+      year_color   = 0
       highlight    = Ncurses::A_REVERSE
       box          = false
       shadow       = false
@@ -529,18 +529,18 @@ module RNDK
         day          = val if key == :day
         month        = val if key == :month
         year         = val if key == :year
-        day_attrib   = val if key == :day
-        month_attrib = val if key == :month
-        year_attrib  = val if key == :year
+        day_color    = val if key == :day_color
+        month_color  = val if key == :month_color
+        year_color   = val if key == :year_color
         highlight    = val if key == :highlight
         box          = val if key == :box
         shadow       = val if key == :shadow
       end
 
       self.set_date(day, month, year)                if defined? day and defined? month and defined? year
-      self.set_day_attrib(day_attrib)                if defined? day_attrib
-      self.set_month_attrib(month_attrib)            if defined? month_attrib
-      self.set_year_attrib(year_attrib)              if defined? year_attrib
+      self.set_day_color(day_color)                if defined? day_color
+      self.set_month_color(month_color)            if defined? month_color
+      self.set_year_color(year_color)              if defined? year_color
       self.set_highlight(highlight)                  if defined? highlight
       self.set_box(box)                              if defined? box
       @box_width = self.set_title(title, @box_width) if defined? title
@@ -576,30 +576,30 @@ module RNDK
     end
 
     # Sets the appearance/color of the days.
-    def set_day_attrib attribute
-      @day_attrib = attribute
+    def set_day_color attribute
+      @day_color = attribute
     end
 
-    def get_day_attrib
-      return @day_attrib
+    def get_day_color
+      return @day_color
     end
 
     # Sets the appearance/color of the month name.
-    def set_month_attrib attribute
-      @month_attrib = attribute
+    def set_month_color attribute
+      @month_color = attribute
     end
 
-    def get_month_attrib
-      return @month_attrib
+    def get_month_color
+      return @month_color
     end
 
     # Sets the appearance/color of the year number.
-    def set_year_attrib attribute
-      @year_attrib = attribute
+    def set_year_color attribute
+      @year_color = attribute
     end
 
-    def get_year_attrib
-      return @year_attrib
+    def get_year_color
+      return @year_color
     end
 
     # Sets the attribute/color of the highlight bar of the scrolling list.
@@ -607,12 +607,12 @@ module RNDK
       @highlight = highlight
     end
 
-    def getHighlight
+    def get_highlight
       return @highlight
     end
 
     # Sets the background attribute/color of the widget.
-    def set_bg_attrib attrib
+    def set_bg_color attrib
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@field_win, attrib)
       Ncurses.wbkgd(@label_win, attrib) unless @label_win.nil?

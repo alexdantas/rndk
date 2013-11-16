@@ -207,7 +207,7 @@ module RNDK
     end
 
     # Sets the background attribute/color of the widget.
-    def set_bg_attrib attrib
+    def set_bg_color attrib
       Ncurses.wbkgd(@win, attrib)
     end
 

@@ -5,8 +5,8 @@ module RNDK
   class FSELECT < Widget
 
     attr_reader :scroll_field, :entry_field
-    attr_reader :dir_attribute, :file_attribute, :link_attribute, :highlight
-    attr_reader :sock_attribute, :field_attribute, :filler_character
+    attr_reader :dir_colorute, :file_colorute, :link_colorute, :highlight
+    attr_reader :sock_colorute, :field_colorute, :filler_character
     attr_reader :dir_contents, :file_counter, :pwd, :pathname
 
     def initialize(screen, config={})
@@ -19,13 +19,13 @@ module RNDK
       height          = 0
       title           = "fselect"
       label           = "label"
-      field_attribute = Ncurses::A_NORMAL
+      field_colorute = Ncurses::A_NORMAL
       filler_char     = '_'
       highlight       = Ncurses::A_REVERSE
-      d_attribute     = "</5>"
-      f_attribute     = "</48>"
-      l_attribute     = "</N>"
-      s_attribute     = "</N>"
+      d_colorute     = "</5>"
+      f_colorute     = "</48>"
+      l_colorute     = "</N>"
+      s_colorute     = "</N>"
       box             = true
       shadow          = false
 
@@ -36,13 +36,13 @@ module RNDK
         height          = val if key == :height
         title           = val if key == :title
         label           = val if key == :label
-        field_attribute = val if key == :field_attribute
+        field_colorute = val if key == :field_colorute
         filler_char     = val if key == :filler_char
         highlight       = val if key == :highlight
-        d_attribute     = val if key == :d_attribute
-        f_attribute     = val if key == :f_attribute
-        l_attribute     = val if key == :l_attribute
-        s_attribute     = val if key == :s_attribute
+        d_colorute     = val if key == :d_colorute
+        f_colorute     = val if key == :f_colorute
+        l_colorute     = val if key == :l_colorute
+        s_colorute     = val if key == :s_colorute
         box             = val if key == :box
         shadow          = val if key == :shadow
       end
@@ -89,13 +89,13 @@ module RNDK
       # Set some variables.
       @screen = screen
       @parent = screen.window
-      @dir_attribute = d_attribute.clone
-      @file_attribute = f_attribute.clone
-      @link_attribute = l_attribute.clone
-      @sock_attribute = s_attribute.clone
+      @dir_colorute = d_colorute.clone
+      @file_colorute = f_colorute.clone
+      @link_colorute = l_colorute.clone
+      @sock_colorute = s_colorute.clone
       @highlight = highlight
       @filler_character = filler_char
-      @field_attribute = field_attribute
+      @field_colorute = field_colorute
       @box_height = box_height
       @box_width = box_width
       @file_counter = 0
@@ -121,7 +121,7 @@ module RNDK
                    else box_width - 2 - label_len
                    end
       @entry_field = RNDK::Entry.new(screen, Ncurses.getbegx(@win), Ncurses.getbegy(@win),
-          title, label, field_attribute, filler_char, :MIXED, temp_width,
+          title, label, field_colorute, filler_char, :MIXED, temp_width,
           0, 512, box, false)
 
       # Make sure the widget was created.
@@ -226,9 +226,9 @@ module RNDK
 
         # XXX original: isDirectory ? mydirname : filename
         fselect.set(if is_directory then filename else mydirname end,
-            fselect.field_attribute, fselect.filler_character,
-            fselect.highlight, fselect.dir_attribute, fselect.file_attribute,
-            fselect.link_attribute, fselect.sock_attribute, fselect.box)
+            fselect.field_colorute, fselect.filler_character,
+            fselect.highlight, fselect.dir_colorute, fselect.file_colorute,
+            fselect.link_colorute, fselect.sock_colorute, fselect.box)
 
         # If we can, change into the directory.
         # XXX original: if isDirectory (with 0 as success result)
@@ -340,10 +340,10 @@ module RNDK
           # If we were successful, reload the scrolling list.
           if File.unlink(filename) == 0
             # Set the file selector information.
-            fselect.set(fselect.pwd, fselect.field_attribute,
+            fselect.set(fselect.pwd, fselect.field_colorute,
                 fselect.filler_character, fselect.highlight,
-                fselect.dir_attribute, fselect.file_attribute,
-                fselect.link_attribute, fselect.sock_attribute, fselect.box)
+                fselect.dir_colorute, fselect.file_colorute,
+                fselect.link_colorute, fselect.sock_colorute, fselect.box)
           else
             # Pop up a message.
             # mesg[0] = copyChar (errorMessage ("<C>Cannot delete file: %s"));
@@ -560,8 +560,8 @@ module RNDK
         complete = true
       else
         # Set the file selector information.
-        self.set(filename, @field_attribute, @filler_character, @highlight,
-            @dir_attribute, @file_attribute, @link_attribute, @sock_attribute,
+        self.set(filename, @field_colorute, @filler_character, @highlight,
+            @dir_colorute, @file_colorute, @link_colorute, @sock_colorute,
             @box)
 
         # Redraw the scrolling list.
@@ -577,14 +577,14 @@ module RNDK
     end
 
     # This function sets the information inside the file selector.
-    def set(directory, field_attrib, filler, highlight, dir_attribute,
-        file_attribute, link_attribute, sock_attribute, box)
+    def set(directory, field_color, filler, highlight, dir_colorute,
+        file_colorute, link_colorute, sock_colorute, box)
       fscroll = @scroll_field
       fentry = @entry_field
       new_directory = ''
 
       # keep the info sent to us.
-      @field_attribute = field_attrib
+      @field_colorute = field_color
       @filler_character = filler
       @highlight = highlight
 
@@ -629,10 +629,10 @@ module RNDK
         @pwd = Dir.getwd
       end
 
-      @file_attribute = file_attribute.clone
-      @dir_attribute = dir_attribute.clone
-      @link_attribute = link_attribute.clone
-      @sock_attribute = sock_attribute.clone
+      @file_colorute = file_colorute.clone
+      @dir_colorute = dir_colorute.clone
+      @link_colorute = link_colorute.clone
+      @sock_colorute = sock_colorute.clone
 
       # Set the contents of the entry field.
       fentry.set_text(@pwd)
@@ -676,15 +676,15 @@ module RNDK
 
         case
         when file_stat.symlink?
-          attr = @link_attribute
+          attr = @link_colorute
           mode = '@'
         when file_stat.socket?
-          attr = @sock_attribute
+          attr = @sock_colorute
           mode = '&'
         when file_stat.file?
-          attr = @file_attribute
+          attr = @file_colorute
         when file_stat.directory?
-          attr = @dir_attribute
+          attr = @dir_colorute
           mode = '/'
         end
         @dir_contents[x] = '%s%s%s' % [attr, dir_list[x], mode]
@@ -755,53 +755,53 @@ module RNDK
     # scrolling list.
     def setDirAttribute(attribute)
       # Make sure they are not the same.
-      if @dir_attribute != attribute
-        @dir_attribute = attribute
+      if @dir_colorute != attribute
+        @dir_colorute = attribute
         self.setDirContents
       end
     end
 
     def getDirAttribute
-      return @dir_attribute
+      return @dir_colorute
     end
 
     # This sets the attribute of the link attribute in the scrolling list.
     def setLinkAttribute(attribute)
       # Make sure they are not the same.
-      if @link_attribute != attribute
-        @link_attribute = attribute
+      if @link_colorute != attribute
+        @link_colorute = attribute
         self.setDirContents
       end
     end
 
     def getLinkAttribute
-      return @link_attribute
+      return @link_colorute
     end
 
     # This sets the attribute of the socket attribute in the scrolling list.
     def setSocketAttribute(attribute)
       # Make sure they are not the same.
-      if @sock_attribute != attribute
-        @sock_attribute = attribute
+      if @sock_colorute != attribute
+        @sock_colorute = attribute
         self.setDirContents
       end
     end
 
     def getSocketAttribute
-      return @sock_attribute
+      return @sock_colorute
     end
 
     # This sets the attribute of the file attribute in the scrolling list.
     def setFileAttribute(attribute)
       # Make sure they are not the same.
-      if @file_attribute != attribute
-        @file_attribute = attribute
+      if @file_colorute != attribute
+        @file_colorute = attribute
         self.setDirContents
       end
     end
 
     def getFileAttribute
-      return @file_attribute
+      return @file_colorute
     end
 
     # this sets the contents of the widget
@@ -878,9 +878,9 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def set_bg_attrib(attrib)
-      @entry_field.set_bg_attrib(attrib)
-      @scroll_field.set_bg_attrib(attrib)
+    def set_bg_color(attrib)
+      @entry_field.set_bg_color(attrib)
+      @scroll_field.set_bg_color(attrib)
     end
 
     # This destroys the file selector.

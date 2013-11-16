@@ -23,7 +23,7 @@ begin
   # Woops, something bad happened
   if label.nil?
     screen.destroy
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts "Cannot create the label. Is the window too small?"
     exit 1
@@ -54,11 +54,11 @@ begin
     Ncurses.napms(500)
   end
 
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # In case something goes wrong
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

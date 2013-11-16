@@ -66,7 +66,7 @@ begin
 
       fselect.destroy
 
-      RNDK::Screen.end_rndk
+      RNDK::Screen.finish
       exit
     end
     fselect.destroy
@@ -86,7 +86,7 @@ begin
 
   # Could we create the viewer widget?
   if example.nil?
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts "Cannot create viewer. Is the window too small?"
     exit 1
@@ -127,11 +127,11 @@ begin
   end
 
   # Clean up
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # In case something goes wrong
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

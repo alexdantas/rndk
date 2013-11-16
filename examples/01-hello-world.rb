@@ -24,19 +24,19 @@ begin
          ]
 
   # Declare the labels.
-  label = RNDK::Label.new(screen,   # screen
-                          RNDK::CENTER, # x
-                          RNDK::CENTER, # y
-                          mesg,         # message
-                          true,         # box?
-                          true)         # shadow?
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::CENTER,
+                            :text => mesg,
+                          })
+
 
   if label.nil?
     # Clean up the memory.
     screen.destroy
 
     # End curses...
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts "Cannot create the label. Is the window too small?"
     exit 1
@@ -47,9 +47,11 @@ begin
   label.wait(' ')
 
   # Ending Ncurses and RNDK
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 end
 
 # Note: Unlike C's CDK, there's no need to clean up
 #       widgets/screens when finishing execution.
+#       You might need to do it when deleting widgets
+#       casually, though.
 

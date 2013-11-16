@@ -81,11 +81,11 @@ begin
   screen.refresh
   RNDK::Traverse.over screen
 
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # Just in case something bad happens.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
   puts e
   puts e.inspect
   puts e.backtrace

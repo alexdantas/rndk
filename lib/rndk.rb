@@ -234,5 +234,13 @@ module RNDK
     end
   end
 
+  def RNDK.blink_cursor option
+    if option
+      Ncurses.curs_set 1
+    else
+      Ncurses.curs_set 0
+    end
+  end
+
 end
 

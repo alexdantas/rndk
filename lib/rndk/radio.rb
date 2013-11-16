@@ -371,7 +371,7 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def set_bg_attrib(attrib)
+    def set_bg_color(attrib)
       Ncurses.wbkgd(@win, attrib)
       Ncurses.wbkgd(@scrollbar_win, attrib) unless @scrollbar_win.nil?
     end

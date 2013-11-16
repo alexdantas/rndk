@@ -29,7 +29,7 @@ begin
                                 false)
 
   if calendar.nil?
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts 'Cannot create the calendar. Is the window too small?'
     exit 1
@@ -88,13 +88,13 @@ begin
   end
 
   # Finishing up and printing message
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts 'Selected Time: %s' % ret_val.ctime unless ret_val.nil?
 
 # Just in case something bad happens.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

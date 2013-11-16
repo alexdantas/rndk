@@ -52,7 +52,7 @@ END
                                  false)             # shadow
 
   if scroll_list.nil?
-    RNDK::Screen.end_rndk
+    RNDK::Screen.finish
 
     puts "Cannot make scrolling list.  Is the window too small?"
     exit 1
@@ -118,11 +118,11 @@ END
   # A quick widget - see example 'quick-widgets.rb'
   screen.popup_label msg
 
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
 # Just in case something bad happens.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect

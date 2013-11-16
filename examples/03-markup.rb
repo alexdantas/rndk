@@ -67,6 +67,6 @@ begin
   screen.refresh
   label.wait('q') # wait for key to be pressed
 
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 end
 

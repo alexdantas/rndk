@@ -612,9 +612,9 @@ module RNDK
     end
 
     # This sets the background attribute of the widget.
-    def set_bg_attrib(attrib)
-      @entry_field.set_bg_attrib(attrib)
-      @scroll_field.set_bg_attrib(attrib)
+    def set_bg_color(attrib)
+      @entry_field.set_bg_color(attrib)
+      @scroll_field.set_bg_color(attrib)
     end
 
     def destroyInfo

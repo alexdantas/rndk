@@ -116,7 +116,7 @@ module RNDK
       @accepts_focus = true
       @input_window = @win
       @shadow = shadow
-      @button_attrib = Ncurses::A_NORMAL
+      @button_color = Ncurses::A_NORMAL
 
       # Set up the row adjustment.
       if box_height - rows - @title_lines > 0
@@ -270,7 +270,7 @@ module RNDK
     end
 
     # This sets th background attribute of the widget.
-    def set_bg_attrib(attrib)
+    def set_bg_color(attrib)
       Ncurses.wbkgd(@win, attrib)
     end
 
@@ -307,7 +307,7 @@ module RNDK
           row = @title_lines + @border_size
 
           (0...@rows).each do |y|
-            attr = @button_attrib
+            attr = @button_color
             if current_button == @current_button
               attr = @highlight
               cur_row = row

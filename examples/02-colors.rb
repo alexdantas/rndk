@@ -11,7 +11,7 @@ begin
   RNDK::Color.init
 
   # Disabling the blinking cursor
-  Ncurses.curs_set 0
+  RNDK::blink_cursor true
 
   # Welcome to our Calendar Widget!
   #
@@ -25,30 +25,23 @@ begin
   #
   #     RNDK::Color[:foreground]
   #
-  # On the calendar, if we supply 0 as the
-  # day/month/year it'll use the current day/month/year.
-  cal = RNDK::Calendar.new(screen,
-                           RNDK::CENTER,             # x
-                           RNDK::CENTER,             # y
-                           "Colored calendar",       # title
-                           0,                        # day
-                           0,                        # month
-                           0,                        # year
-                           RNDK::Color[:red_yellow], # day attrib
-                           RNDK::Color[:cyan_white], # month attrib
-                           RNDK::Color[:black_cyan], # year attrib
-                           RNDK::Color[:red],        # highlight
-                           true,                     # has box?
-                           false)                    # has shadow?
+  cal = RNDK::Calendar.new(screen, {
+                             :x => RNDK::CENTER,
+                             :y => RNDK::CENTER,
+                             :title => "Colored calendar",
+                             :day_color => RNDK::Color[:red_yellow],
+                             :highlight => RNDK::Color[:red],
+                           })
+  # Oh yeah
   cal.activate
 
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
-# Assuring we end RNDK in case something
-# bad happens.
-# You'll see this a lot on the examples.
+  # Assuring we end RNDK in case something
+  # bad happens.
+  # You'll see this a lot on the examples.
 rescue Exception => e
-  RNDK::Screen.end_rndk
+  RNDK::Screen.finish
 
   puts e
   puts e.inspect
