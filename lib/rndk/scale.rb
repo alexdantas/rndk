@@ -2,13 +2,12 @@ require 'rndk'
 
 module RNDK
 
-  #
-  #
   class Scale < Widget
 
     def initialize(screen, config={})
       super()
       @widget_type = :scale
+      @supported_signals += [:before_input, :after_input]
 
       x           = 0
       y           = 0
@@ -40,13 +39,13 @@ module RNDK
         shadow      = val if key == :shadow
       end
 
-      parent_width = Ncurses.getmaxx(screen.window)
-      parent_height = Ncurses.getmaxy(screen.window)
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       self.set_box box
 
+      box_width  = field_width + 2 * @border_size
       box_height = @border_size * 2 + 1
-      box_width = field_width + 2 * @border_size
 
       # Set some basic values of the widget's data field.
       @label = []
@@ -56,7 +55,9 @@ module RNDK
       # If the field_width is a negative value, the field_width will
       # be COLS-field_width, otherwise the field_width will be the
       # given width.
-      field_width = RNDK.set_widget_dimension(parent_width, field_width, 0)
+      field_width = RNDK.set_widget_dimension(parent_width,
+                                              field_width,
+                                              0)
       box_width = field_width + 2 * @border_size
 
       # Translate the label string to a chtype array
@@ -168,7 +169,7 @@ module RNDK
     # This allows the person to use the widget's data field.
     def activate(actions=[])
       ret = false
-      # Draw the widget.
+
       self.draw
 
       if actions.nil? || actions.size == 0
@@ -178,34 +179,31 @@ module RNDK
 
           # Inject the character into the widget.
           ret = self.inject(input)
-          if @exit_type != :EARLY_EXIT
-            return ret
-          end
+
+          return ret if @exit_type != :EARLY_EXIT
         end
       else
         # Inject each character one at a time.
         actions.each do |action|
           ret = self.inject(action)
         end
-        if @exit_type != :EARLY_EXIT
-          return ret
-        end
+
+        return ret if @exit_type != :EARLY_EXIT
       end
 
       # Set the exit type and return.
       self.set_exit_type(0)
-      return ret
+      ret
     end
 
     # Check if the value lies outsid the low/high range. If so, force it in.
     def limitCurrentValue
       if @current < @low
         @current = @low
-        RNDK.beep
       elsif @current > @high
         @current = @high
-        RNDK.beep
       end
+      RNDK.beep
     end
 
     # Move the cursor to the given edit-position
@@ -322,14 +320,9 @@ module RNDK
       self.draw_field
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        # Call the pre-process function.
-        pp_return = @pre_process_func.call(self.widget_type, self,
-            @pre_process_data, input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
 
         # Check for a key bindings.
         if self.is_bound? input
@@ -389,16 +382,12 @@ module RNDK
         end
         self.limitCurrentValue
 
-        # Should we call a post-process?
-        if !complete && !(@post_process_func).nil?
-          @post_process_func.call(self.widget_type, self,
-              @post_process_data, input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
-      if !complete
+      if not complete
         self.draw_field
-        self.set_exit_type(0)
+        self.set_exit_type 0
       end
 
       @result_data = ret
@@ -418,7 +407,7 @@ module RNDK
 
       Draw.drawObjBox(@win, self) if @box
 
-      self.draw_title(@win)
+      self.draw_title @win
 
       # Draw the label.
       unless @label_win.nil?
@@ -428,7 +417,7 @@ module RNDK
                          @label, RNDK::HORIZONTAL,
                          0,
                          @label_len)
-        Ncurses.wrefresh(@label_win)
+        Ncurses.wrefresh @label_win
       end
       Ncurses.wrefresh @win
 
@@ -493,12 +482,12 @@ module RNDK
     # This function sets the low/high/current values of the widget.
     def set(low, high, value, box)
       self.setLowHigh(low, high)
-      self.setValue(value)
-      self.set_box(box)
+      self.setValue value
+      self.set_box box
     end
 
     # This sets the widget's value
-    def setValue(value)
+    def setValue value
       @current = value
       self.limitCurrentValue
     end

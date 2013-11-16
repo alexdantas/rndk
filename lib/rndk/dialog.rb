@@ -11,15 +11,16 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :dialog
+      @supported_signals += [:before_input, :after_input]
 
-      x            = 0
-      y            = 0
-      text         = "dialog"
-      buttons      = ["button"]
-      highlight    = Ncurses::A_REVERSE
-      separator    = true
-      box          = true
-      shadow       = false
+      x         = 0
+      y         = 0
+      text      = "dialog"
+      buttons   = ["button"]
+      highlight = Ncurses::A_REVERSE
+      separator = true
+      box       = true
+      shadow    = false
 
       config.each do |key, val|
         x            = val if key == :x
@@ -197,15 +198,10 @@ module RNDK
       self.set_exit_type(0)
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(@widget_type,
-                                           self,
-                                           @pre_process_data,
-                                           input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
+
         # Check for a key binding.
         if self.is_bound? input
           self.run_key_binding input
@@ -243,16 +239,11 @@ module RNDK
         end
 
         # Should we call a post_process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(@widget_type,
-                                  self,
-                                  @post_process_data,
-                                  input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
       unless complete
-        self.drawButtons
+        self.draw_buttons
         Ncurses.wrefresh @win
         self.set_exit_type(0)
       end
@@ -283,7 +274,7 @@ module RNDK
       end
 
       # Draw in the buttons.
-      self.drawButtons
+      self.draw_buttons
 
       Ncurses.wrefresh @win
     end
@@ -340,7 +331,7 @@ module RNDK
     end
 
     # This draws the dialog buttons and the separation line.
-    def drawButtons
+    def draw_buttons
       (0...@button_count).each do |x|
         Draw.writeChtype(@win,
                          @button_pos[x],

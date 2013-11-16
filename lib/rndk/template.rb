@@ -1,10 +1,11 @@
 require 'rndk'
 
 module RNDK
-  class TEMPLATE < Widget
+  class Template < Widget
     def initialize(screen, config={})
       super()
-      @widget_type = :TEMPLATE
+      @widget_type = :template
+      @supported_signals += [:before_input, :after_input]
 
       x       = 0
       y       = 0
@@ -26,17 +27,15 @@ module RNDK
         shadow  = val if key == :shadow
       end
 
-      parent_width = Ncurses.getmaxx(screen.window)
+      parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
       box_height = if box then 3 else 1 end
       plate_len = 0
 
-      if plate.nil? || plate.size == 0
-        return nil
-      end
+      return nil if plate.nil? || plate.size == 0
 
-      self.set_box(box)
+      self.set_box box
 
       field_width = plate.size + 2 * @border_size
 
@@ -182,7 +181,7 @@ module RNDK
           end
 
           if change
-            if self.validTemplate(test)
+            if self.valid_template? test
               @info = test
               self.drawField
             else
@@ -208,7 +207,7 @@ module RNDK
             ypos + 1, xpos + 1)
       end
 
-      screen.register(:TEMPLATE, self)
+      screen.register(@widget_type, self)
     end
 
     # This actually manages the tempalte widget
@@ -252,13 +251,10 @@ module RNDK
       self.drawField
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:TEMPLATE, self,
-            @pre_process_data, input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
+
         # Check a predefined binding
         if self.is_bound? input
           self.run_key_binding input
@@ -318,26 +314,22 @@ module RNDK
           end
         end
 
-        # Should we call a post-process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:TEMPLATE, self, @post_process_data, input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
-      if !complete
-        self.set_exit_type(0)
-      end
 
+      self.set_exit_type(0) if not complete
       @return_data = ret
-      return ret
+
+      ret
     end
 
-    def validTemplate(input)
+    def valid_template? input
       pp = 0
       ip = 0
       while ip < input.size && pp < @plate.size
         newchar = input[ip]
-        while pp < @plate.size && !RNDK::TEMPLATE.isPlateChar(@plate[pp])
+        while pp < @plate.size && !RNDK::Template.isPlateChar(@plate[pp])
           pp += 1
         end
         if pp == @plate.size
@@ -374,7 +366,7 @@ module RNDK
       if @info.size > 0
         mixed_string = ''
         while plate_pos < @plate_len && info_pos < @info.size
-          mixed_string << if RNDK::TEMPLATE.isPlateChar(@plate[plate_pos])
+          mixed_string << if RNDK::Template.isPlateChar(@plate[plate_pos])
                           then info_pos += 1; @info[info_pos - 1]
                           else @plate[plate_pos]
                           end
@@ -391,7 +383,7 @@ module RNDK
       unmixed_string = ''
 
       while pos < @info.size
-        if RNDK::TEMPLATE.isPlateChar(@plate[pos])
+        if RNDK::Template.isPlateChar(@plate[pos])
           unmixed_string << info[pos]
         end
         pos += 1
@@ -447,7 +439,7 @@ module RNDK
       if @info.size > 0
         pos = 0
         (0...[@field_width, @plate.size].min).each do |x|
-          if RNDK::TEMPLATE.isPlateChar(@plate[x]) && pos < @info.size
+          if RNDK::Template.isPlateChar(@plate[x]) && pos < @info.size
             field_color = @overlay[x] & Ncurses::A_ATTRIBUTES
             Ncurses.mvwaddch(@field_win, 0, x, @info[pos].ord | field_color)
             pos += 1
@@ -463,7 +455,7 @@ module RNDK
     # Adjust the cursor for the template
     def adjustCursor(direction)
       while @plate_pos < [@field_width, @plate.size].min &&
-          !RNDK::TEMPLATE.isPlateChar(@plate[@plate_pos])
+          !RNDK::Template.isPlateChar(@plate[@plate_pos])
         @plate_pos += direction
         @screen_pos += direction
       end

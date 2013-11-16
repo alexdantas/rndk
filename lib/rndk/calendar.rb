@@ -134,6 +134,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :calendar
+      @supported_signals += [:before_input, :after_input]
 
       # This is UGLY AS HELL
       # But I don't have time to clean this up right now
@@ -328,19 +329,13 @@ module RNDK
       ret       = nil
       complete  = false
 
-      # Set the exit type
       self.set_exit_type(0)
-
-      # Refresh the widget field.
       self.draw_field
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:calendar, self, @pre_process_data, char)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
 
         # Check a predefined binding
         if self.is_bound? char
@@ -375,7 +370,7 @@ module RNDK
             complete = true
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
             self.set_exit_type char
-            ret = self.getCurrentTime
+            ret = self.get_current_time
             complete = true
           when RNDK::REFRESH
             @screen.erase
@@ -384,9 +379,7 @@ module RNDK
         end
 
         # Should we do a post-process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:calendar, self, @post_process_data, char)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
       if !complete
@@ -645,7 +638,7 @@ module RNDK
     end
 
     # This returns what day of the week the month starts on.
-    def getCurrentTime
+    def get_current_time
       # Determine the current time and determine if we are in DST.
       return Time.mktime(@year, @month, @day, 0, 0, 0).gmtime
     end

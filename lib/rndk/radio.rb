@@ -7,6 +7,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :radio
+      @supported_signals += [:before_input, :after_input]
 
       x           = 0
       y           = 0
@@ -197,17 +198,13 @@ module RNDK
       self.set_exit_type(0)
 
       # Draw the widget items
-      self.drawItems(@box)
+      self.draw_items(@box)
 
-      # Check if there is a pre-process function to be called
-      unless @pre_process_func.nil?
-        # Call the pre-process function.
-        pp_return = @pre_process_func.call(@widget_type, self,
-            @pre_process_data, input)
-      end
+      # Check if there is a pre-process function to be called.
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
+
         # Check for a predefined key binding.
         if self.is_bound? input
           self.run_key_binding input
@@ -248,13 +245,11 @@ module RNDK
         end
 
         # Should we call a post-process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(@widget_type, self, @post_process_data, input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
-      if !complete
-        self.drawItems(@box)
+      if not complete
+        self.draw_items(@box)
         self.set_exit_type(0)
       end
 
@@ -278,11 +273,11 @@ module RNDK
       self.draw_title @win
 
       # Draw in the radio items.
-      self.drawItems @box
+      self.draw_items @box
     end
 
     # This redraws the radio items.
-    def drawItems(box)
+    def draw_items(box)
       scrollbar_adj = if @scrollbar_placement == RNDK::LEFT then 1 else 0 end
       screen_pos = 0
 
@@ -482,11 +477,11 @@ module RNDK
     end
 
     def focus
-      self.drawItems(@box)
+      self.draw_items(@box)
     end
 
     def unfocus
-      self.drawItems(@box)
+      self.draw_items(@box)
     end
 
     def create_items(items, box_width)

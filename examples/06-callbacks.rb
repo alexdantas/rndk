@@ -45,7 +45,8 @@ begin
   # If it returns true, it keeps going.
   #
   scroll.bind_signal(:before_input) do |key|
-    message = "</73>Skip current action? #{key}"
+    message = ["</73>You just pressed </74>#{Ncurses.keyname key}",
+               "</73>Skip current action?"]
     buttons = ["Yes", "No"]
 
     choice  = screen.popup_dialog(message, buttons)

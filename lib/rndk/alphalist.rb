@@ -65,6 +65,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type  = :alphaitems
+      @supported_signals += [:before_input, :after_input]
 
       # This is UGLY AS HELL
       # But I don't have time to clean this up right now
@@ -103,12 +104,7 @@ module RNDK
 
       label_len = 0
 
-      bindings = {
-        RNDK::BACKCHAR => Ncurses::KEY_PPAGE,
-        RNDK::FORCHAR  => Ncurses::KEY_NPAGE,
-      }
-
-      if not self.createItems items
+      if not self.create_items items
         self.destroy
         return nil
       end
@@ -188,189 +184,15 @@ module RNDK
       @entry_field.setLLchar Ncurses::ACS_LTEE
       @entry_field.setLRchar Ncurses::ACS_RTEE
 
-      # Callback functions
-      adjust_alphaitems_cb = lambda do |widget_type, widget, alphaitems, key|
-        scrollp = alphaitems.scroll_field
-        entry   = alphaitems.entry_field
-
-        if scrollp.items_size > 0
-          # Adjust the scrolling items.
-          alphaitems.injectMyScroller(key)
-
-          # Set the value in the entry field.
-          current = RNDK.chtype2Char scrollp.item[scrollp.current_item]
-          entry.setValue current
-          entry.draw entry.box
-          return true
-        end
-
-        RNDK.beep
-        false
-      end
-
-      complete_word_cb = lambda do |widget_type, widget, alphaitems, key|
-        entry = alphaitems.entry_field
-        scrollp = nil
-        selected = -1
-        ret = 0
-        alt_words = []
-
-        if entry.info.size == 0
-          RNDK.beep
-          return true
-        end
-
-        # Look for a unique word match.
-        index = RNDK.searchItems(alphaitems.items, alphaitems.items.size, entry.info)
-
-        # if the index is less than zero, return we didn't find a match
-        if index < 0
-          RNDK.beep
-          return true
-        end
-
-        # Did we find the last word in the items?
-        if index == alphaitems.items.size - 1
-          entry.setValue alphaitems.items[index]
-          entry.draw entry.box
-          return true
-        end
-
-        # Ok, we found a match, is the next item similar?
-        len = [entry.info.size, alphaitems.items[index + 1].size].min
-        ret = alphaitems.items[index + 1][0...len] <=> entry.info
-        if ret == 0
-          current_index = index
-          match = 0
-          selected = -1
-
-          # Start looking for alternate words
-          # FIXME(original): bsearch would be more suitable.
-          while (current_index < alphaitems.items.size) and
-              ((alphaitems.items[current_index][0...len] <=> entry.info) == 0)
-            alt_words << alphaitems.items[current_index]
-            current_index += 1
-          end
-
-          # Determine the height of the scrolling items.
-          height = if alt_words.size < 8 then alt_words.size + 3 else 11 end
-
-          # Create a scrolling items of close matches.
-          scrollp = RNDK::Scroll.new(entry.screen,
-                                     RNDK::CENTER,
-                                     RNDK::CENTER,
-                                     RNDK::RIGHT,
-                                     height,
-                                     -30,
-                                     "<C></B/5>Possible Matches.",
-                                     alt_words,
-                                     true,
-                                     Ncurses::A_REVERSE,
-                                     true,
-                                     false)
-
-          # Allow them to select a close match.
-          match = scrollp.activate
-          selected = scrollp.current_item
-
-          # Check how they exited the items.
-          if scrollp.exit_type == :ESCAPE_HIT
-            # Destroy the scrolling items.
-            scrollp.destroy
-
-            RNDK.beep
-
-            # Redraw the alphaitems and return.
-            alphaitems.draw(alphaitems.box)
-            return true
-          end
-
-          # Destroy the scrolling items.
-          scrollp.destroy
-
-          # Set the entry field to the selected value.
-          entry.set(alt_words[match], entry.min, entry.max, entry.box)
-
-          # Move the highlight bar down to the selected value.
-          (0...selected).each do |x|
-            alphaitems.injectMyScroller(Ncurses::KEY_DOWN)
-          end
-
-          # Redraw the alphaitems.
-          alphaitems.draw alphaitems.box
-
-        else
-          # Set the entry field with the found item.
-          entry.set(alphaitems.items[index], entry.min, entry.max, entry.box)
-          entry.draw entry.box
-        end
-        true
-      end
-
-      pre_process_entry_field = lambda do |rndktype, widget, alphaitems, input|
-        scrollp = alphaitems.scroll_field
-        entry = alphaitems.entry_field
-        info_len = entry.info.size
-        result = 1
-        empty = false
-
-        if alphaitems.is_bound? input
-          result = 1  # Don't try to use this key in editing
-
-        elsif (RNDK.is_char?(input) &&
-            input.chr.match(/^[[:alnum:][:punct:]]$/)) ||
-            [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include?(input)
-
-          index = 0
-          curr_pos = entry.screen_col + entry.left_char
-          pattern = entry.info.clone
-
-          if [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include? input
-
-            curr_pos -= 1 if input == Ncurses::KEY_BACKSPACE
-
-            pattern.slice!(curr_pos) if curr_pos >= 0
-
-          else
-            front   = (pattern[0...curr_pos] or '')
-            back    = (pattern[curr_pos..-1] or '')
-            pattern = front + input.chr + back
-          end
-
-          if pattern.size == 0
-            empty = true
-
-          elsif (index = RNDK.searchItems(alphaitems.items,
-                                         alphaitems.items.size,
-                                         pattern)) >= 0
-
-            # XXX: original uses n scroll downs/ups for <10 positions change
-              scrollp.setPosition(index)
-            alphaitems.drawMyScroller
-
-          else
-            RNDK.beep
-            result = 0
-          end
-        end
-
-        if empty
-          scrollp.setPosition(0)
-          alphaitems.drawMyScroller
-        end
-
-        result
-      end
-
       # Set the key bindings for the entry field.
-      @entry_field.bind(Ncurses::KEY_UP,    adjust_alphaitems_cb, self)
-      @entry_field.bind(Ncurses::KEY_DOWN,  adjust_alphaitems_cb, self)
-      @entry_field.bind(Ncurses::KEY_NPAGE, adjust_alphaitems_cb, self)
-      @entry_field.bind(Ncurses::KEY_PPAGE, adjust_alphaitems_cb, self)
-      @entry_field.bind(RNDK::KEY_TAB,      complete_word_cb,    self)
+      @entry_field.bind_key(Ncurses::KEY_UP)    { self.autocomplete }
+      @entry_field.bind_key(RNDK::KEY_TAB)      { self.autocomplete }
+      @entry_field.bind_key(Ncurses::KEY_DOWN)  { self.adjust_items }
+      @entry_field.bind_key(Ncurses::KEY_NPAGE) { self.adjust_items }
+      @entry_field.bind_key(Ncurses::KEY_PPAGE) { self.adjust_items }
 
       # Set up the post-process function for the entry field.
-      @entry_field.before_processing(pre_process_entry_field, self)
+      @entry_field.bind_signal(:before_input) { self.pre_process_entry_field }
 
       # Create the scrolling items.  It overlaps the entry field by one line if
       # we are using box-borders.
@@ -395,11 +217,6 @@ module RNDK
 
       @scroll_field.setULchar Ncurses::ACS_LTEE
       @scroll_field.setURchar Ncurses::ACS_RTEE
-
-      # Setup the key bindings.
-      bindings.each do |from, to|
-        self.bind(from, :getc, to)
-      end
 
       screen.register(:alphaitems, self)
     end
@@ -527,7 +344,7 @@ module RNDK
 
     # This function sets the information inside the alphaitems.
     def set_contents items
-      return if not self.createItems items
+      return if not self.create_items items
 
       # Set the information in the scrolling items.
       @scroll_field.set(@items, @items_size, false,
@@ -640,17 +457,12 @@ module RNDK
       @screen.unregister self
     end
 
-    # This function sets the pre-process function.
-    def before_processing(callback, data)
-      @entry_field.before_processing(callback, data)
+    # @see Widget#bind_signal
+    def bind_signal(signal, &action)
+      @entry_field.bind_signal(signal, action)
     end
 
-    # This function sets the post-process function.
-    def after_processing(callback, data)
-      @entry_field.after_processing(callback, data)
-    end
-
-    def createItems items
+    def create_items items
       if items.size >= 0
         newitems = []
 
@@ -693,7 +505,180 @@ module RNDK
     end
 
 
+    protected
 
+    def autocomplete
+      scrollp = self.scroll_field
+      entry   = self.entry_field
+
+      if scrollp.items_size > 0
+        # Adjust the scrolling items.
+        self.injectMyScroller Ncurses::KEY_UP
+
+        # Set the value in the entry field.
+        current = RNDK.chtype2Char scrollp.item[scrollp.current_item]
+        entry.setValue current
+        entry.draw entry.box
+        return true
+      end
+
+      RNDK.beep
+      false
+    end
+
+    def adjust_items
+      entry = self.entry_field
+      scrollp = nil
+      selected = -1
+      ret = 0
+      alt_words = []
+
+      if entry.info.size == 0
+        RNDK.beep
+        return true
+      end
+
+      # Look for a unique word match.
+      index = RNDK.searchItems(self.items, self.items.size, entry.info)
+
+      # if the index is less than zero, return we didn't find a match
+      if index < 0
+        RNDK.beep
+        return true
+      end
+
+      # Did we find the last word in the items?
+      if index == self.items.size - 1
+        entry.setValue self.items[index]
+        entry.draw entry.box
+        return true
+      end
+
+      # Ok, we found a match, is the next item similar?
+      len = [entry.info.size, self.items[index + 1].size].min
+      ret = self.items[index + 1][0...len] <=> entry.info
+      if ret == 0
+        current_index = index
+        match = 0
+        selected = -1
+
+        # Start looking for alternate words
+        # FIXME(original): bsearch would be more suitable.
+        while (current_index < self.items.size) and
+            ((self.items[current_index][0...len] <=> entry.info) == 0)
+          alt_words << self.items[current_index]
+          current_index += 1
+        end
+
+        # Determine the height of the scrolling items.
+        height = if alt_words.size < 8 then alt_words.size + 3 else 11 end
+
+        # Create a scrolling items of close matches.
+        scrollp = RNDK::Scroll.new(entry.screen,
+                                   RNDK::CENTER,
+                                   RNDK::CENTER,
+                                   RNDK::RIGHT,
+                                   height,
+                                   -30,
+                                   "<C></B/5>Possible Matches.",
+                                   alt_words,
+                                   true,
+                                   Ncurses::A_REVERSE,
+                                   true,
+                                   false)
+
+        # Allow them to select a close match.
+        match = scrollp.activate
+        selected = scrollp.current_item
+
+        # Check how they exited the items.
+        if scrollp.exit_type == :ESCAPE_HIT
+          # Destroy the scrolling items.
+          scrollp.destroy
+
+          RNDK.beep
+
+          # Redraw the self and return.
+          self.draw(self.box)
+          return true
+        end
+
+        # Destroy the scrolling items.
+        scrollp.destroy
+
+        # Set the entry field to the selected value.
+        entry.set(alt_words[match], entry.min, entry.max, entry.box)
+
+        # Move the highlight bar down to the selected value.
+        (0...selected).each do |x|
+          self.injectMyScroller(Ncurses::KEY_DOWN)
+        end
+
+        # Redraw the self.
+        self.draw self.box
+
+      else
+        # Set the entry field with the found item.
+        entry.set(self.items[index], entry.min, entry.max, entry.box)
+        entry.draw entry.box
+      end
+      true
+    end
+
+    def pre_process_entry_field
+      scrollp = alphaitems.scroll_field
+      entry = alphaitems.entry_field
+      info_len = entry.info.size
+      result = 1
+      empty = false
+
+      if alphaitems.is_bound? input
+        result = 1  # Don't try to use this key in editing
+
+      elsif (RNDK.is_char?(input) &&
+             input.chr.match(/^[[:alnum:][:punct:]]$/)) ||
+        [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include?(input)
+
+        index = 0
+        curr_pos = entry.screen_col + entry.left_char
+        pattern = entry.info.clone
+
+        if [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include? input
+
+          curr_pos -= 1 if input == Ncurses::KEY_BACKSPACE
+
+          pattern.slice!(curr_pos) if curr_pos >= 0
+
+        else
+          front   = (pattern[0...curr_pos] or '')
+          back    = (pattern[curr_pos..-1] or '')
+          pattern = front + input.chr + back
+        end
+
+        if pattern.size == 0
+          empty = true
+
+        elsif (index = RNDK.searchItems(alphaitems.items,
+                                        alphaitems.items.size,
+                                        pattern)) >= 0
+
+          # XXX: original uses n scroll downs/ups for <10 positions change
+          scrollp.setPosition(index)
+          alphaitems.drawMyScroller
+
+        else
+          RNDK.beep
+          result = 0
+        end
+      end
+
+      if empty
+        scrollp.setPosition(0)
+        alphaitems.drawMyScroller
+      end
+
+      result
+    end
 
   end
 end

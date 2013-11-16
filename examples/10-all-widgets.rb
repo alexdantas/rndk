@@ -106,10 +106,8 @@ begin
                      :x => 50,
                      :y => 8,
                      :label => "</77>button",
-                     :action => Proc.new do
-                       screen.popup_label "Button pressed"
-                     end,
-                   })
+                   }).bind_signal(:pressed) { screen.popup_label "Button pressed" }
+
   screen.refresh
   RNDK::Traverse.over screen
   RNDK::Screen.finish

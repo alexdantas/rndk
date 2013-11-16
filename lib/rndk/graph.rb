@@ -3,11 +3,30 @@ require 'rndk'
 module RNDK
 
   # TODO Fix how this widget is displayed onscreen.
+  #
+  # ## Signals
+  #
+  # For info, see Signals section on Widget class.
+  #
+  # ### :before_set_data
+  #
+  # * when: right before Graph#set_values fix the new values
+  #         into the widget.
+  # * argument: The **new data** to be fixed
+  # * effect when return false: Interrupt fixing the data,
+  #                             old data is kept.
+  #
+  # ### :after_set_data
+  #
+  # * when: right after Graph#set_values does it's job.
+  # * argument: The **new data** as an argument.
+  #
   class Graph < Widget
 
     def initialize(screen, config={})
       super()
       @widget_type = :graph
+      @supported_signals += [:before_set_data, :after_set_data]
 
       x      = 0
       y      = 0
@@ -120,7 +139,7 @@ module RNDK
     end
 
     # Set the scale factors for the graph after wee have loaded new values.
-    def setScales
+    def set_scales
       @xscale = (@maxx - @minx) / [1, @box_height - @title_lines - 5].max
       if @xscale <= 0
         @xscale = 1
@@ -143,6 +162,9 @@ module RNDK
       if count < 0
         return false
       end
+
+      keep_going = self.run_signal_binding(:before_set_data)
+      return if not keep_going
 
       if !(@values.nil?) && @values.size > 0
         @values = []
@@ -168,18 +190,18 @@ module RNDK
         @minx = 0
       end
 
-      self.setScales
-
-      return true
+      self.set_scales
+      self.run_signal_binding(:after_set_data)
+      true
     end
 
     def getValues(size)
       size << @count
-      return @values
+      @values
     end
 
     # Set the value of the graph at the given index.
-    def setValue(index, value, start_at_zero)
+    def set_value(index, value, start_at_zero)
       # Make sure the index is within range.
       if index < 0 || index >= @count
         return false
@@ -195,9 +217,8 @@ module RNDK
         @minx = 0
       end
 
-      self.setScales
-
-      return true
+      self.set_scales
+      true
     end
 
     def getValue(index)
@@ -410,12 +431,10 @@ module RNDK
       end
     end
 
-
-
-
     def position
       super(@win)
     end
+
   end
 end
 

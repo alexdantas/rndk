@@ -116,6 +116,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :entry
+      @supported_signals += [:before_input, :after_input]
 
       x           = 0
       y           = 0
@@ -342,13 +343,10 @@ module RNDK
       # Refresh the widget field.
       self.drawField
 
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:entry, self,
-            @pre_process_data, input)
-      end
+      # Check if there is a pre-process function to be called.
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
 
         # Check a predefined binding
         if self.is_bound? input
@@ -493,9 +491,8 @@ module RNDK
           end
         end
 
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:entry, self, @post_process_data, input)
-        end
+        # Should we do a post-process?
+        self.run_signal_binding(:after_input) if not complete
       end
 
       unless complete
@@ -533,12 +530,12 @@ module RNDK
     # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw(box=false)
+    def draw
       # Did we ask for a shadow?
       Draw.drawShadow @shadow_win unless @shadow_win.nil?
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if box
+      Draw.drawObjBox(@win, self) if @box
 
       self.draw_title @win
       Ncurses.wrefresh @win
@@ -681,7 +678,7 @@ module RNDK
     end
 
     def unfocus
-      self.draw box
+      self.draw
       Ncurses.wrefresh @field_win
     end
 
@@ -689,9 +686,6 @@ module RNDK
     def position
       super @win
     end
-
-
-
 
     # Allows the programmer to set a different widget input handler.
     #

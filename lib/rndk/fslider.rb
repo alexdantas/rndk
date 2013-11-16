@@ -1,9 +1,8 @@
 require 'rndk/slider'
 
 module RNDK
-  class FSLIDER < Slider
+  class Fslider < Slider
     def initialize(screen, config={})
-
       x           = 0
       y           = 0
       title       = "fslider"
@@ -38,11 +37,11 @@ module RNDK
 
       @digits = digits
       super(screen, x, y, title, label, filler, field_width, start, low, high, inc, fast_inc, box, shadow)
-      @widget_type = :FSLIDER
+      @widget_type = :fslider
     end
 
     # This draws the widget.
-    def drawField
+    def draw_field
       step = 1.0 * @field_width / (@high - @low)
 
       # Determine how many filler characters need to be drawn.
@@ -73,7 +72,7 @@ module RNDK
       Ncurses.wrefresh(@field_win)
     end
 
-    def formattedSize(value)
+    def formatted_size(value)
       digits = [@digits, 30].min
       format = '%%.%if' % [digits]
       temp = format % [value]
@@ -91,8 +90,6 @@ module RNDK
     def SCAN_FMT
       '%g%c'
     end
-
-
 
   end
 end

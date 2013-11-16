@@ -20,18 +20,25 @@ module RNDK
     #
     # ## Usage
     # ```
-    # RNDK::Button.new(screen, {
-    #                    :x => 50,
-    #                    :y => 8,
-    #                    :label => "</77>button",
-    #                    :action => Proc.new do
-    #                      screen.popup_label "Button pressed"
-    #                    end,
-    #                  })
+    # b = RNDK::Button.new(screen, {
+    #                       :x => 50,
+    #                       :y => 8,
+    #                       :label => "</77>button",
+    #                     })
+    #
+    # b.bind_signal(:pressed) do
+    #   screen.popup_label "Button pressed"
+    # end
     # ```
+    #
+    # @note When binding signals, remember that if you return
+    #       `false` it stops executing other signals.
+    #       So that's a nice idea for a `:before_pressing`
+    #       signal that asks the user if he's certain of pressing.
     def initialize(screen, config={})
       super()
       @widget_type = :button
+      @supported_signals += [:before_pressing, :pressed]
 
       x        = 0
       y        = 0
@@ -99,7 +106,6 @@ module RNDK
       @y = y
       @box_width = box_width
       @box_height = box_height
-      @action = action
       @input_window = @win
       @accepts_focus = true
       @shadow = shadow
@@ -142,7 +148,7 @@ module RNDK
     end
 
     # Sets the text within the button.
-    def set_label(label)
+    def set_label label
       label_len = []
       label_pos = []
       @label = RNDK.char2Chtype(label, label_len, label_pos)
@@ -315,20 +321,27 @@ module RNDK
 
       else
         case input
-        when RNDK::KEY_ESC
+        when RNDK::KEY_ESC, Ncurses::ERR
           self.set_exit_type(input)
           complete = true
-        when Ncurses::ERR
-          self.set_exit_type(input)
-          complete = true
+
         when ' '.ord, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-          @action.call(self) unless @action.nil?
-          self.set_exit_type(Ncurses::KEY_ENTER)
-          ret = true
-          complete = true
+          keep_going = self.run_signal_binding(:before_pressing)
+
+          # RUBY DOESN'T HAVE BREAK INSIDE CASE..WHEN BLOCKS
+          # AGHGW
+
+          if keep_going
+            self.run_signal_binding(:pressed)
+            self.set_exit_type(Ncurses::KEY_ENTER)
+            ret = true
+            complete = true
+          end
+
         when RNDK::REFRESH
           @screen.erase
           @screen.refresh
+
         else
           RNDK.beep
         end
@@ -337,7 +350,7 @@ module RNDK
       self.set_exit_type(0) unless complete
 
       @result_data = ret
-      return ret
+      ret
     end
 
     def focus

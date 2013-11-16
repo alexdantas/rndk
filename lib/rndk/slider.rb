@@ -69,6 +69,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :slider
+      @supported_signals += [:before_input, :after_input]
 
       x           = 0
       y           = 0
@@ -100,8 +101,8 @@ module RNDK
         shadow      = val if key == :shadow
       end
 
-      parent_width  = Ncurses.getmaxx(screen.window)
-      parent_height = Ncurses.getmaxy(screen.window)
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
 
       self.set_box box
       box_height = @border_size * 2 + 1
@@ -110,7 +111,7 @@ module RNDK
       @label = []
       @label_len = 0
       @label_win = nil
-      maximum_value_len = self.formattedSize(maximum)
+      maximum_value_len = self.formattedSize maximum
 
       # If the field_width is a negative will be COLS-field_width,
       # otherwise field_width will be the given width.
@@ -391,23 +392,14 @@ module RNDK
       ret = nil
       complete = false
 
-      # Set the exit type.
-      self.set_exit_type(0)
+      self.set_exit_type 0
 
-      # Draw the field.
       self.draw_field
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        # Call the pre-process function.
-        pp_return = @pre_process_func.call(@widget_type,
-                                           self,
-                                           @pre_process_data,
-                                           input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
 
         # Check for a key binding.
         if self.is_bound? input
@@ -469,19 +461,12 @@ module RNDK
           end
         end
         self.limitCurrentValue
-
-        # Should we call a post-process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(@widget_type,
-                                  self,
-                                  @post_process_data,
-                                  input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
-      if !complete
+      if not complete
         self.draw_field
-        self.set_exit_type(0)
+        self.set_exit_type 0
       end
 
       @return_data = 0

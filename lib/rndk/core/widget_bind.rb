@@ -86,15 +86,15 @@ module RNDK
       @actions[signal] << action
     end
 
-    # Run all actions based on `signal`, passing `data` as an
+    # Runs all actions based on `signal`, passing `data` as an
     # argument.
     #
     # @note It interrupts executing when any action returns
     #       `false`.
-    # @return `true` if all actions were executed, `false` if
-    #         they were interrupted.
+    # @return `true` if all actions were executed or no actions
+    #         exist, `false` if they were interrupted.
     def run_signal_binding(signal, data=nil)
-      return if @actions[signal].nil?
+      return true if @actions[signal].nil?
 
       @actions[signal].each do |action|
         return false if action.call(data) == false

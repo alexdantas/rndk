@@ -12,6 +12,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :viewer
+      @supported_signals += [:before_input, :after_input]
 
       # This is UGLY AS HELL
       # But I don't have time to clean this up right now
@@ -141,39 +142,35 @@ module RNDK
 
     # This function sets various attributes of the widget.
     def set(config)
-      x                = 0
-      y                = 0
-      width            = 0
-      height           = 0
-      items            = []
-      hide_control_chars = true
-      show_line_items   = true
-      title            = "viewer"
-      buttons          = []
-      button_highlight = Ncurses::A_REVERSE
-      box              = true
-      shadow           = false
+      items            = @items
+      hide_control_chars = @hide_control_chars
+      show_line_items   = @show_line_items
+      title            = @title
+      buttons          = @buttons
+      button_highlight = @button_highlight
+      box              = @box
+      shadow           = @shadow
 
       config.each do |key, val|
-        x                = val if key == :x
-        y                = val if key == :y
-        width            = val if key == :width
-        height           = val if key == :height
-        title            = val if key == :title
-        items            = val if key == :items
+        x                  = val if key == :x
+        y                  = val if key == :y
+        width              = val if key == :width
+        height             = val if key == :height
+        title              = val if key == :title
+        items              = val if key == :items
         hide_control_chars = val if key == :hide_control_chars
-        show_line_items   = val if key == :show_line_items
-        buttons          = val if key == :buttons
-        button_highlight = val if key == :button_highlight
-        box              = val if key == :box
-        shadow           = val if key == :shadow
+        show_line_items    = val if key == :show_line_items
+        buttons            = val if key == :buttons
+        button_highlight   = val if key == :button_highlight
+        box                = val if key == :box
+        shadow             = val if key == :shadow
       end
 
-      self.set_title(title)                  if title != "viewer"
-      self.set_highlight(button_highlight)   if button_highlight != Ncurses::A_REVERSE
-      self.set_items_line(show_line_items)
-      self.set_box(box)                      if box
-      self.set_items(items, hide_control_chars) if not items.empty?
+      self.set_title(title)                  if title != @title
+      self.set_highlight(button_highlight)   if button_highlight != @button_highlight
+      self.set_items_line(show_line_items)   if show_line_items != @show_line_items
+      self.set_box(box)                      if box != @box
+      self.set_items(items, hide_control_chars) if items != @items
     end
 
     # This sets the title of the viewer. (A nil title is allowed.
@@ -380,6 +377,33 @@ module RNDK
 
     # This function actually controls the viewer...
     def activate(actions=[])
+      self.draw
+
+      if actions.nil? || actions.size == 0
+        loop do
+          input = self.getch
+
+          # Inject the character into the widget.
+          ret = self.inject input
+
+          return ret if @exit_type != :EARLY_EXIT
+        end
+      else
+        # Inject each character one at a time.
+        actions.each do |action|
+          ret = self.inject action
+
+          return ret if @exit_type != :EARLY_EXIT
+        end
+      end
+
+      # Set the exit type for the widget and return
+      self.set_exit_type(0)
+      return nil
+    end
+
+    def inject input
+
       refresh = false
       # Create the itemsrmation about the file stats.
       file_items = [
@@ -396,11 +420,12 @@ module RNDK
       # Set the current button.
       @current_button = 0
 
-      # Draw the widget items.
-      self.draw
+      # Calls a pre-process block if exists.
+      # They can interrup input.
+      continue = run_signal_binding(:before_input, input)
 
-      # Do this until KEY_ENTER is hit.
-      while true
+      if continue
+
         # Reset the refresh flag.
         refresh = false
 
@@ -513,6 +538,8 @@ module RNDK
           else
             RNDK.beep
           end
+
+          run_signal_binding(:after_input, input)
         end
 
         # Do we need to redraw the screen?

@@ -7,6 +7,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :buttonbox
+      @supported_signals += [:before_pressing, :pressed]
 
       x            = 0
       y            = 0
@@ -176,7 +177,7 @@ module RNDK
     end
 
     # This injects a single character into the widget.
-    def inject(input)
+    def inject input
       first_button = 0
       last_button = @button_count - 1
       pp_return = true
@@ -186,19 +187,16 @@ module RNDK
       # Set the exit type
       self.set_exit_type(0)
 
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(@widget_type,
-                                           self,
-                                           @pre_process_data,
-                                           input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
       # Should we continue?
-      if pp_return
+      if keep_going
+
         # Check for a key binding.
         if self.is_bound? input
           self.run_key_binding input
           #complete = true
+
         else
           case input
           when Ncurses::KEY_LEFT, Ncurses::KEY_BTAB, Ncurses::KEY_BACKSPACE
@@ -228,30 +226,32 @@ module RNDK
           when RNDK::REFRESH
             @screen.erase
             @screen.refresh
+
           when RNDK::KEY_ESC
             self.set_exit_type(input)
             complete = true
+
           when Ncurses::ERR
             self.set_exit_type(input)
             complete = true
+
           when RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            self.set_exit_type(input)
-            ret = @current_button
-            complete = true
+            keep_going = self.run_signal_binding(:before_pressing)
+
+            if keep_going
+              self.run_signal_binding(:pressed)
+              self.set_exit_type input
+              ret = @current_button
+              complete = true
+            end
           end
         end
 
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(@widget_type,
-                                  self,
-                                  @post_process_data,
-                                  input)
-        end
-
+        self.run_signal_binding(:after_input) if not complete
       end
 
       unless complete
-        self.drawButtons
+        self.draw_buttons
         self.set_exit_type(0)
       end
 
@@ -280,7 +280,7 @@ module RNDK
     end
 
     # This draws the buttonbox box widget.
-    def draw(box)
+    def draw
       # Is there a shadow?
       unless @shadow_win.nil?
         Draw.drawShadow(@shadow_win)
@@ -295,48 +295,7 @@ module RNDK
       self.draw_title @win
 
       # Draw in the buttons.
-      self.drawButtons
-    end
-
-    # This draws the buttons on the button box widget.
-    def drawButtons
-      row = @title_lines + 1
-      col = @col_adjust / 2
-      current_button = 0
-      cur_row = -1
-      cur_col = -1
-
-      # Draw the buttons.
-      while current_button < @button_count
-        (0...@cols).each do |x|
-          row = @title_lines + @border_size
-
-          (0...@rows).each do |y|
-            attr = @button_color
-            if current_button == @current_button
-              attr = @highlight
-              cur_row = row
-              cur_col = col
-            end
-            Draw.writeChtypeAttrib(@win,
-                                   col,
-                                   row,
-                                   @button[current_button],
-                                   attr,
-                                   RNDK::HORIZONTAL,
-                                   0,
-                                   @button_len[current_button])
-            row += (1 + @row_adjust)
-            current_button += 1
-          end
-          col += @column_widths[x] + @col_adjust + @border_size
-        end
-      end
-
-      if cur_row >= 0 && cur_col >= 0
-        Ncurses.wmove(@win, cur_row, cur_col)
-      end
-      Ncurses.wrefresh @win
+      self.draw_buttons
     end
 
     # This erases the buttonbox box from the screen.
@@ -386,6 +345,47 @@ module RNDK
     end
 
     protected
+
+    # This draws the buttons on the button box widget.
+    def draw_buttons
+      row = @title_lines + 1
+      col = @col_adjust / 2
+      current_button = 0
+      cur_row = -1
+      cur_col = -1
+
+      # Draw the buttons.
+      while current_button < @button_count
+        (0...@cols).each do |x|
+          row = @title_lines + @border_size
+
+          (0...@rows).each do |y|
+            attr = @button_color
+            if current_button == @current_button
+              attr = @highlight
+              cur_row = row
+              cur_col = col
+            end
+            Draw.writeChtypeAttrib(@win,
+                                   col,
+                                   row,
+                                   @button[current_button],
+                                   attr,
+                                   RNDK::HORIZONTAL,
+                                   0,
+                                   @button_len[current_button])
+            row += (1 + @row_adjust)
+            current_button += 1
+          end
+          col += @column_widths[x] + @col_adjust + @border_size
+        end
+      end
+
+      if cur_row >= 0 && cur_col >= 0
+        Ncurses.wmove(@win, cur_row, cur_col)
+      end
+      Ncurses.wrefresh @win
+    end
 
 
   end

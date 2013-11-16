@@ -1,5 +1,25 @@
 RNDK TODO List
-(forked from Tawny-Cdk's TODO List)
+
+The main things we must do are:
+
+* Turn general api less C-like and more Ruby-ish.
+  - easy: Convert all methods from 'CamelCase' to 'under_scores'.
+  - hard: Reflect over the general API
+  - hard: Create a nice config system for widgets.
+          Mine is so messed up...
+
+* Document stuff.
+  - easy: Copy relevant parts from CDK's documentation into
+          class headers, method docs and such.
+  - medium: Explain stuff on modules and classes.
+            Argument lists, config, signals, stuff.
+
+
+
+
+Now those items were forked from Tawny-Cdk's TODO List.
+Don't take them too seriously.
+
 ------------------------------------------------------------------------------
 
 Now that Tawny CDK is basically a complete copy of Thomas Dickey version of

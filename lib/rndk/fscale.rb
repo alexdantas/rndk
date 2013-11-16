@@ -74,7 +74,6 @@ module RNDK
       '%g%c'
     end
 
-
-
   end
 end
+

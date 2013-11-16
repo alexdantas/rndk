@@ -84,6 +84,7 @@ module RNDK
         ncurses_window = Ncurses.initscr
         Ncurses.noecho
         Ncurses.cbreak
+        Ncurses.keypad(ncurses_window, true)
       end
 
       RNDK::ALL_SCREENS << self

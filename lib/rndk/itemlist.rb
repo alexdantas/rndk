@@ -7,6 +7,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :itemlist
+      @supported_signals += [:before_input, :after_input]
 
       x            = 0
       y            = 0
@@ -136,7 +137,7 @@ module RNDK
 
       # Draw the widget.
       self.draw
-      self.drawField(true)
+      self.draw_field(true)
 
       if actions.nil? || actions.size == 0
         input = 0
@@ -175,16 +176,13 @@ module RNDK
       self.set_exit_type(0)
 
       # Draw the widget field
-      self.drawField(true)
+      self.draw_field(true)
 
       # Check if there is a pre-process function to be called.
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(@widget_type, self,
-            @pre_process_data, input)
-      end
+      keep_going = self.run_signal_binding(:before_input)
 
-      # Should we continue?
-      if pp_return
+      if keep_going
+
         # Check a predefined binding.
         if self.is_bound? input
           self.run_key_binding input
@@ -228,13 +226,11 @@ module RNDK
         end
 
         # Should we call a post-process?
-        if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(@widget_type, self, @post_process_data, input)
-        end
+        self.run_signal_binding(:after_input) if not complete
       end
 
       if !complete
-        self.drawField(true)
+        self.draw_field(true)
         self.set_exit_type(0)
       end
 
@@ -245,8 +241,8 @@ module RNDK
     # This moves the itemlist field to the given location.
     def move(x, y, relative, refresh_flag)
       windows = [@win, @field_win, @label_win, @shadow_win]
-      self.move_specific(x, y, relative, refresh_flag,
-          windows, [])
+
+      self.move_specific(x, y, relative, refresh_flag, windows, [])
     end
 
     # This draws the widget on the screen.
@@ -268,7 +264,7 @@ module RNDK
       Ncurses.wrefresh @win
 
       # Draw in the field.
-      self.drawField(false)
+      self.draw_field(false)
     end
 
     # This sets the background attribute of the widget
@@ -279,7 +275,7 @@ module RNDK
     end
 
     # This function draws the contents of the field.
-    def drawField(highlight)
+    def draw_field(highlight)
       # Declare local vars.
       current_item = @current_item
 
@@ -400,11 +396,11 @@ module RNDK
     end
 
     def focus
-      self.drawField(true)
+      self.draw_field(true)
     end
 
     def unfocus
-      self.drawField(false)
+      self.draw_field(false)
     end
 
     def create_list item

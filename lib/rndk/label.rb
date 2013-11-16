@@ -24,6 +24,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :label
+      @supported_signals += [:before_message_change]
 
       # This is UGLY AS HELL
       # But I don't have time to clean this up right now
@@ -143,22 +144,18 @@ module RNDK
       # This is UGLY ATTRIBUTESS HELL
       # But I don't have time to clean this up right now
       # (lots of widgets, you know)  :(
-      x      = 0
-      y      = 0
-      text   = "label"
-      box    = false
-      shadow = false
+      text   = @text
+      box    = @box
+      shadow = @shadow
 
       config.each do |key, val|
-        x      = val if key == :x
-        y      = val if key == :y
         text   = val if key == :text
         box    = val if key == :box
         shadow = val if key == :shadow
       end
 
-      self.set_message text if defined? text
-      self.set_box box      if defined? box
+      self.set_message text if text != @text
+      self.set_box box      if box  != @box
     end
 
     # Sets the contents of the Label Widget.
@@ -166,7 +163,9 @@ module RNDK
     def set_message text
       return if text.class != Array or text.empty?
 
-      text_size = text.size
+      keep_going = self.run_signal_binding(:before_message_change)
+      return if not keep_going
+
       # Clean out the old message.
       (0...@rows).each do |x|
         @text[x]     = ''
@@ -174,8 +173,8 @@ module RNDK
         @text_len[x] = 0
       end
 
-      @rows = if text_size < @rows
-              then text_size
+      @rows = if text.size < @rows
+              then text.size
               else @rows
               end
 
