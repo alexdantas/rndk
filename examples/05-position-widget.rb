@@ -51,7 +51,9 @@ begin
                             :title => title,
                             :field_width => 30
                           })
-
+  entry.when(:POSITIONING) do
+    puts 'lel'
+  end
   if entry.nil?
     screen.destroy
     RNDK::Screen.finish
