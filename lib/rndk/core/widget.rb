@@ -15,6 +15,10 @@ module RNDK
     attr_accessor :ULChar, :URChar, :LLChar, :LRChar, :HZChar, :VTChar, :BXAttr
     attr_reader :binding_list, :accepts_focus, :exit_type, :border_size
 
+    # All the signals the current widget supports.
+    # Use them on Widget#bind_signal
+    attr_reader :supported_signals
+
     @@g_paste_buffer = ''
 
     def initialize
@@ -43,9 +47,9 @@ module RNDK
 
       # Actions to be executed at certain signals
       @actions = {}
-      [:POSITIONING, :DESTROYING].each do |signal|
-        @actions[signal] = []
-      end
+
+      @supported_signals = []
+      @supported_signals << :position << :destroy
     end
 
     # Makes `block` execute right before processing input

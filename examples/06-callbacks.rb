@@ -44,8 +44,8 @@ begin
   # char.
   # If it returns true, it keeps going.
   #
-  scroll.before_processing do
-    message = "</73>Skip current action?"
+  scroll.bind_signal(:before_input) do |key|
+    message = "</73>Skip current action? #{key}"
     buttons = ["Yes", "No"]
 
     choice  = screen.popup_dialog(message, buttons)
@@ -58,7 +58,7 @@ begin
   # It's commented to avoid annoyance.
   # Uncomment for awesomeness
 
-  #scroll.after_processing { screen.popup_label "</75>You did it!" }
+  #scroll.bind_signal(:after_input) { screen.popup_label "</75>You did it!" }
 
 
   # Finally, we activate the widget!

@@ -333,7 +333,7 @@ module RNDK
 
         # Check for a key bindings.
         if self.is_bound? input
-          self.run_binding input
+          self.run_key_binding input
           #complete = true
 
         else

@@ -352,7 +352,7 @@ module RNDK
 
         # Check a predefined binding
         if self.is_bound? input
-          self.run_binding input
+          self.run_key_binding input
           #complete = true
 
         else

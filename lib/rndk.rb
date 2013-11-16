@@ -120,7 +120,8 @@ module RNDK
     (character >= 0) and (character < Ncurses::KEY_MIN)
   end
 
-  # Returns the function keys - F1, F2 ... F12 ...
+  # Returns internal Ncurses' function keys values
+  # (F1, F2 ... F12 ...)
   def RNDK.KEY_F(n)
     264 + n
   end

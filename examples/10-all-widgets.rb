@@ -100,7 +100,7 @@ begin
                      :buttons => ["one", "two", "three"],
                      :width => 24,
                      :height => 15
-                   }).set_items([__FILE__], false)
+                   }).set_items(`ls -l`.lines, false)
 
   RNDK::Button.new(screen, {
                      :x => 50,

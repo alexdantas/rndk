@@ -26,7 +26,7 @@ module RNDK
         0          => :INVALID
       }
 
-      if table.include?(string)
+      if table.include? string
         table[string]
       else
         :INVALID

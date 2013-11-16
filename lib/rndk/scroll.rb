@@ -62,6 +62,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :scroll
+      @supported_signals += [:before_input, :after_input]
 
       x         = 0
       y         = 0
@@ -205,6 +206,7 @@ module RNDK
                                      xpos + 1)
       end
 
+      # Standard keybindings (plus the Arrow Keys)
       self.bind_key('g') { self.scroll_begin }
       self.bind_key('1') { self.scroll_begin }
       self.bind_key('G') { self.scroll_end   }
@@ -262,21 +264,15 @@ module RNDK
       # Draw the scrolling items
       self.draw_items @box
 
-      # Calls a pre-process block if exists
-      pp_return = true
-      unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:scroll,
-                                           self,
-                                           @pre_process_data,
-                                           input)
-      end
+      # Calls a pre-process block if exists.
+      # They can interrup input.
+      continue = run_signal_binding(:before_input, input)
 
-      # Should we continue?
-      if pp_return
+      if continue
 
         # Check for a predefined key binding.
         if self.is_bound? input
-          self.run_binding input
+          self.run_key_binding input
 
         else
           case input
@@ -313,16 +309,11 @@ module RNDK
           end
         end
 
-        if (not complete) and @post_process_func
-          @post_process_func.call(:scroll,
-                                  self,
-                                  @post_process_data,
-                                  input)
-        end
+        run_signal_binding(:after_input, input) if not complete
       end
 
       if not complete
-        self.draw_items(@box)
+        self.draw_items @box
         self.set_exit_type(0)
       end
 

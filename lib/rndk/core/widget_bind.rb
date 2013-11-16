@@ -54,7 +54,7 @@ module RNDK
     # @return The binding's return value or `false`, if no
     #         keybinding for `key` exists.
 
-    def run_binding key
+    def run_key_binding key
       obj = self.bindable_widget @widget_type
 
       return false if obj.nil? or (not obj.binding_list.include? key)
@@ -76,13 +76,33 @@ module RNDK
       obj.binding_list.include? key
     end
 
-    def when(signal, &action)
+    # Binds an `action` to be executed when
+    # `signal` is activated.
+    def bind_signal(signal, &action)
+      return unless @supported_signals.include? signal
+
+      @actions[signal] = [] if @actions[signal].nil?
+
       @actions[signal] << action
     end
 
-    def run_actions(signal)
-      @actions[signal].each { |action| action.call }
+    # Run all actions based on `signal`, passing `data` as an
+    # argument.
+    #
+    # @note It interrupts executing when any action returns
+    #       `false`.
+    # @return `true` if all actions were executed, `false` if
+    #         they were interrupted.
+    def run_signal_binding(signal, data=nil)
+      return if @actions[signal].nil?
+
+      @actions[signal].each do |action|
+        return false if action.call(data) == false
+      end
+
+      true
     end
+
   end
 end
 

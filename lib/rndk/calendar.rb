@@ -344,7 +344,7 @@ module RNDK
 
         # Check a predefined binding
         if self.is_bound? char
-          self.run_binding char
+          self.run_key_binding char
 
           ## FIXME What the heck? Missing method?
           #self.checkEarlyExit

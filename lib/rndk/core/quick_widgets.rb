@@ -52,7 +52,7 @@ module RNDK
                                   :y => RNDK::CENTER,
                                   :text => message
                                 })
-        popup.draw true
+        popup.draw
 
         # Wait for some input.
         Ncurses.keypad(popup.win, true)
@@ -74,7 +74,7 @@ module RNDK
                                 })
 
         popup.set_bg_color attrib
-        popup.draw(true)
+        popup.draw
 
         # Wait for some input
         Ncurses.keypad(popup.win, true)
@@ -102,7 +102,7 @@ module RNDK
                                    :buttons => buttons
                                  })
 
-        popup.draw true
+        popup.draw
         choice = popup.activate
         popup.destroy
       end
