@@ -4,6 +4,64 @@ require 'rndk/entry'
 
 module RNDK
 
+  # Shows a list of lines with lots of fancy things.
+  # Generally used to view files, has Buttons, Label and Entry.
+  #
+  # ## Example
+  #
+  # ```
+  # viewer = RNDK::Viewer.new(screen, {
+  #                             :x => RNDK::CENTER,
+  #                             :y => RNDK::CENTER,
+  #                             :title => "</77>Awesome Viewer",
+  #                             :buttons => buttons,
+  #                             :shadow => true
+  #                           })
+  #
+  # # To set the lines of Viewer we must use Viewer#set.
+  # # No way to do it on the constructor :(
+  # viewer.set :items => lines
+  # ```
+  #
+  # ## Keybindings
+  #
+  # Left Arrow::  Shifts the viewport one column left.
+  # Right Arrow:: Shifts the viewport one column left
+  # Up Arrow::    Scrolls the viewport one line up.
+  # Down Arrow::  Scrolls the viewport one line down.
+  # Prev Page::   Scroll one page backward.
+  # Ctrl-B::      Scroll one page backward.
+  # B::           Scroll one page backward.
+  # b::           Scroll one page backward.
+  # Next Page::   Scroll one page forward.
+  # Ctrl-F::      Scroll one page forward.
+  # Space::       Scroll one page forward.
+  # F::           Scroll one page forward.
+  # f::           Scroll one page forward.
+  # Home::        Shift the whole list to the far left.
+  # |::           Shift the whole list to the far left.
+  # End::         Shift the whole list to the far right.
+  # $::           Shift the whole list to the far right.
+  # 1::           Moves to the first line in the viewer.
+  # <::           Moves to the first line in the viewer.
+  # g::           Moves to the first line in the viewer.
+  # >::           Moves to the last line in the viewer.
+  # G::           Moves to the last line in the viewer.
+  # L::           Moves half the distance to  the  end  of the viewer.
+  # l::           Moves  half  the  distance to the top of the viewer.
+  # ?::           Searches up for a pattern.
+  # /::           Searches down for a pattern.
+  # n::           Repeats last search.
+  # N::           Repeats last search, reversed direction.
+  # :::           Jumps to a given line.
+  # i::           Displays file statistics.
+  # s::              Displays file statistics.
+  # Tab::            Switches buttons.
+  # Return::         Exit the widget and return the index  of the  selected  button.   Set `exit_type` to `:NORMAL`.
+  # Escape::         Exit the widget and return -1.  Set `exit_type` to `:ESCAPE_HIT`.
+  # Ctrl-L::         Refreshes the screen.
+  #
+  #
   # TODO There's something wrong with this widget
   #      why wont it work with Traverse?
   class Viewer < Widget
@@ -11,6 +69,27 @@ module RNDK
     DOWN = 0
     UP   = 1
 
+    # Creates a new Viewer Widget.
+    #
+    # ## Settings
+    #
+    # * `x` is the x position - can be an integer or
+    #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
+    # * `y` is the y position - can be an integer or
+    #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
+    # * `width`/`height` are integers - if either are 0, Widget
+    #   will be created with full width/height of the screen.
+    #   If it's a negative value, will create with full width/height
+    #   minus the value.
+    # * `title` can be more than one line - just split them
+    #   with `\n`s.
+    # * `buttons` is an Array of Strings with all buttons.
+    #
+    # @todo complete documentation
+    #
+    # @note To set the data inside Viewer, you _must_ call
+    #       Viewer#set! No stuffin' things on the constructor.
+    #
     def initialize(screen, config={})
       super()
       @widget_type = :viewer
@@ -41,7 +120,6 @@ module RNDK
         shadow           = val if key == :shadow
       end
 
-      button_count  = buttons.size
       parent_width  = Ncurses.getmaxx screen.window
       parent_height = Ncurses.getmaxy screen.window
 
@@ -75,21 +153,21 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the buttons.
-      @button_count = button_count
+      @button_count = buttons.size
       @button = []
       @button_len = []
       @button_pos = []
 
-      if button_count > 0
-        (0...button_count).each do |x|
+      if @button_count > 0
+        (0...@button_count).each do |x|
           button_len = []
           @button << RNDK.char2Chtype(buttons[x], button_len, [])
           @button_len << button_len[0]
           button_width += @button_len[x] + 1
         end
-        button_adj = (box_width - button_width) / (button_count + 1)
+        button_adj = (box_width - button_width) / (@button_count + 1)
         button_pos = 1 + button_adj
-        (0...button_count).each do |x|
+        (0...@button_count).each do |x|
           @button_pos << button_pos
           button_pos += button_adj + @button_len[x]
         end
@@ -115,6 +193,8 @@ module RNDK
       @items_size = -1
       @show_line_items = 1
       @exit_type = :EARLY_EXIT
+
+      @search_pattern = []
 
       self.set_title title
 
@@ -209,8 +289,8 @@ module RNDK
               t  << ' '
               len += 1
             end while (len & 7) != 0
-          elsif RNDK.CharOf(items[y].ord).match(/^[[:print:]]$/)
-            t << RNDK.CharOf(items[y].ord)
+          elsif RNDK.char_of(items[y].ord).match(/^[[:print:]]$/)
+            t << RNDK.char_of(items[y].ord)
             len += 1
           else
             t << Ncurses.unctrl(items[y].ord)
@@ -419,9 +499,6 @@ module RNDK
 
       temp_items = ['<C></5>Press Any Key To Continue.<!5>']
 
-      # Set the current button.
-      @current_button = 0
-
       # Calls a pre-process block if exists.
       # They can interrup input.
       continue = run_signal_binding(:before_input, input)
@@ -497,7 +574,7 @@ module RNDK
             end
 
           when '?'.ord
-            @search_direction = RNDK::Viewer::UP
+            @search_direction = Viewer::UP
             self.get_and_store_pattern(@screen)
             if !self.search_for_word(@search_pattern, @search_direction)
               self.PatternNotFound(@search_pattern)
@@ -543,8 +620,6 @@ module RNDK
             return @current_button
           when RNDK::REFRESH
             self.draw
-#            @screen.erase
-#            @screen.refresh
           else
             RNDK.beep
           end
@@ -574,9 +649,9 @@ module RNDK
                                       :x => RNDK::CENTER,
                                       :y => RNDK::CENTER,
                                       :title => '',
-                                      :label => label,
+                                      :label => temp,
                                       :field_color => RNDK::Color[:white_blue] | Ncurses::A_BOLD,
-                                      :filler => '.' | RNDK::Color[:white_blue] | Ncurses::A_BOLD,
+                                      :filler => '.'.ord | RNDK::Color[:white_blue] | Ncurses::A_BOLD,
                                       :field_width => 10
                                     })
 
@@ -605,17 +680,17 @@ module RNDK
 
       # If the pattern is empty then return.
       if pattern.size != 0
-        if direction == RNDK::Viewer::DOWN
+        if direction == Viewer::DOWN
           # Start looking from 'here' down.
           x = @current_top + 1
           while !found && x < @items_size
             pos = 0
             y = 0
             while y < @items[x].size
-              plain_char = RNDK.CharOf(@items[x][y])
+              plain_char = RNDK.char_of(@items[x][y])
 
               pos += 1
-              if @RNDK.CharOf(pattern[pos-1]) != plain_char
+              if RNDK.char_of(pattern[pos-1]) != plain_char
                 y -= (pos - 1)
                 pos = 0
               elsif pos == pattern.size
@@ -635,10 +710,10 @@ module RNDK
             y = 0
             pos = 0
             while y < @items[x].size
-              plain_char = RNDK.CharOf(@items[x][y])
+              plain_char = RNDK.char_of(@items[x][y])
 
               pos += 1
-              if RNDK.CharOf(pattern[pos-1]) != plain_char
+              if RNDK.char_of(pattern[pos-1]) != plain_char
                 y -= (pos - 1)
                 pos = 0
               elsif pos == pattern.size
@@ -656,11 +731,20 @@ module RNDK
 
     # This allows us to 'jump' to a given line in the file.
     def jump_to_line
-      newline = RNDK::Scale.new(@screen, RNDK::CENTER, RNDK::CENTER,
-          '<C>Jump To Line', '</5>Line :', Ncurses::A_BOLD,
-          @items_size.size + 1, @current_top + 1, 0, @max_top_line + 1,
-          1, 10, true, true)
-      line = newline.activate([])
+      newline = RNDK::Scale.new(@screen, {
+                                  :x => RNDK::CENTER,
+                                  :y => RNDK::CENTER,
+                                  :title => '<C>Jump To Line',
+                                  :label => '</5>Line :',
+                                  :field_color => Ncurses::A_BOLD,
+                                  :field_width => @items_size.size + 1,
+                                  :start => @current_top + 1,
+                                  :high => @max_top_line + 1,
+                                  :fast_increment => 10,
+                                  :shador => true
+                                })
+
+      line = newline.activate
       newline.destroy
       line - 1
     end
@@ -706,7 +790,7 @@ module RNDK
       # Highlight the current button.
       (0...@button_len[@current_button]).each do |x|
         # Strip the character of any extra attributes.
-        character = RNDK.CharOf(@button[@current_button][x])
+        character = RNDK.char_of @button[@current_button][x]
 
         # Add the character into the window.
         Ncurses.mvwaddch(@win,

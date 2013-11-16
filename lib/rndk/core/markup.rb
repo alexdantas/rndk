@@ -150,6 +150,10 @@
 
 module RNDK
 
+  def RNDK.char_of chtype
+    (chtype.ord & 255).chr
+  end
+
   # Takes a String full of format markers and translates it
   # into a chtype array.
   #
@@ -386,10 +390,6 @@ module RNDK
     end
   end
 
-  def RNDK.CharOf chtype
-    (chtype.ord & 255).chr
-  end
-
   # This returns a string from a chtype array
   # Formatting codes are omitted.
   def RNDK.chtype2Char(string)
@@ -397,7 +397,7 @@ module RNDK
 
     unless string.nil?
       string.each do |char|
-        newstring << RNDK.CharOf(char)
+        newstring << RNDK.char_of(char)
       end
     end
 

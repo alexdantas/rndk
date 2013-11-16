@@ -290,7 +290,7 @@ module RNDK
         return false
       end
       ch = Ncurses.winch(@field_win)
-      if RNDK.CharOf(ch) != ' '
+      if RNDK.char_of(ch) != ' '
         return true
       end
       if new_position > 1
@@ -299,7 +299,7 @@ module RNDK
           return false
         end
         ch = Ncurses.winch(@field_win)
-        return RNDK.CharOf(ch) != ' '
+        return RNDK.char_of(ch) != ' '
       end
       return false
     end

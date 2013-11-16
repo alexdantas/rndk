@@ -9,34 +9,34 @@ module RNDK
       @widget_type = :scale
       @supported_signals += [:before_input, :after_input]
 
-      x           = 0
-      y           = 0
-      title       = "scale"
-      label       = "label"
-      field_attr  = Ncurses::A_NORMAL
-      field_width = 0
-      start       = 0
-      low         = 0
-      high        = 100
-      inc         = 1
-      fast_inc    = 5
-      box         = true
-      shadow      = false
+      x              = 0
+      y              = 0
+      title          = "scale"
+      label          = "label"
+      field_color    = Ncurses::A_NORMAL
+      field_width    = 0
+      start          = 0
+      low            = 0
+      high           = 100
+      inc            = 1
+      fast_increment = 5
+      box            = true
+      shadow         = false
 
       config.each do |key, val|
-        x           = val if key == :x
-        y           = val if key == :y
-        title       = val if key == :title
-        label       = val if key == :label
-        field_attr  = val if key == :field_attr
-        field_width = val if key == :field_width
-        start       = val if key == :start
-        low         = val if key == :low
-        high        = val if key == :high
-        inc         = val if key == :inc
-        fast_inc    = val if key == :fast_inc
-        box         = val if key == :box
-        shadow      = val if key == :shadow
+        x              = val if key == :x
+        y              = val if key == :y
+        title          = val if key == :title
+        label          = val if key == :label
+        field_color    = val if key == :field_color
+        field_width    = val if key == :field_width
+        start          = val if key == :start
+        low            = val if key == :low
+        high           = val if key == :high
+        inc            = val if key == :inc
+        fast_increment = val if key == :fast_increment
+        box            = val if key == :box
+        shadow         = val if key == :shadow
       end
 
       parent_width  = Ncurses.getmaxx screen.window
@@ -130,13 +130,13 @@ module RNDK
       @box_width = box_width
       @box_height = box_height
       @field_width = field_width
-      @field_attr = field_attr
+      @field_color = field_color
       @current = low
       @low = low
       @high = high
       @current = start
       @inc = inc
-      @fastinc = fast_inc
+      @fastinc = fast_increment
       @accepts_focus = true
       @input_window = @win
       @shadow = shadow
@@ -435,7 +435,7 @@ module RNDK
                            @field_width - temp.size - 1,
                            0,
                            temp,
-                           @field_attr,
+                           @field_color,
                            RNDK::HORIZONTAL,
                            0,
                            temp.size)
