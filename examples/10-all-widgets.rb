@@ -13,6 +13,8 @@ require 'rndk/radio'
 require 'rndk/scroll'
 require 'rndk/slider'
 require 'rndk/viewer'
+require 'rndk/button'
+require 'rndk/buttonbox'
 
 begin
   # All widgets will be attached to this
@@ -100,6 +102,14 @@ begin
                      :height => 15
                    }).set_items(`ls -l`.lines, false)
 
+  RNDK::Button.new(screen, {
+                     :x => 50,
+                     :y => 8,
+                     :label => "</77>button",
+                     :action => Proc.new do
+                       screen.popup_label "Button pressed"
+                     end,
+                   })
   screen.refresh
   RNDK::Traverse.over screen
   RNDK::Screen.finish

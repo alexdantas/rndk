@@ -1,12 +1,12 @@
 require 'rndk'
 
 module RNDK
-  class BUTTONBOX < Widget
+  class Buttonbox < Widget
     attr_reader :current_button
 
     def initialize(screen, config={})
       super()
-      @widget_type = :BUTTONBOX
+      @widget_type = :buttonbox
 
       x            = 0
       y            = 0
@@ -142,7 +142,7 @@ module RNDK
       end
 
       # Register this baby.
-      screen.register(:BUTTONBOX, self)
+      screen.register(@widget_type, self)
     end
 
     # This activates the widget.
@@ -152,7 +152,7 @@ module RNDK
 
       if actions.nil? || actions.size == 0
         while true
-          input = self.getch([])
+          input = self.getch
 
           # Inject the characer into the widget.
           ret = self.inject(input)
@@ -187,8 +187,10 @@ module RNDK
       self.set_exit_type(0)
 
       unless @pre_process_func.nil?
-        pp_return = @pre_process_func.call(:BUTTONBOX, self,
-            @pre_process_data, input)
+        pp_return = @pre_process_func.call(@widget_type,
+                                           self,
+                                           @pre_process_data,
+                                           input)
       end
 
       # Should we continue?
@@ -239,8 +241,10 @@ module RNDK
         end
 
         if !complete && !(@post_process_func.nil?)
-          @post_process_func.call(:BUTTONBOX, self, @post_process_data,
-              input)
+          @post_process_func.call(@widget_type,
+                                  self,
+                                  @post_process_data,
+                                  input)
         end
 
       end

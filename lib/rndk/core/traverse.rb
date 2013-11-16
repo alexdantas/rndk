@@ -263,7 +263,7 @@ module RNDK
 
       switchFocus(menu, oldobj)
       while !done
-        key = menu.getch([])
+        key = menu.getch
 
         case key
         when RNDK::KEY_TAB

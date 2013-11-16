@@ -188,7 +188,7 @@ module RNDK
         info_label = RNDK::Label.new(entry.screen, RNDK::CENTER, RNDK::CENTER,
             mesg, 9, true, false)
         info_label.draw(true)
-        info_label.getch([])
+        info_label.getch
 
         info_label.destroy
 
@@ -505,7 +505,7 @@ module RNDK
 
       if actions.nil? || actions.size == 0
         while true
-          input = @entry_field.getch([])
+          input = @entry_field.getch
 
           # Inject the character into the widget.
           ret = self.inject(input)

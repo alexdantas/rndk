@@ -431,7 +431,7 @@ module RNDK
       end_y = beg_y + Ncurses.getmaxy(@screen.window)
 
       loop do
-        key = self.getch([])
+        key = self.getch
 
         # Let them move the widget around until they hit return.
         break if [RNDK::KEY_RETURN, Ncurses::KEY_ENTER].include? key

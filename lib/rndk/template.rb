@@ -217,7 +217,7 @@ module RNDK
 
       if actions.nil? || actions.size == 0
         while true
-          input = self.getch([])
+          input = self.getch
 
           # Inject each character into the widget.
           ret = self.inject(input)

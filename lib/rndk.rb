@@ -58,7 +58,7 @@ module RNDK
 
   MAX_BINDINGS = 300
   MAX_ITEMS    = 2000
-  MAX_BUTTONS  = 200
+  MAX_ButtonS  = 200
 
   # Key value when pressing Ctrl+`char`.
   def RNDK.CTRL(char)
@@ -152,6 +152,7 @@ module RNDK
 
     RNDK.window_erase window
     Ncurses.delwin window
+    window = nil
   end
 
   # Safely moves a raw Ncurses window.

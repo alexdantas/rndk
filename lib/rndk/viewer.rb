@@ -2,7 +2,7 @@ require 'rndk'
 
 module RNDK
 
-  # TODO THere's something wrong with this widget
+  # TODO There's something wrong with this widget
   #      why wont it work with Traverse?
   class Viewer < Widget
 
@@ -13,6 +13,9 @@ module RNDK
       super()
       @widget_type = :viewer
 
+      # This is UGLY AS HELL
+      # But I don't have time to clean this up right now
+      # (lots of widgets, you know)  :(
       x                = 0
       y                = 0
       width            = 0
@@ -409,7 +412,7 @@ module RNDK
         # Reset the refresh flag.
         refresh = false
 
-        input = self.getch([])
+        input = self.getch
         if !self.check_bind(input)
           case input
           when RNDK::KEY_TAB
@@ -678,7 +681,7 @@ module RNDK
 
       # Draw the label and wait.
       label.draw(true)
-      label.getch([])
+      label.getch
 
       # Clean up.
       label.destroy

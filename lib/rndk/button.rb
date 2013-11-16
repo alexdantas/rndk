@@ -1,32 +1,59 @@
 require 'rndk'
 
 module RNDK
-  class BUTTON < Widget
+
+  class Button < Widget
+
+    # A button with a label attached to a callback.
+    #
+    # ## Settings
+    #
+    # * `x` is the x position - can be an integer or `RNDK::LEFT`,
+    #   `RNDK::RIGHT`, `RNDK::CENTER`.
+    # * `y` is the y position - can be an integer or `RNDK::TOP`,
+    #   `RNDK::BOTTOM`, `RNDK::CENTER`.
+    # * `label` is the String that will appear on the button.
+    # * `action` is a Proc that will execute when the button is
+    #   pressed.
+    # * `box` if the Widget is drawn with a box outside it.
+    # * `shadow` turns on/off the shadow around the Widget.
+    #
+    # ## Usage
+    # ```
+    # RNDK::Button.new(screen, {
+    #                    :x => 50,
+    #                    :y => 8,
+    #                    :label => "</77>button",
+    #                    :action => Proc.new do
+    #                      screen.popup_label "Button pressed"
+    #                    end,
+    #                  })
+    # ```
     def initialize(screen, config={})
       super()
-      @widget_type = :BUTTON
+      @widget_type = :button
 
       x        = 0
       y        = 0
-      text     = "button"
+      label    = "button"
       action   = nil
-      box      = 0
-      shadow   = 0
+      box      = true
+      shadow   = false
 
       config.each do |key, val|
         x        = val if key == :x
         y        = val if key == :y
-        text     = val if key == :text
+        label    = val if key == :label
         action   = val if key == :action
         box      = val if key == :box
         shadow   = val if key == :shadow
       end
 
-      parent_width = Ncurses.getmaxx(screen.window)
+      parent_width  = Ncurses.getmaxx(screen.window)
       parent_height = Ncurses.getmaxy(screen.window)
       box_width = 0
-      xpos = x
-      ypos = y
+      x = x
+      y = y
 
       self.set_box(box)
       box_height = 1 + 2 * @border_size
@@ -34,16 +61,18 @@ module RNDK
       # Translate the string to a chtype array.
       info_len = []
       info_pos = []
-      @info = RNDK.char2Chtype(text, info_len, info_pos)
+      @info = RNDK.char2Chtype(label, info_len, info_pos)
       @info_len = info_len[0]
       @info_pos = info_pos[0]
       box_width = [box_width, @info_len].max + 2 * @border_size
 
       # Create the string alignments.
       @info_pos = RNDK.justifyString(box_width - 2 * @border_size,
-          @info_len, @info_pos)
+                                     @info_len,
+                                     @info_pos)
 
-      # Make sure we didn't extend beyond the dimensions of the window.
+      # Make sure we didn't extend beyond the dimensions of the
+      # window.
       box_width = if box_width > parent_width
                   then parent_width
                   else box_width
@@ -54,20 +83,20 @@ module RNDK
                    end
 
       # Rejustify the x and y positions if we need to.
-      xtmp = [xpos]
-      ytmp = [ypos]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(screen.window, xtmp, ytmp, box_width, box_height)
-      xpos = xtmp[0]
-      ypos = ytmp[0]
+      x = xtmp[0]
+      y = ytmp[0]
 
       # Create the button.
       @screen = screen
       # ObjOf (button)->fn = &my_funcs;
       @parent = screen.window
-      @win = Ncurses.newwin(box_height, box_width, ypos, xpos)
+      @win = Ncurses.newwin(box_height, box_width, y, x)
       @shadow_win = nil
-      @xpos = xpos
-      @ypos = ypos
+      @x = x
+      @y = y
       @box_width = box_width
       @box_height = box_height
       @action = action
@@ -82,68 +111,65 @@ module RNDK
 
       Ncurses.keypad(@win, true)
 
-      # If a shadow was requested, then create the shadow window.
-      if shadow
-        @shadow_win = Ncurses.newwin(box_height, box_width,
-            ypos + 1, xpos + 1)
-      end
+      set_shadow @shadow
 
       # Register this baby.
-      screen.register(:BUTTON, self)
+      screen.register(@widget_type, self)
     end
 
-    # This was added for the builder.
-    def activate(actions=[])
-      self.draw(@box)
-      ret = false
+    # Sets multiple attributes of the Widget.
+    #
+    # See Button#initialize.
+    #
+    # @note Don't try to change `x`/`y` positions here,
+    #       use Button#move
+    # @note Don't try to change `action` here,
+    #       use TODO
+    def set(config)
+      label    = @label
+      box      = @box
+      shadow   = @shadow
 
-      if actions.nil? || actions.size == 0
-        while true
-          input = self.getch([])
-
-          # Inject the character into the widget.
-          ret = self.inject(input)
-          if @exit_type != :EARLY_EXIT
-            return ret
-          end
-        end
-      else
-        # Inject each character one at a time.
-        actions.each do |x|
-          ret = self.inject(action)
-          if @exit_type == :EARLY_EXIT
-            return ret
-          end
-        end
+      config.each do |key, val|
+        label    = val if key == :label
+        box      = val if key == :box
+        shadow   = val if key == :shadow
       end
 
-      # Set the exit type and exit
-      self.set_exit_type(0)
-      return -1
+      self.set_label(label)   if label  != @label
+      self.set_box(box)       if box    != @box
+      self.set_shadow(shadow) if shadow != @shadow
     end
 
-    # This sets multiple attributes of the widget.
-    def set(mesg, box)
-      self.set_message(mesg)
-      self.set_box(box)
-    end
-
-    # This sets the information within the button.
-    def set_message(info)
-      info_len = []
-      info_pos = []
-      @info = RNDK.char2Chtype(info, info_len, info_pos)
-      @info_len = info_len[0]
-      @info_pos = RNDK.justifyString(@box_width - 2 * @border_size,
-          info_pos[0])
+    # Sets the text within the button.
+    def set_label(label)
+      label_len = []
+      label_pos = []
+      @label = RNDK.char2Chtype(label, label_len, label_pos)
+      @label_len = label_len[0]
+      @label_pos = RNDK.justifyString(@box_width - 2 * @border_size,
+                                     label_pos[0])
 
       # Redraw the button widget.
       self.erase
       self.draw(box)
     end
 
-    def get_message
+    def get_label
       return @info
+    end
+
+    # Turns on/off the shadow around the window
+    def set_shadow option
+      if option and @shadow_win.nil?
+          @shadow_win = Ncurses.newwin(box_height,
+                                       box_width,
+                                       y + 1,
+                                       x + 1)
+
+      elsif (not option) and (not @shadow_win.nil?)
+          RNDK::window_delete @shadow_win
+      end
     end
 
     # This sets the background attribute of the widget.
@@ -151,7 +177,7 @@ module RNDK
       Ncurses.wbkgd(@win, attrib)
     end
 
-    def drawText
+    def draw_label
       box_width = @box_width
 
       # Draw in the message.
@@ -183,7 +209,7 @@ module RNDK
       if @box
         Draw.drawObjBox(@win, self)
       end
-      self.drawText
+      self.draw_label
       Ncurses.wrefresh @win
     end
 
@@ -199,26 +225,26 @@ module RNDK
     def move(x, y, relative, refresh_flag)
       current_x = Ncurses.getbegx(@win)
       current_y = Ncurses.getbegy(@win)
-      xpos = x
-      ypos = y
+      x = x
+      y = y
 
       # If this is a relative move, then we will adjust where we want
       # to move to.
       if relative
-        xpos = Ncurses.getbegx(@win) + x
-        ypos = Ncurses.getbegy(@win) + y
+        x = Ncurses.getbegx(@win) + x
+        y = Ncurses.getbegy(@win) + y
       end
 
       # Adjust the window if we need to.
-      xtmp = [xpos]
-      ytmp = [ypos]
+      xtmp = [x]
+      ytmp = [y]
       RNDK.alignxy(@screen.window, xtmp, ytmp, @box_width, @box_height)
-      xpos = xtmp[0]
-      ypos = ytmp[0]
+      x = xtmp[0]
+      y = ytmp[0]
 
       # Get the difference
-      xdiff = current_x - xpos
-      ydiff = current_y - ypos
+      xdiff = current_x - x
+      ydiff = current_y - y
 
       # Move the window to the new location.
       RNDK.window_move(@win, -xdiff, -ydiff)
@@ -233,8 +259,98 @@ module RNDK
       end
     end
 
-    # This allows the user to use the cursor keys to adjust the
-    # position of the widget.
+    # This destroys the button widget pointer.
+    def destroy
+      RNDK.window_delete @shadow_win
+      RNDK.window_delete @win
+
+      self.clean_bindings
+
+      @screen.unregister self
+    end
+
+    # Activates the Widget, letting the user interact with it.
+    #
+    # `actions` is an Array of characters. If it's non-null,
+    # will #inject each char on it into the Widget.
+    #
+    # @return `true` if pressed, `false` elsewhere.
+    def activate(actions=[])
+      self.draw(@box)
+      ret = false
+
+      if actions.nil? || actions.size == 0
+        while true
+          input = self.getch
+
+          # Inject the character into the widget.
+          ret = self.inject input
+
+          return ret if @exit_type != :EARLY_EXIT
+        end
+      else
+        # Inject each character one at a time.
+        actions.each do |x|
+          ret = self.inject action
+
+          return ret if @exit_type == :EARLY_EXIT
+        end
+      end
+
+      # Set the exit type and exit
+      self.set_exit_type(0)
+      return false
+    end
+
+    # This injects a single character into the widget.
+    def inject(input)
+      ret = false
+      complete = false
+
+      self.set_exit_type(0)
+
+      # Check a predefined binding.
+      if self.check_bind(input)
+        complete = true
+
+      else
+        case input
+        when RNDK::KEY_ESC
+          self.set_exit_type(input)
+          complete = true
+        when Ncurses::ERR
+          self.set_exit_type(input)
+          complete = true
+        when ' '.ord, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
+          @action.call(self) unless @action.nil?
+          self.set_exit_type(Ncurses::KEY_ENTER)
+          ret = true
+          complete = true
+        when RNDK::REFRESH
+          @screen.erase
+          @screen.refresh
+        else
+          RNDK.beep
+        end
+      end
+
+      self.set_exit_type(0) unless complete
+
+      @result_data = ret
+      return ret
+    end
+
+    def focus
+      self.draw_label
+      Ncurses.wrefresh @win
+    end
+
+    def unfocus
+      self.draw_label
+      Ncurses.wrefresh @win
+    end
+
+    # @see Widget#position
     def position
       # Declare some variables
       orig_x = Ncurses.getbegx(@win)
@@ -243,7 +359,7 @@ module RNDK
 
       # Let them move the widget around until they hit return
       while key != Ncurses::KEY_ENTER && key != RNDK::KEY_RETURN
-        key = self.getch([])
+        key = self.getch
         if key == Ncurses::KEY_UP || key == '8'.ord
           if Ncurses.getbegy(@win) > 0
             self.move(0, -1, true, true)
@@ -318,67 +434,6 @@ module RNDK
           RNDK.beep
         end
       end
-    end
-
-    # This destroys the button widget pointer.
-    def destroy
-      RNDK.window_delete(@shadow_win)
-      RNDK.window_delete(@win)
-
-      self.clean_bindings
-
-      @screen.unregister self
-    end
-
-    # This injects a single character into the widget.
-    def inject(input)
-      ret = false
-      complete = false
-
-      self.set_exit_type(0)
-
-      # Check a predefined binding.
-      if self.check_bind(input)
-        complete = true
-      else
-        case input
-        when RNDK::KEY_ESC
-          self.set_exit_type(input)
-          complete = true
-        when Ncurses::ERR
-          self.set_exit_type(input)
-          complete = true
-        when ' '.ord, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-          unless @action.nil?
-            @action.call(self)
-          end
-          self.set_exit_type(Ncurses::KEY_ENTER)
-          ret = 0
-          complete = true
-        when RNDK::REFRESH
-          @screen.erase
-          @screen.refresh
-        else
-          RNDK.beep
-        end
-      end
-
-      unless complete
-        self.set_exit_type(0)
-      end
-
-      @result_data = ret
-      return ret
-    end
-
-    def focus
-      self.drawText
-      Ncurses.wrefresh @win
-    end
-
-    def unfocus
-      self.drawText
-      Ncurses.wrefresh @win
     end
 
   end
