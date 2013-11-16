@@ -141,7 +141,7 @@ module RNDK
                    :hide_control_chars => hide_control_chars
                  })
 
-      selected = viewer.activate([])
+      selected = viewer.activate
 
       # Make sure they exited normally.
       if viewer.exit_type != :NORMAL
@@ -169,7 +169,7 @@ module RNDK
       result = 0
 
       # Open the file and read the contents.
-      lines = RNDK.read_file(filename, info)
+      lines = RNDK.read_file filename
 
       # If we couldn't read the file, return an error.
       if lines == -1

@@ -96,7 +96,7 @@ module RNDK
     #   with `\n`s.
     # * `label` is the String that will appear on the label
     #   of the Entry field.
-    # * `field_attr` is the attribute/color of the characters
+    # * `field_color` is the attribute/color of the characters
     #   that are typed in.
     # * `filler_char` is the character to display on the
     #   empty spaces in the entry field.
@@ -118,34 +118,34 @@ module RNDK
       @widget_type = :entry
       @supported_signals += [:before_input, :after_input]
 
-      x           = 0
-      y           = 0
-      title       = "entry"
-      label       = "label"
-      field_attr  = Ncurses::A_NORMAL
-      filler      = '.'
-      disp_type   = :MIXED
-      field_width = 0
+      x            = 0
+      y            = 0
+      title        = "entry"
+      label        = "label"
+      field_color  = Ncurses::A_NORMAL
+      filler       = '.'
+      disp_type    = :MIXED
+      field_width  = 0
       initial_text = ""
-      min         = 0
-      max         = 9001
-      box         = true
-      shadow      = false
+      min          = 0
+      max          = 9001
+      box          = true
+      shadow       = false
 
       config.each do |key, val|
-        x          = val if key == :x
-        y          = val if key == :y
-        title      = val if key == :title
-        label      = val if key == :label
-        field_attr = val if key == :field_attr
-        filler     = val if key == :filler
-        disp_type  = val if key == :disp_type
-        field_width    = val if key == :field_width
+        x            = val if key == :x
+        y            = val if key == :y
+        title        = val if key == :title
+        label        = val if key == :label
+        field_color  = val if key == :field_color
+        filler       = val if key == :filler
+        disp_type    = val if key == :disp_type
+        field_width  = val if key == :field_width
         initial_text = val if key == :initial_text
-        min        = val if key == :min
-        max        = val if key == :max
-        box        = val if key == :box
-        shadow     = val if key == :shadow
+        min          = val if key == :min
+        max          = val if key == :max
+        box          = val if key == :box
+        shadow       = val if key == :shadow
       end
 
       parent_width  = Ncurses.getmaxx screen.window
@@ -160,8 +160,9 @@ module RNDK
       self.set_box box
       box_height = @border_size*2 + 1
 
-      # If the field_width is a negative value, the field_width will be
-      # COLS-field_width, otherwise the field_width will be the given width.
+      # If the field_width is a negative value, the field_width
+      # WILL be COLS-field_width, otherwise the field_width will
+      # be the given width.
       field_width = RNDK.set_widget_dimension(parent_width, field_width, 0)
       box_width = field_width + 2*@border_size
 
@@ -233,7 +234,7 @@ module RNDK
       @screen = screen
       @parent = screen.window
       @shadow_win = nil
-      @field_attr = field_attr
+      @field_color = field_color
       @field_width = field_width
       @filler = filler
       @hidden = filler
@@ -666,7 +667,7 @@ module RNDK
     # See Ncurses#curs_set.
     def set_highlight(highlight, cursor)
       Ncurses.wbkgd(@field_win, highlight)
-      @field_attr = highlight
+      @field_color = highlight
       Ncurses.curs_set cursor
 
       # FIXME(original) - if (cursor) { move the cursor to this widget }
@@ -710,7 +711,7 @@ module RNDK
           end
         else
           (@left_char...@info.size).each do |x|
-            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @info[x].ord | @field_attr)
+            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @info[x].ord | @field_color)
           end
         end
         Ncurses.wmove(@field_win, 0, @screen_col)

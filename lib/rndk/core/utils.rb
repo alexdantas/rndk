@@ -119,7 +119,7 @@ module RNDK
   # Reads a file and concatenate it's lines into `array`.
   #
   # @note The lines don't end with '\n'.
-  def RNDK.read_file(filename, array)
+  def RNDK.read_file filename
     begin
       fd = File.new(filename, "r")
     rescue
@@ -133,10 +133,9 @@ module RNDK
         line
       end
     end
-
-    array.concat lines
     fd.close
-    array.size
+
+    lines
   end
 
 end

@@ -400,7 +400,7 @@ module RNDK
     # Draws the Widget on the Screen.
     #
     # If `box` is true, it is drawn with a box.
-    def draw(box=false)
+    def draw
 
       header_len = @day_name.size
       col_len = (6 + header_len) / 7
@@ -409,7 +409,7 @@ module RNDK
       Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if box
+      Draw.drawObjBox(@win, self) if @box
 
       self.draw_title @win
 

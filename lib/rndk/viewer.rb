@@ -1,4 +1,6 @@
 require 'rndk'
+require 'rndk/label'
+require 'rndk/entry'
 
 module RNDK
 
@@ -372,7 +374,7 @@ module RNDK
       temp_items = [
           "</U/5>Pattern '%s' not found.<!U!5>" % pattern,
       ]
-      self.pop_up_label(temp_items)
+      @screen.popup_label temp_items
     end
 
     # This function actually controls the viewer...
@@ -429,7 +431,6 @@ module RNDK
         # Reset the refresh flag.
         refresh = false
 
-        input = self.getch
         if self.is_bound? input
           self.run_key_binding input
           #complete = true
@@ -472,9 +473,11 @@ module RNDK
           when 'g'.ord, '1'.ord, '<'.ord
             @current_top = 0
             refresh = true
+
           when 'G'.ord, '>'.ord
             @current_top = @max_top_line
             refresh = true
+
           when 'L'.ord
             x = (@items_size + @current_top) / 2
             if x < @max_top_line
@@ -483,6 +486,7 @@ module RNDK
             else
               RNDK.beep
             end
+
           when 'l'.ord
             x = @current_top / 2
             if x >= 0
@@ -491,6 +495,7 @@ module RNDK
             else
               RNDK.beep
             end
+
           when '?'.ord
             @search_direction = RNDK::Viewer::UP
             self.get_and_store_pattern(@screen)
@@ -498,17 +503,20 @@ module RNDK
               self.PatternNotFound(@search_pattern)
             end
             refresh = true
+
           when '/'.ord
-            @search_direction = RNDK::Viewer:DOWN
+            @search_direction = Viewer::DOWN
             self.get_and_store_pattern(@screen)
             if !self.search_for_word(@search_pattern, @search_direction)
               self.PatternNotFound(@search_pattern)
             end
             refresh = true
+
           when 'N'.ord, 'n'.ord
             if @search_pattern == ''
               temp_items[0] = '</5>There is no pattern in the buffer.<!5>'
-              self.pop_up_label(temp_items)
+              @screen.popup_label temp_items
+
             elsif !self.search_for_word(@search_pattern,
                 if input == 'n'.ord
                 then @search_direction
@@ -517,11 +525,12 @@ module RNDK
               self.PatternNotFound(@search_pattern)
             end
             refresh = true
+
           when ':'.ord
             @current_top = self.jump_to_line
             refresh = true
           when 'i'.ord, 's'.ord, 'S'.ord
-            self.pop_up_label(file_items)
+            @screen.popup_label file_items
             refresh = true
           when RNDK::KEY_ESC
             self.set_exit_type(input)
@@ -533,8 +542,9 @@ module RNDK
             self.set_exit_type(input)
             return @current_button
           when RNDK::REFRESH
-            @screen.erase
-            @screen.refresh
+            self.draw
+#            @screen.erase
+#            @screen.refresh
           else
             RNDK.beep
           end
@@ -543,10 +553,9 @@ module RNDK
         end
 
         # Do we need to redraw the screen?
-        if refresh
-          self.draw_items
-        end
+        self.draw_items if refresh
       end
+      self.draw
     end
 
     # This searches the document looking for the given word.
@@ -554,17 +563,22 @@ module RNDK
       temp = ''
 
       # Check the direction.
-      if @search_direction == RNDK::Viewer::UP
+      if @search_direction == Viewer::UP
         temp = '</5>Search Up  : <!5>'
       else
         temp = '</5>Search Down: <!5>'
       end
 
       # Pop up the entry field.
-      get_pattern = RNDK::Entry.new(screen, RNDK::CENTER, RNDK::CENTER,
-          '', label, Ncurses.COLOR_PAIR(5) | Ncurses::A_BOLD,
-          '.' | Ncurses.COLOR_PAIR(5) | Ncurses::A_BOLD,
-          :MIXED, 10, 0, 256, true, false)
+      get_pattern = RNDK::Entry.new(screen, {
+                                      :x => RNDK::CENTER,
+                                      :y => RNDK::CENTER,
+                                      :title => '',
+                                      :label => label,
+                                      :field_color => RNDK::Color[:white_blue] | Ncurses::A_BOLD,
+                                      :filler => '.' | RNDK::Color[:white_blue] | Ncurses::A_BOLD,
+                                      :field_width => 10
+                                    })
 
       # Is there an old search pattern?
       if @search_pattern.size != 0
@@ -651,34 +665,20 @@ module RNDK
       line - 1
     end
 
-    # This pops a little message up on the screen.
-    def pop_up_label(mesg)
-      # Set up variables.
-      label = RNDK::Label.new(@screen, RNDK::CENTER, RNDK::CENTER,
-          mesg, mesg.size, true, false)
-
-      # Draw the label and wait.
-      label.draw(true)
-      label.getch
-
-      # Clean up.
-      label.destroy
-    end
-
     # This moves the viewer field to the given location.
     # Inherited
     # def move(x, y, relative, refresh_flag)
     # end
 
     # This function draws the viewer widget.
-    def draw(box=false)
+    def draw
       # Do we need to draw in the shadow?
       unless @shadow_win.nil?
         Draw.drawShadow @shadow_win
       end
 
       # Box it if it was asked for.
-      if box
+      if @box
         Draw.drawObjBox(@win, self)
         Ncurses.wrefresh @win
       end
