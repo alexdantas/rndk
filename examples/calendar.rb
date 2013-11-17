@@ -17,13 +17,13 @@ begin
 
   # Declare the calendar widget.
   calendar = RNDK::Calendar.new(screen, {
-                                  :x => RNDK::CENTER,
-                                  :y => RNDK::CENTER,
-                                  :title => title,
-                                  :day_color => RNDK::Color[:red_black] | RNDK::Color[:bold],
+                                  :x           => RNDK::CENTER,
+                                  :y           => RNDK::CENTER,
+                                  :title       => title,
+                                  :day_color   => RNDK::Color[:red_black] | RNDK::Color[:bold],
                                   :month_color => RNDK::Color[:green_black] | RNDK::Color[:bold],
-                                  :yeah_color => RNDK::Color[:yellow_black] | RNDK::Color[:bold],
-                                  :highlight => RNDK::Color[:blue_black] | RNDK::Color[:reverse],
+                                  :yeah_color  => RNDK::Color[:yellow_black] | RNDK::Color[:bold],
+                                  :highlight   => RNDK::Color[:blue_black] | RNDK::Color[:reverse],
                                 })
 
   if calendar.nil?

@@ -17,12 +17,12 @@ begin
           "<C>This line should be set to whatever the screen default is."
          ]
 
-  label = RNDK::Label.new(screen,
-                          RNDK::CENTER,
-                          RNDK::CENTER,
-                          mesg,
-                          true,
-                          true)
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::CENTER,
+                            :text => mesg,
+                            :shadow => true
+                          })
 
   if label.nil?
     RNDK::Screen.finish

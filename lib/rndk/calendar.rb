@@ -121,14 +121,14 @@ module RNDK
     #   `RNDK::LEFT`, `RNDK::RIGHT`, `RNDK::CENTER`.
     # * `y` is the y position - can be an integer or
     #   `RNDK::TOP`, `RNDK::BOTTOM`, `RNDK::CENTER`.
-    # * `day`, `month` and `year` are integers. I suggest
-    #   you to use Ruby's `Time.now.gmtime`.
+    # * `day`, `month` and `year` are integers on the
+    #   format `dd`, `mm`, `yyyy`.
     # * `title` can be more than one line - just split them
     #   with `\n`s.
     # * `*_color` are specific colors.
     #
     # @note If `day`, `month` or `year` are zero, we'll use
-    #       the current date for it.
+    #       the current date for it (`Time.now.gmtime`).
     #       If all of them are 0, will use the complete date
     #       of today.
     def initialize(screen, config={})

@@ -14,20 +14,19 @@ begin
   RNDK::Color.init
 
   # Create the widget
-  widget = RNDK::Slider.new(screen,
-                            RNDK::CENTER,
-                            RNDK::CENTER,
-                            title,
-                            label,
-                            RNDK::Color[:reverse] | RNDK::Color[:white_blue] | ' '.ord,
-                            50,
-                            1,
-                            1,
-                            100,
-                            1,
-                            2,
-                            true,
-                            false)
+  widget = RNDK::Slider.new(screen, {
+                              :x => RNDK::CENTER,
+                              :y => RNDK::CENTER,
+                              :title => title,
+                              :label => label,
+                              :filler => RNDK::Color[:reverse] | RNDK::Color[:white_blue] | ' '.ord,
+                              :field_width => 50,
+                              :start => 50,
+                              :mininum => 1,
+                              :maximum => 100,
+                              :increment => 1,
+                              :fast_increment => 2
+                            })
 
   if widget.nil?
     RNDK::Screen.finish

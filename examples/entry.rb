@@ -17,20 +17,15 @@ begin
   label = "</U/5>Oh yeah<!U!5>:"
 
   # Create the entry field widget.
-  entry = RNDK::Entry.new(screen,
-                          RNDK::CENTER,
-                          RNDK::CENTER,
-                          title,
-                          label,
-                          RNDK::Color[:normal],
-                          '.',
-                          :MIXED,   # behavior
-                          40,
-                          0,
-                          256,
-                          true,
-                          false)
-
+  entry = RNDK::Entry.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::CENTER,
+                            :title => title,
+                            :label => label,
+                            :field_width => 40,
+                            :min => 0,
+                            :max => 256
+                          })
   # Is the widget nil?
   if entry.nil?
     RNDK::Screen.finish
