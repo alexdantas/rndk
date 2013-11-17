@@ -104,7 +104,7 @@ module RNDK
       height           = 0
       title            = "viewer"
       buttons          = []
-      button_highlight = Ncurses::A_REVERSE
+      button_highlight = RNDK::Color[:reverse]
       box              = true
       shadow           = false
 
@@ -650,8 +650,8 @@ module RNDK
                                       :y => RNDK::CENTER,
                                       :title => '',
                                       :label => temp,
-                                      :field_color => RNDK::Color[:white_blue] | Ncurses::A_BOLD,
-                                      :filler => '.'.ord | RNDK::Color[:white_blue] | Ncurses::A_BOLD,
+                                      :field_color => RNDK::Color[:white_blue] | RNDK::Color[:bold],
+                                      :filler => '.'.ord | RNDK::Color[:white_blue] | RNDK::Color[:bold],
                                       :field_width => 10
                                     })
 
@@ -736,7 +736,7 @@ module RNDK
                                   :y => RNDK::CENTER,
                                   :title => '<C>Jump To Line',
                                   :label => '</5>Line :',
-                                  :field_color => Ncurses::A_BOLD,
+                                  :field_color => RNDK::Color[:bold],
                                   :field_width => @items_size.size + 1,
                                   :start => @current_top + 1,
                                   :high => @max_top_line + 1,

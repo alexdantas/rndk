@@ -324,7 +324,7 @@ module RNDK
     def draw(box=false)
       adj = 2 + (if @xtitle.nil? || @xtitle.size == 0 then 0 else 1 end)
       spacing = 0
-      attrib = ' '.ord | Ncurses::A_REVERSE
+      attrib = ' '.ord | RNDK::Color[:reverse]
 
       if box
         Draw.drawObjBox(@win, self)
@@ -351,7 +351,7 @@ module RNDK
       # Draw in the X axis title.
       if !(@xtitle.nil?) && @xtitle.size > 0
         Draw.writeChtype(@win, 0, @xtitle_pos, @xtitle, RNDK::VERTICAL, 0, @xtitle_len)
-        attrib = @xtitle[0] & Ncurses::A_ATTRIBUTES
+        attrib = @xtitle[0] & RNDK::Color[:extract]
       end
 
       # Draw in the X axis high value

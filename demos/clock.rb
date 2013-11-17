@@ -18,7 +18,12 @@ begin
   mesg = ['</1/B>HH:MM:SS']
 
   # Declare the labels.
-  label = RNDK::Label.new(screen, RNDK::CENTER, RNDK::CENTER, mesg, true, true)
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::CENTER,
+                            :text => mesg,
+                            :shadow => true
+                          })
 
   # Woops, something bad happened
   if label.nil?
@@ -47,10 +52,10 @@ begin
     mesg = [str]
 
     # Set the label contents
-    label.set(mesg, label.box)
+    label.set(:text => mesg)
 
     # Draw the label and sleep
-    label.draw(label.box)
+    label.draw
     Ncurses.napms(500)
   end
 

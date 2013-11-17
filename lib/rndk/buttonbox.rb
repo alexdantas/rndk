@@ -17,7 +17,7 @@ module RNDK
       buttons      = []
       button_rows         = 0
       button_cols         = 0
-      highlight    = Ncurses::A_REVERSE
+      highlight    = RNDK::Color[:reverse]
       box          = true
       shadow       = false
 
@@ -117,7 +117,7 @@ module RNDK
       @accepts_focus = true
       @input_window = @win
       @shadow = shadow
-      @button_color = Ncurses::A_NORMAL
+      @button_color = RNDK::Color[:normal]
 
       # Set up the row adjustment.
       if box_height - button_rows - @title_lines > 0

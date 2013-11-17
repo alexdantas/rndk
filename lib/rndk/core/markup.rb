@@ -170,7 +170,7 @@ module RNDK
       # The original code makes two passes since it has to pre-allocate space but
       # we should be able to make do with one since we can dynamically size it
       adjust = 0
-      attrib = Ncurses::A_NORMAL
+      attrib = RNDK::Color[:normal]
       last_char = 0
       start = 0
       used = 0
@@ -192,7 +192,7 @@ module RNDK
 
           # Pull out the bullet marker.
           while x < string.size and string[x] != R_MARKER
-            result << (string[x].ord | Ncurses::A_BOLD)
+            result << (string[x].ord | RNDK::Color[:bold])
             x += 1
           end
           adjust = 1
@@ -448,17 +448,17 @@ module RNDK
     mask << 0
     case string[from + 1]
     when 'B'
-      mask[0] = Ncurses::A_BOLD
+      mask[0] = RNDK::Color[:bold]
     when 'D'
-      mask[0] = Ncurses::A_DIM
+      mask[0] = RNDK::Color[:dim]
     when 'K'
-      mask[0] = Ncurses::A_BLINK
+      mask[0] = RNDK::Color[:blink]
     when 'R'
-      mask[0] = Ncurses::A_REVERSE
+      mask[0] = RNDK::Color[:reverse]
     when 'S'
-      mask[0] = Ncurses::A_STANDOUT
+      mask[0] = RNDK::Color[:standout]
     when 'U'
-      mask[0] = Ncurses::A_UNDERLINE
+      mask[0] = RNDK::Color[:underline]
     end
 
     if mask[0] != 0
@@ -494,19 +494,19 @@ module RNDK
   # Also, alignment markers and tabs are lost.
   def RNDK.decodeAttribute (string, from, oldattr, newattr)
     table = {
-      'B' => Ncurses::A_BOLD,
-      'D' => Ncurses::A_DIM,
-      'K' => Ncurses::A_BLINK,
-      'R' => Ncurses::A_REVERSE,
-      'S' => Ncurses::A_STANDOUT,
-      'U' => Ncurses::A_UNDERLINE
+      'B' => RNDK::Color[:bold],
+      'D' => RNDK::Color[:dim],
+      'K' => RNDK::Color[:blink],
+      'R' => RNDK::Color[:reverse],
+      'S' => RNDK::Color[:standout],
+      'U' => RNDK::Color[:underline]
     }
 
     result = if string.nil? then '' else string end
     base_len = result.size
-    tmpattr = oldattr & Ncurses::A_ATTRIBUTES
+    tmpattr = oldattr & RNDK::Color[:extract]
 
-    newattr &= Ncurses::A_ATTRIBUTES
+    newattr &= RNDK::Color[:extract]
     if tmpattr != newattr
       while tmpattr != newattr
         found = false

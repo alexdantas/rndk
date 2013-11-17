@@ -81,7 +81,7 @@ module RNDK
       label       = "label"
       items        = []
       filler_char = '.'
-      highlight   = Ncurses::A_REVERSE
+      highlight   = RNDK::Color[:reverse]
       box         = true
       shadow      = false
 

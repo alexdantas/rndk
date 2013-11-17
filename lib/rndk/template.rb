@@ -56,11 +56,11 @@ module RNDK
         overlay_len = []
         @overlay = RNDK.char2Chtype(overlay, overlay_len, [])
         @overlay_len = overlay_len[0]
-        @field_attr = @overlay[0] & Ncurses::A_ATTRIBUTES
+        @field_attr = @overlay[0] & RNDK::Color[:extract]
       else
         @overlay = []
         @overlay_len = 0
-        @field_attr = Ncurses::A_NORMAL
+        @field_attr = RNDK::Color[:normal]
       end
 
       # Set the box width.
@@ -440,7 +440,7 @@ module RNDK
         pos = 0
         (0...[@field_width, @plate.size].min).each do |x|
           if RNDK::Template.isPlateChar(@plate[x]) && pos < @info.size
-            field_color = @overlay[x] & Ncurses::A_ATTRIBUTES
+            field_color = @overlay[x] & RNDK::Color[:extract]
             Ncurses.mvwaddch(@field_win, 0, x, @info[pos].ord | field_color)
             pos += 1
           end

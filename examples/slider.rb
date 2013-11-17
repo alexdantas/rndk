@@ -19,7 +19,7 @@ begin
                             RNDK::CENTER,
                             title,
                             label,
-                            Ncurses::A_REVERSE | RNDK::Color[:white_blue] | ' '.ord,
+                            RNDK::Color[:reverse] | RNDK::Color[:white_blue] | ' '.ord,
                             50,
                             1,
                             1,

@@ -75,7 +75,7 @@ module RNDK
       y           = 0
       title       = "slider"
       label       = "label"
-      filler      = ' '.ord | Ncurses::A_REVERSE
+      filler      = ' '.ord | RNDK::Color[:reverse]
       field_width = 0
       start       = 0
       minimum     = 0
@@ -521,7 +521,7 @@ module RNDK
 
       # Draw the value in the field.
       Draw.writeCharAttrib(@field_win, @field_width, 0, @current.to_s,
-          Ncurses::A_NORMAL, RNDK::HORIZONTAL, 0, @current.to_s.size)
+          RNDK::Color[:normal], RNDK::HORIZONTAL, 0, @current.to_s.size)
 
       self.moveToEditPosition(@field_edit)
       Ncurses.wrefresh(@field_win)

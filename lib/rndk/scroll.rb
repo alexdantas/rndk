@@ -34,7 +34,7 @@ module RNDK
   # Ctrl-L::      Refreshes the screen.
   #
   class Scroll < Scroller
-    attr_reader :item, :items_size, :current_item, :highlight
+    attr_reader :item, :current_item, :highlight
 
     # Creates a Scroll Widget.
     #
@@ -62,8 +62,9 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :scroll
-      @supported_signals += [:before_input, :after_input]
-
+      @supported_signals += [:before_input,
+                             :after_input,
+                             :after_scrolling]
       x          = 0
       y          = 0
       scroll_bar = RNDK::RIGHT
@@ -72,7 +73,7 @@ module RNDK
       title      = "scroll"
       items      = []
       numbers    = false
-      highlight  = Ncurses::A_REVERSE
+      highlight  = RNDK::Color[:reverse]
       box        = true
       shadow     = false
 
@@ -276,19 +277,49 @@ module RNDK
 
         else
           case input
-          when Ncurses::KEY_UP    then self.scroll_up
-          when Ncurses::KEY_DOWN  then self.scroll_down
-          when Ncurses::KEY_LEFT  then self.scroll_left
-          when Ncurses::KEY_RIGHT then self.scroll_right
-          when Ncurses::KEY_PPAGE then self.scroll_page_up
-          when Ncurses::KEY_NPAGE then self.scroll_page_down
-          when Ncurses::KEY_HOME  then self.scroll_begin
-          when Ncurses::KEY_END   then self.scroll_end
-          when RNDK::BACKCHAR     then self.scroll_page_up
-          when RNDK::FORCHAR      then self.scroll_page_down
 
-          when '$'                then @left_char = @max_left_char
-          when '|'                then @left_char = 0
+          when Ncurses::KEY_UP
+            self.scroll_up
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_DOWN
+            self.scroll_down
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_LEFT
+            self.scroll_left
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_RIGHT
+            self.scroll_right
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_PPAGE
+            self.scroll_page_up
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_NPAGE
+            self.scroll_page_down
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_HOME
+            self.scroll_begin
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when Ncurses::KEY_END
+            self.scroll_end
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when RNDK::BACKCHAR
+            self.scroll_page_up
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when RNDK::FORCHAR
+            self.scroll_page_down
+            run_signal_binding(:after_scrolling, @current_item)
+
+          when '$' then @left_char = @max_left_char
+          when '|' then @left_char = 0
 
           when RNDK::KEY_ESC
             self.set_exit_type(input)
@@ -391,7 +422,7 @@ module RNDK
         Draw.writeBlanks(@win, 1, x, RNDK::HORIZONTAL, 0, @box_width - 2);
       end
 
-      self.set_view_size(items_size)
+      self.set_view_size(items.size)
       self.set_position(0)
       self.erase
 
@@ -603,7 +634,7 @@ module RNDK
             source = source[0...k] + source[k+1..-1]
           end
 
-          target[k] &= Ncurses::A_ATTRIBUTES
+          target[k] &= RNDK::Color[:extract]
           target[k] |= source[k].ord
           k += 1
         end
@@ -685,7 +716,7 @@ module RNDK
           Ncurses.mvwvline(@scrollbar_win,
                            @toggle_pos,
                            0,
-                           ' '.ord | Ncurses::A_REVERSE,
+                           ' '.ord | RNDK::Color[:reverse],
                            @toggle_size)
         end
       end
@@ -714,7 +745,7 @@ module RNDK
       screen_pos = @item_pos[@current_item] - @left_char
       highlight = if self.has_focus
                   then @highlight
-                  else Ncurses::A_NORMAL
+                  else RNDK::Color[:normal]
                   end
 
       Draw.writeChtypeAttrib(@items_win,

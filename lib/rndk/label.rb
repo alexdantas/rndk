@@ -59,29 +59,29 @@ module RNDK
       self.set_box box
       box_height = rows + 2*@border_size
 
-      @info = []
-      @info_len = []
-      @info_pos = []
+      @text = []
+      @text_len = []
+      @text_pos = []
 
       # Determine the box width.
       (0...rows).each do |x|
 
         # Translate the string to a chtype array
-        info_len = []
-        info_pos = []
-        @info << RNDK.char2Chtype(text[x], info_len, info_pos)
-        @info_len << info_len[0]
-        @info_pos << info_pos[0]
+        text_len = []
+        text_pos = []
+        @text << RNDK.char2Chtype(text[x], text_len, text_pos)
+        @text_len << text_len[0]
+        @text_pos << text_pos[0]
 
-        box_width = [box_width, @info_len[x]].max
+        box_width = [box_width, @text_len[x]].max
       end
       box_width += 2 * @border_size
 
       # Create the string alignments.
       (0...rows).each do |x|
-        @info_pos[x] = RNDK.justifyString(box_width - 2*@border_size,
-                                          @info_len[x],
-                                          @info_pos[x])
+        @text_pos[x] = RNDK.justifyString(box_width - 2*@border_size,
+                                          @text_len[x],
+                                          @text_pos[x])
       end
 
       # Make sure we didn't extend beyond the dimensions of the window.
@@ -103,15 +103,15 @@ module RNDK
                                box_width,
                                y[0],
                                x[0])
-      @shadow_win = nil
-      @x = x[0]
-      @y = y[0]
-      @rows = rows
+      @shadow_win   = nil
+      @x            = x[0]
+      @y            = y[0]
+      @rows         = rows
       @box_width    = box_width
       @box_height   = box_height
       @input_window = @win
-      @has_focus = false
-      @shadow    = shadow
+      @has_focus    = false
+      @shadow       = shadow
 
       if @win.nil?
         self.destroy
@@ -140,7 +140,7 @@ module RNDK
     # Sets multiple attributes of the Widget.
     #
     # See Label#initialize.
-    def set(text, box)
+    def set(config)
       # This is UGLY ATTRIBUTESS HELL
       # But I don't have time to clean this up right now
       # (lots of widgets, you know)  :(
@@ -159,7 +159,7 @@ module RNDK
     end
 
     # Sets the contents of the Label Widget.
-    # @note `info` is an Array of Strings.
+    # @note `text` is an Array of Strings.
     def set_message text
       return if text.class != Array or text.empty?
 
@@ -196,7 +196,7 @@ module RNDK
 
     # Returns current contents of the Widget.
     def get_message
-      @info
+      @text
     end
 
     # Sets the background attribute/color of the widget.
@@ -218,12 +218,12 @@ module RNDK
       # Draw in the message.
       (0...@rows).each do |x|
         Draw.writeChtype(@win,
-                         @info_pos[x] + @border_size,
+                         @text_pos[x] + @border_size,
                          x + @border_size,
-                         @info[x],
+                         @text[x],
                          RNDK::HORIZONTAL,
                          0,
-                         @info_len[x])
+                         @text_len[x])
       end
 
       Ncurses.wrefresh @win

@@ -148,7 +148,7 @@ module RNDK
       day_color   = 0
       month_color = 0
       year_color  = 0
-      highlight    = Ncurses::A_REVERSE
+      highlight    = RNDK::Color[:reverse]
       box          = true
       shadow       = false
 
@@ -352,9 +352,9 @@ module RNDK
             self.decrementCalendarDay 7
           when Ncurses::KEY_DOWN,  RNDK::NEXT
             self.incrementCalendarDay 7
-          when Ncurses::KEY_LEFT,  RNDK::BACKINPUT
+          when Ncurses::KEY_LEFT,  RNDK::BACKCHAR
             self.decrementCalendarDay 1
-          when Ncurses::KEY_RIGHT, RNDK::FORINPUT
+          when Ncurses::KEY_RIGHT, RNDK::FORCHAR
             self.incrementCalendarDay 1
           when Ncurses::KEY_NPAGE then self.incrementCalendarMonth 1
           when Ncurses::KEY_PPAGE then self.decrementCalendarMonth 1
@@ -446,7 +446,7 @@ module RNDK
       day_color    = 0
       month_color  = 0
       year_color   = 0
-      highlight    = Ncurses::A_REVERSE
+      highlight    = RNDK::Color[:reverse]
       box          = false
       shadow       = false
 
@@ -469,7 +469,7 @@ module RNDK
       self.set_day_color(day_color)                if not day_color.zero?
       self.set_month_color(month_color)            if not month_color.zero?
       self.set_year_color(year_color)              if not year_color.zero?
-      self.set_highlight(highlight)                  if highlight != Ncurses::A_REVERSE
+      self.set_highlight(highlight)                  if highlight != RNDK::Color[:reverse]
       self.set_box(box)                              if box
       @box_width = self.set_title(title, @box_width) if title != "calendar"
     end
@@ -571,13 +571,13 @@ module RNDK
     end
 
     # Sets a marker on a specific date.
-    def setMarker(day, month, year, marker)
+    def set_marker(day, month, year, marker)
       year_index = Calendar.global_year_index(year)
       oldmarker = self.getMarker(day, month, year)
 
       # Check to see if a marker has not already been set
       if oldmarker != 0
-        self.setCalendarCell(day, month, year_index, oldmarker | Ncurses::A_BLINK)
+        self.setCalendarCell(day, month, year_index, oldmarker | RNDK::Color[:blink])
       else
         self.setCalendarCell(day, month, year_index, marker)
       end
@@ -590,7 +590,7 @@ module RNDK
       if @marker != 0
         result = self.getCalendarCell(day, month, year)
       end
-      return result
+      result
     end
 
     # Removes a marker from the Calendar.
@@ -626,10 +626,14 @@ module RNDK
     # Makes sure that the internal dates exist, capping
     # the values if too big/small.
     def normalize_date
+      max = 1900 + MAX_YEARS - 1
+      @year  = max if @year > max
+
       @year  = 1900 if @year  < 1900
       @month = 12   if @month > 12
       @month = 1    if @month < 1
       @day   = 1    if @day   < 1
+
 
       # Make sure the day given is within range of the month.
       month_length = Calendar.days_in_month(@year, @month)

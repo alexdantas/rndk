@@ -22,7 +22,7 @@ begin
                           RNDK::CENTER,
                           title,
                           label,
-                          Ncurses::A_NORMAL,
+                          RNDK::Color[:normal],
                           '.',
                           :MIXED,   # behavior
                           40,

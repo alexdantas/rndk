@@ -19,8 +19,13 @@
 #   page with `man lowercase_function_name`.
 #
 require 'ffi-ncurses'
-require 'scanf'
 
+# Shortcut to avoid typing FFI::NCurses all the time.
+# You can use it too!
+# It MUST come before `require 'rndk/core/draw'`
+Ncurses = FFI::NCurses
+
+require 'scanf'
 require 'rndk/core/draw'
 require 'rndk/core/color'
 require 'rndk/core/display'
@@ -30,9 +35,6 @@ require 'rndk/core/screen'
 require 'rndk/core/markup'
 require 'rndk/core/utils'
 
-# Shortcut to avoid typing FFI::NCurses all the time.
-# You can use it too!
-Ncurses = FFI::NCurses
 
 module RNDK
 

@@ -13,7 +13,7 @@ module RNDK
       y              = 0
       title          = "scale"
       label          = "label"
-      field_color    = Ncurses::A_NORMAL
+      field_color    = RNDK::Color[:normal]
       field_width    = 0
       start          = 0
       low            = 0

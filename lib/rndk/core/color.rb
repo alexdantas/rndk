@@ -22,16 +22,42 @@ module RNDK
   #     color = RNDK::Color[:default_background]
   #     color = RNDK::Color[:foreground]
   #
+  # Also, there are special color modifiers. They change how
+  # the color appears and can make some interesting effects:
+  #
+  # * RNDK::Color[:normal]
+  # * RNDK::Color[:bold]
+  # * RNDK::Color[:reverse]
+  # * RNDK::Color[:underline]
+  # * RNDK::Color[:blink]
+  # * RNDK::Color[:dim]
+  # * RNDK::Color[:invisible]
+  # * RNDK::Color[:standout]
+  #
+  # To apply them, "add" to the regular colors with the
+  # pipe ('|'):
+  #
+  #     color = RNDK::Color[:red] | RNDK::Color[:bold]
+  #
   # ## Examples
   #
-  #     wb  = Color[:white_black]
-  #     gm  = Color[:green_magenta]
-  #     red = Color[:red]
-  #     bl  = Color[:default_black]
+  #```
+  # wb  = Color[:white_black]
+  # gm  = Color[:green_magenta]
+  # red = Color[:red]
+  # bl  = Color[:default_black]
+  # x   = RNDK::Color[:blue_yellow] | RNDK::Color[:reverse] # guess what?
+  # y   = RNDK::Color[:cyan] | RNDK::Color[:invisible] # opps
+  #```
   #
   # ## Developer Notes
   #
-  # Color#init creates 80 color pairs.
+  # Color#init creates 80 color pairs. Neat!
+  #
+  # Also, to extract attributes from a chtype (mix between
+  # characters and ncurses colors) use
+  #
+  #     chtype & RNDK::Color[:extract]
   #
   module Color
 
@@ -42,6 +68,27 @@ module RNDK
     #
     # They're defined on Color#init.
     @@colors = {}
+
+    # These special attributes exist even if no color
+    # were initialized.
+    #
+    # They modify the way colors show on the screen.
+
+    @@attributes = {
+      :normal    => Ncurses::A_NORMAL,
+      :bold      => Ncurses::A_BOLD,
+      :reverse   => Ncurses::A_REVERSE,
+      :underline => Ncurses::A_UNDERLINE,
+      :blink     => Ncurses::A_BLINK,
+      :dim       => Ncurses::A_DIM,
+      :invisible => Ncurses::A_INVIS,
+      :standout  => Ncurses::A_STANDOUT,
+
+      # To extract attributes from a chtype (mix between
+      # characters and ncurses colors) use
+      # `chtype & RNDK::Color[:extract]
+      :extract   => Ncurses::A_ATTRIBUTES
+    }
 
     # Start support for colors, initializing all color pairs.
     def self.init
@@ -117,18 +164,21 @@ module RNDK
       Ncurses.has_colors
     end
 
-    # Access individual color pairs.
+    # Access individual color pairs or attributes.
     #
-    # If colors were not initialized, returns white foreground
-    # over default background.
+    # If colors were not initialized and user request colors,
+    # returns **white foreground over default background**.
     #
-    # @return Ncurses `COLOR_PAIR` over `label` color.
     def self.[] label
-      unless @@colors.include? label
-        return Ncurses.COLOR_PAIR(0)
-      end
+      if @@attributes.include? label
+        @@attributes[label]
 
-      Ncurses.COLOR_PAIR @@colors[label]
+      elsif @@colors.include? label
+        Ncurses.COLOR_PAIR @@colors[label]
+
+      else
+        Ncurses.COLOR_PAIR 0
+      end
     end
 
   end

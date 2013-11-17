@@ -290,7 +290,7 @@ module RNDK
         c = @item[current_item][x]
 
         if highlight
-          c = c.ord | Ncurses::A_REVERSE
+          c = c.ord | RNDK::Color[:reverse]
         end
 
         Ncurses.mvwaddch(@field_win, 0, x + @item_pos[current_item], c)

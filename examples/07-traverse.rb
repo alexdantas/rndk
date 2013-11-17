@@ -52,11 +52,10 @@ begin
   # On this case, we're showing the description of the
   # current item.
 
-  scroll_1.after_processing do
+  scroll_1.bind_signal(:after_scrolling) do |current|
 
-    desc = descriptions[scroll_1.current_item]
-
-    scroll_2.set_items(desc, false) # numbering
+    desc = descriptions[current]
+    scroll_2.set_items(desc, false) # numbering=false
     screen.refresh
   end
 

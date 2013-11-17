@@ -34,7 +34,7 @@ module RNDK
       @LRChar = Ncurses::ACS_LRCORNER
       @HZChar = Ncurses::ACS_HLINE
       @VTChar = Ncurses::ACS_VLINE
-      @BXAttr = Ncurses::A_NORMAL
+      @BXAttr = RNDK::Color[:normal]
 
       # set default exit-types
       @exit_type  = :NEVER_ACTIVATED
@@ -49,7 +49,7 @@ module RNDK
       @actions = {}
 
       @supported_signals = []
-      @supported_signals << :position << :destroy
+      @supported_signals << :destroy
     end
 
     # Makes `block` execute right before processing input
@@ -358,8 +358,6 @@ module RNDK
       beg_y = Ncurses.getbegy parent
       end_x = beg_x + Ncurses.getmaxx(@screen.window)
       end_y = beg_y + Ncurses.getmaxy(@screen.window)
-
-      self.run_actions :POSITIONING
 
       loop do
         key = self.getch

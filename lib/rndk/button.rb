@@ -197,7 +197,7 @@ module RNDK
         end
 
         if @has_focus
-          c = Ncurses::A_REVERSE | c
+          c = RNDK::Color[:reverse] | c
         end
 
         Ncurses.mvwaddch(@win, @border_size, i + @border_size, c)

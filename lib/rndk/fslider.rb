@@ -7,7 +7,7 @@ module RNDK
       y           = 0
       title       = "fslider"
       label       = "label"
-      filler      = ' '.ord | Ncurses::A_REVERSE
+      filler      = ' '.ord | RNDK::Color[:reverse]
       field_width = 0
       start       = 0
       low         = 0
@@ -63,7 +63,7 @@ module RNDK
                            @field_width,
                            0,
                            temp,
-                           Ncurses::A_NORMAL,
+                           RNDK::Color[:normal],
                            RNDK::HORIZONTAL,
                            0,
                            temp.size)

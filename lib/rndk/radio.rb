@@ -16,9 +16,9 @@ module RNDK
       height      = 0
       title       = "radio"
       items        = []
-      choice_char = '#'.ord | Ncurses::A_REVERSE
+      choice_char = '#'.ord | RNDK::Color[:reverse]
       default    = 0
-      highlight   = Ncurses::A_REVERSE
+      highlight   = RNDK::Color[:reverse]
       box         = true
       shadow      = false
 
@@ -338,7 +338,7 @@ module RNDK
         Ncurses.mvwvline(@scrollbar_win,
                          @toggle_pos,
                          0,
-                         ' '.ord | Ncurses::A_REVERSE,
+                         ' '.ord | RNDK::Color[:reverse],
                          @toggle_size)
       end
 

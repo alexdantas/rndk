@@ -46,14 +46,12 @@ begin
   # Create the entry field widget.
   entry = RNDK::Entry.new(screen, {
                             :x => RNDK::CENTER,
-                            :y => RNDK::CENTER,
+                            :y => RNDK::BOTTOM,
                             :label => label,
                             :title => title,
                             :field_width => 30
                           })
-  entry.when(:POSITIONING) do
-    puts 'lel'
-  end
+
   if entry.nil?
     screen.destroy
     RNDK::Screen.finish
@@ -62,8 +60,36 @@ begin
     exit 1
   end
 
+  # Create a label explaining the keybindings
+  help = ["</77>Keybindings",
+          "Up Arrow    Moves the widget up one row.",
+
+          "Down Arrow  Moves the widget down one row.",
+          "Left Arrow  Moves the widget left one column",
+          "Right Arrow Moves the widget right one column",
+          "1           Moves the widget down one row and left one column.",
+          "2           Moves the widget down one row.",
+          "3           Moves the widget down one row and right one column.",
+          "4           Moves the widget left one column.",
+          "5           Centers the widget both vertically and horizontally.",
+          "6           Moves the widget right one column",
+          "7           Moves the widget up one row and left one column.",
+          "8           Moves the widget up one row.",
+          "9           Moves the widget up one row and right one column.",
+          "t           Moves the widget to the top of the screen.",
+          "b           Moves the widget to the bottom of the screen.",
+          "l           Moves the widget to the left of the screen.",
+          "r           Moves the widget to the right of the screen.",
+          "c           Centers the widget between the left and right of the window.",
+          "C           Centers the widget between the top and bottom of the window.",
+          "Escape      Returns the widget to its original position.",
+          "Return      Exits the function and leaves the Widget where"]
+
+  label = RNDK::Label.new(screen, :text => help)
+  label.draw
+
   # Let the user move the widget around the window.
-  entry.draw(entry.box)
+  entry.draw
   entry.position
 
   # Activate the entry field.

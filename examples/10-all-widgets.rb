@@ -22,7 +22,7 @@ begin
   screen = RNDK::Screen.new
   RNDK::Color.init
 
-  RNDK::Label.new(screen, :text => ["<C></77>Lots of Widgets",
+  RNDK::Label.new(screen, :text => ["<C></66>Lots of Widgets",
                                     "</75>tab: <!75>circle  </75>F10: <!75>quit"])
 
   RNDK::Calendar.new(screen, {
@@ -33,7 +33,7 @@ begin
 
   RNDK::Entry.new(screen, {
                     :x => 24,
-                    :field_width => -43,
+                    :field_width => -44,
                     :title => "</77>entry",
                     :label => "</75>type me something "
                   })
@@ -50,7 +50,7 @@ begin
                      :x => 24,
                      :y => 8,
                      :text => "</77>dialog",
-                     :highlight => RNDK::Color[:cyan] | Ncurses::A_REVERSE,
+                     :highlight => RNDK::Color[:cyan] | RNDK::Color[:reverse],
                      :buttons => ["Press me", "No, press me!"]
                    })
 
@@ -108,7 +108,7 @@ begin
                      :x => 58,
                      :y => 22,
                      :start => 50,
-                     :filler => ' '.ord | RNDK::Color[:cyan] | Ncurses::A_REVERSE,
+                     :filler => ' '.ord | RNDK::Color[:cyan] | RNDK::Color[:reverse],
                      :title => "</77>slider",
                      :field_width => -58
                    })
@@ -149,7 +149,7 @@ begin
                         :buttons => ["one", "two", "three", "four"],
                         :button_rows => 2,
                         :button_cols => 2,
-                        :highlight => RNDK::Color[:blue] | Ncurses::A_REVERSE
+                        :highlight => RNDK::Color[:blue] | RNDK::Color[:reverse]
                       })
 
   screen.refresh

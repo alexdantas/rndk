@@ -29,36 +29,36 @@ begin
   # building label
   title = ["<C></77>#{feed.channel.title}",
            "</76>Press ESC to quit"]
-  label = RNDK::Label.new(screen,
-                          RNDK::CENTER,                 # x
-                          RNDK::TOP,                    # y
-                          title,                        # title
-                          true,                         # border?
-                          false)                        # shadow?
+
+  label = RNDK::Label.new(screen, {
+                            :x => RNDK::CENTER,
+                            :y => RNDK::TOP,
+                            :title => "</77>#{feed.channel.title}"
+                          })
 
   # will show the titles at scroll widget
   titles = []
   feed.items.each { |item| titles << item.title }
 
   # building scroll
-  scroll = RNDK::Scroll.new(screen,
-                            RNDK::CENTER,               # x
-                            4,                          # y
-                            RNDK::RIGHT,                # scroll bar
-                            RNDK::Screen.width/2,       # width
-                            RNDK::Screen.height/2 - 5,  # height
-                            "<C></77>Items",            # title
-                            titles,                     # items
-                            true,                       # numbers?
-                            RNDK::Color[:cyan],         # highlight
-                            true,                       # border?
-                            false)                      # shadow?
+  scroll = RNDK::Scroll.new(screen, {
+                              :x => RNDK::CENTER,
+                              :y => 4,
+                              :width => RNDK::Screen.width/2,
+                              :height => RNDK::Screen.height/2 - 5,
+                              :title => "<C></77>Items",
+                              :items => titles,
+                              :numbers => true,
+                              :highlight => RNDK::Color[:cyan],
+                            })
   screen.refresh
 
   loop do
     scroll.activate
 
+    # Scroll exited, thus the
     # user selected an item
+    # or pressed ESC to get out
     if scroll.exit_type == :NORMAL
 
       # Getting current item's content

@@ -20,10 +20,10 @@ begin
                                   :x => RNDK::CENTER,
                                   :y => RNDK::CENTER,
                                   :title => title,
-                                  :day_color => RNDK::Color[:red_black] | Ncurses::A_BOLD,
-                                  :month_color => RNDK::Color[:green_black] | Ncurses::A_BOLD,
-                                  :yeah_color => RNDK::Color[:yellow_black] | Ncurses::A_BOLD,
-                                  :highlight => RNDK::Color[:blue_black] | Ncurses::A_REVERSE,
+                                  :day_color => RNDK::Color[:red_black] | RNDK::Color[:bold],
+                                  :month_color => RNDK::Color[:green_black] | RNDK::Color[:bold],
+                                  :yeah_color => RNDK::Color[:yellow_black] | RNDK::Color[:bold],
+                                  :highlight => RNDK::Color[:blue_black] | RNDK::Color[:reverse],
                                 })
 
   if calendar.nil?
@@ -39,7 +39,7 @@ begin
 
   # This adds a marker ot the calendar.
   calendar.bind_key('m') do |widget_type, calendar, client_data, key|
-    calendar.setMarker(calendar.day, calendar.month, calendar.year)
+    calendar.set_marker(calendar.day, calendar.month, calendar.year)
     calendar.draw(calendar.box)
     return false
   end

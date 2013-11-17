@@ -122,7 +122,7 @@ module RNDK
       y            = 0
       title        = "entry"
       label        = "label"
-      field_color  = Ncurses::A_NORMAL
+      field_color  = RNDK::Color[:normal]
       filler       = '.'
       disp_type    = :MIXED
       field_width  = 0

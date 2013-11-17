@@ -18,7 +18,7 @@ module RNDK
       y         = 0
       text      = "dialog"
       buttons   = ["button"]
-      highlight = Ncurses::A_REVERSE
+      highlight = RNDK::Color[:reverse]
       separator = true
       box       = true
       shadow    = false

@@ -135,14 +135,14 @@ module RNDK
         y_hi = Ncurses.getmaxy(shadow_win) - 1
 
         # Draw the line on the bottom.
-        Ncurses.mvwhline(shadow_win, y_hi, 1, Ncurses::ACS_HLINE | Ncurses::A_DIM, x_hi)
+        Ncurses.mvwhline(shadow_win, y_hi, 1, Ncurses::ACS_HLINE | RNDK::Color[:dim], x_hi)
 
         # Draw the line on teh right.
-        Ncurses.mvwvline(shadow_win, 0, x_hi, Ncurses::ACS_VLINE | Ncurses::A_DIM, y_hi)
+        Ncurses.mvwvline(shadow_win, 0, x_hi, Ncurses::ACS_VLINE | RNDK::Color[:dim], y_hi)
 
-        Ncurses.mvwaddch(shadow_win, 0, x_hi, Ncurses::ACS_URCORNER | Ncurses::A_DIM)
-        Ncurses.mvwaddch(shadow_win, y_hi, 0, Ncurses::ACS_LLCORNER | Ncurses::A_DIM)
-        Ncurses.mvwaddch(shadow_win, y_hi, x_hi, Ncurses::ACS_LRCORNER | Ncurses::A_DIM)
+        Ncurses.mvwaddch(shadow_win, 0, x_hi, Ncurses::ACS_URCORNER | RNDK::Color[:dim])
+        Ncurses.mvwaddch(shadow_win, y_hi, 0, Ncurses::ACS_LLCORNER | RNDK::Color[:dim])
+        Ncurses.mvwaddch(shadow_win, y_hi, x_hi, Ncurses::ACS_LRCORNER | RNDK::Color[:dim])
         Ncurses.wrefresh shadow_win
       end
     end
@@ -160,7 +160,7 @@ module RNDK
 
     # This writes out a char string with no attributes
     def Draw.writeChar(window, xpos, ypos, string, align, start, endn)
-      Draw.writeCharAttrib(window, xpos, ypos, string, Ncurses::A_NORMAL,
+      Draw.writeCharAttrib(window, xpos, ypos, string, RNDK::Color[:normal],
           align, start, endn)
     end
 
@@ -186,7 +186,7 @@ module RNDK
 
     # This writes out a chtype string
     def Draw.writeChtype (window, xpos, ypos, string, align, start, endn)
-      Draw.writeChtypeAttrib(window, xpos, ypos, string, Ncurses::A_NORMAL,
+      Draw.writeChtypeAttrib(window, xpos, ypos, string, RNDK::Color[:normal],
           align, start, endn)
     end
 
