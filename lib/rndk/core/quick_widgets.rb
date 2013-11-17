@@ -18,7 +18,6 @@
 require 'rndk/label'
 require 'rndk/dialog'
 require 'rndk/viewer'
-require 'rndk/fselect'
 require 'rndk/entry'
 require 'rndk/scroll'
 
