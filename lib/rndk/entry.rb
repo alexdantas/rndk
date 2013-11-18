@@ -80,7 +80,7 @@ module RNDK
   # `:VIEWONLY`:: Uneditable field.
   #
   class Entry < Widget
-    attr_accessor :info, :left_char, :screen_col
+    attr_accessor :text, :left_char, :screen_col
     attr_reader :win, :box_height, :box_width, :max, :field_width
     attr_reader :min, :max
 
@@ -116,7 +116,8 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :entry
-      @supported_signals += [:before_input, :after_input]
+      @supported_signals += [:before_input, :after_input,
+                             :before_leaving, :after_leaving]
 
       x            = 0
       y            = 0
@@ -226,9 +227,9 @@ module RNDK
             xpos + horizontal_adjust + @border_size)
       end
 
-      # cleanChar (entry->info, max + 3, '\0');
-      @info = ''
-      @info_width = max + 3
+      # cleanChar (entry->text, max + 3, '\0');
+      @text = ''
+      @text_width = max + 3
 
       # Set up the rest of the structure.
       @screen = screen
@@ -237,7 +238,7 @@ module RNDK
       @field_color = field_color
       @field_width = field_width
       @filler = filler
-      @hidden = filler
+      @hidden = '*'
       @input_window = @field_win
       @accepts_focus = true
       @data_ptr = nil
@@ -252,26 +253,26 @@ module RNDK
       @callbackfn = lambda do |entry, character|
         plainchar = Display.filter_by_display_type(entry, character)
 
-        if plainchar == Ncurses::ERR || entry.info.size >= entry.max
+        if plainchar == Ncurses::ERR || entry.text.size >= entry.max
           RNDK.beep
         else
           # Update the screen and pointer
           if entry.screen_col != entry.field_width - 1
-            front = (entry.info[0...(entry.screen_col + entry.left_char)] or '')
-            back  = (entry.info[(entry.screen_col + entry.left_char)..-1] or '')
+            front = (entry.text[0...(entry.screen_col + entry.left_char)] or '')
+            back  = (entry.text[(entry.screen_col + entry.left_char)..-1] or '')
 
-            entry.info = front + plainchar.chr + back
+            entry.text = front + plainchar.chr + back
             entry.screen_col += 1
 
           else
             # Update the character pointer.
-            entry.info << plainchar
+            entry.text << plainchar
             # Do not update the pointer if it's the last character
-            entry.left_char += 1 if (entry.info.size < entry.max)
+            entry.left_char += 1 if (entry.text.size < entry.max)
           end
 
           # Update the entry field.
-          entry.drawField
+          entry.draw_field
         end
       end
 
@@ -324,9 +325,9 @@ module RNDK
         end
       end
 
-      # Make sure we return the correct info.
+      # Make sure we return the correct text.
       if @exit_type == :NORMAL
-        return @info
+        return @text
       else
         return 0
       end
@@ -342,7 +343,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Refresh the widget field.
-      self.drawField
+      self.draw_field
 
       # Check if there is a pre-process function to be called.
       keep_going = self.run_signal_binding(:before_input, input)
@@ -364,21 +365,21 @@ module RNDK
           when Ncurses::KEY_HOME
             @left_char = 0
             @screen_col = 0
-            self.drawField
+            self.draw_field
 
           when RNDK::TRANSPOSE
-            if curr_pos >= @info.size - 1
+            if curr_pos >= @text.size - 1
               RNDK.beep
             else
-              holder = @info[curr_pos]
-              @info[curr_pos] = @info[curr_pos + 1]
-              @info[curr_pos + 1] = holder
-              self.drawField
+              holder = @text[curr_pos]
+              @text[curr_pos] = @text[curr_pos + 1]
+              @text[curr_pos + 1] = holder
+              self.draw_field
             end
 
           when Ncurses::KEY_END
             self.setPositionToEnd
-            self.drawField
+            self.draw_field
 
           when Ncurses::KEY_LEFT
             if curr_pos <= 0
@@ -386,19 +387,19 @@ module RNDK
             elsif @screen_col == 0
               # Scroll left.
               @left_char -= 1
-              self.drawField
+              self.draw_field
             else
               @screen_col -= 1
               Ncurses.wmove(@field_win, 0, @screen_col)
             end
 
           when Ncurses::KEY_RIGHT
-            if curr_pos >= @info.size
+            if curr_pos >= @text.size
               RNDK.beep
             elsif @screen_col == @field_width - 1
               # Scroll to the right.
               @left_char += 1
-              self.drawField
+              self.draw_field
             else
               # Move right.
               @screen_col += 1
@@ -414,12 +415,12 @@ module RNDK
                 curr_pos -= 1
               end
 
-              if curr_pos >= 0 && @info.size > 0
-                if curr_pos < @info.size
-                  @info = @info[0...curr_pos] + @info[curr_pos+1..-1]
+              if curr_pos >= 0 && @text.size > 0
+                if curr_pos < @text.size
+                  @text = @text[0...curr_pos] + @text[curr_pos+1..-1]
                   success = true
                 elsif input == Ncurses::KEY_BACKSPACE
-                  @info = @info[0...-1]
+                  @text = @text[0...-1]
                   success = true
                 end
               end
@@ -432,7 +433,7 @@ module RNDK
                     @left_char -= 1
                   end
                 end
-                self.drawField
+                self.draw_field
               else
                 RNDK.beep
               end
@@ -442,23 +443,23 @@ module RNDK
             complete = true
 
           when RNDK::ERASE
-            if @info.size != 0
+            if @text.size != 0
               self.clean
-              self.drawField
+              self.draw_field
             end
 
           when RNDK::CUT
-            if @info.size != 0
-              @@g_paste_buffer = @info.clone
+            if @text.size != 0
+              @@g_paste_buffer = @text.clone
               self.clean
-              self.drawField
+              self.draw_field
             else
               RNDK.beep
             end
 
           when RNDK::COPY
-            if @info.size != 0
-              @@g_paste_buffer = @info.clone
+            if @text.size != 0
+              @@g_paste_buffer = @text.clone
             else
               RNDK.beep
             end
@@ -466,16 +467,21 @@ module RNDK
           when RNDK::PASTE
             if @@g_paste_buffer != 0
               self.set_text(@@g_paste_buffer)
-              self.drawField
+              self.draw_field
             else
               RNDK.beep
             end
 
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            if @info.size >= @min
-              self.set_exit_type(input)
-              ret = @info
-              complete = true
+            # Let's quit the widget
+            if @text.size >= @min
+              lets_go = self.run_signal_binding(:before_leaving)
+              if lets_go
+                self.run_signal_binding(:after_leaving)
+                self.set_exit_type(input)
+                ret = @text
+                complete = true
+              end
             else
               RNDK.beep
             end
@@ -490,6 +496,10 @@ module RNDK
           else
             @callbackfn.call(self, input)
           end
+        end
+
+        if complete
+
         end
 
         # Should we do a post-process?
@@ -515,7 +525,7 @@ module RNDK
     def clean
       width = @field_width
 
-      @info = ''
+      @text = ''
 
       # Clean the entry screen field.
       Ncurses.mvwhline(@field_win, 0, 0, @filler.ord, width)
@@ -532,10 +542,8 @@ module RNDK
     #
     # If `box` is true, it is drawn with a box.
     def draw
-      # Did we ask for a shadow?
       Draw.drawShadow @shadow_win unless @shadow_win.nil?
 
-      # Box the widget if asked.
       Draw.drawObjBox(@win, self) if @box
 
       self.draw_title @win
@@ -554,7 +562,7 @@ module RNDK
         Ncurses.wrefresh @label_win
       end
 
-      self.drawField
+      self.draw_field
     end
 
     # @see Widget#erase
@@ -596,12 +604,12 @@ module RNDK
     # Sets the current text on the entry field.
     def set_text new_value
       if new_value.nil?
-        @info = ''
+        @text = ''
 
         @left_char = 0
         @screen_col = 0
       else
-        @info = new_value.clone
+        @text = new_value.clone
 
         self.setPositionToEnd
       end
@@ -609,7 +617,7 @@ module RNDK
 
     # Returns the current text on the entry field.
     def get_text
-      return @info
+      return @text
     end
 
     # Sets the maximum length of the string that
@@ -662,14 +670,9 @@ module RNDK
     end
 
     # Sets the background attribute/color of the entry field.
-    #
-    # `cursor` tells if we hide the blinking cursor or not.
-    # See Ncurses#curs_set.
-    def set_highlight(highlight, cursor)
-      Ncurses.wbkgd(@field_win, highlight)
-      @field_color = highlight
-      Ncurses.curs_set cursor
-
+    def set_field_color field_color
+      Ncurses.wbkgd(@field_win, field_color)
+      @field_color = field_color
       # FIXME(original) - if (cursor) { move the cursor to this widget }
     end
 
@@ -698,20 +701,20 @@ module RNDK
 
     protected
 
-    def drawField
+    def draw_field
       # Draw in the filler characters.
       Ncurses.mvwhline(@field_win, 0, 0, @filler.ord, @field_width)
 
-      # If there is information in the field then draw it in.
-      if (not @info.nil?) and (@info.size > 0)
+      # If there is textrmation in the field then draw it in.
+      if (not @text.nil?) and (@text.size > 0)
         # Redraw the field.
         if Display.is_hidden_display_type(@disp_type)
-          (@left_char...@info.size).each do |x|
-            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @hidden)
+          (@left_char...@text.size).each do |x|
+            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @hidden.ord | @field_color)
           end
         else
-          (@left_char...@info.size).each do |x|
-            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @info[x].ord | @field_color)
+          (@left_char...@text.size).each do |x|
+            Ncurses.mvwaddch(@field_win, 0, x - @left_char, @text[x].ord | @field_color)
           end
         end
         Ncurses.wmove(@field_win, 0, @screen_col)
@@ -721,18 +724,18 @@ module RNDK
     end
 
     def setPositionToEnd
-      if @info.size >= @field_width
-        if @info.size < @max
+      if @text.size >= @field_width
+        if @text.size < @max
           char_count = @field_width - 1
-          @left_char = @info.size - char_count
+          @left_char = @text.size - char_count
           @screen_col = char_count
         else
-          @left_char = @info.size - @field_width
-          @screen_col = @info.size - 1
+          @left_char = @text.size - @field_width
+          @screen_col = @text.size - 1
         end
       else
         @left_char = 0
-        @screen_col = @info.size
+        @screen_col = @text.size
       end
     end
 

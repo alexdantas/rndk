@@ -48,8 +48,9 @@ module RNDK
       # Actions to be executed at certain signals
       @actions = {}
 
-      @supported_signals = []
-      @supported_signals << :destroy
+      @supported_signals = [:destroy,
+                            :before_leaving,
+                            :after_leaving]
     end
 
     # Makes `block` execute right before processing input
