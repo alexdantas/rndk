@@ -26,7 +26,7 @@ module RNDK
     #                       :label => "</77>button",
     #                     })
     #
-    # b.bind_signal(:pressed) do
+    # b.bind_signal(:after_pressing) do
     #   screen.popup_label "Button pressed"
     # end
     # ```
@@ -38,7 +38,7 @@ module RNDK
     def initialize(screen, config={})
       super()
       @widget_type = :button
-      @supported_signals += [:before_pressing, :pressed]
+      @supported_signals += [:before_pressing, :after_pressing]
 
       x        = 0
       y        = 0
@@ -332,7 +332,7 @@ module RNDK
           # AGHGW
 
           if keep_going
-            run_signal_binding(:pressed)
+            run_signal_binding(:after_pressing)
             focus
             set_exit_type(Ncurses::KEY_ENTER)
             ret = true

@@ -11,7 +11,7 @@ module RNDK
 
       x           = 0
       y           = 0
-      splace      = RNDK::RIGHT
+      scrollbar      = RNDK::RIGHT
       width       = 0
       height      = 0
       title       = "radio"
@@ -25,7 +25,7 @@ module RNDK
       config.each do |key, val|
         x           = val if key == :x
         y           = val if key == :y
-        splace      = val if key == :splace
+        scrollbar      = val if key == :scrollbar
         width       = val if key == :width
         height      = val if key == :height
         title       = val if key == :title
@@ -62,7 +62,7 @@ module RNDK
       end
 
       # Adjust the box width if there is a scroll bar.
-      if splace == RNDK::LEFT || splace == RNDK::RIGHT
+      if scrollbar == RNDK::LEFT || scrollbar == RNDK::RIGHT
         box_width += 1
         @scrollbar = true
       else
@@ -104,10 +104,10 @@ module RNDK
       Ncurses.keypad(@win, true)
 
       # Create the scrollbar window.
-      if splace == RNDK::RIGHT
+      if scrollbar == RNDK::RIGHT
         @scrollbar_win = Ncurses.subwin(@win, self.max_view_size, 1,
             self.Screen_YPOS(ypos), xpos + @box_width - @border_size - 1)
-      elsif splace == RNDK::LEFT
+      elsif scrollbar == RNDK::LEFT
         @scrollbar_win = Ncurses.subwin(@win, self.max_view_size, 1,
             self.Screen_YPOS(ypos), self.Screen_XPOS(xpos))
       else
@@ -117,7 +117,7 @@ module RNDK
       # Set the rest of the variables
       @screen = screen
       @parent = screen.window
-      @scrollbar_placement = splace
+      @scrollbar_placement = scrollbar
       @widest_item = widest_item
       @left_char = 0
       @selected_item = 0
@@ -149,7 +149,7 @@ module RNDK
     end
 
     # Put the cursor on the currently-selected item.
-    def fixCursorPosition
+    def fix_cursor_position
       scrollbar_adj = if @scrollbar_placement == RNDK::LEFT then 1 else 0 end
       ypos = self.Screen_YPOS(@current_item - @current_top)
       xpos = self.Screen_XPOS(0) + scrollbar_adj
@@ -165,7 +165,7 @@ module RNDK
 
       if actions.nil? || actions.size == 0
         while true
-          self.fixCursorPosition
+          self.fix_cursor_position
           input = self.getch
 
           # Inject the character into the widget.
@@ -253,7 +253,7 @@ module RNDK
         self.set_exit_type(0)
       end
 
-      self.fixCursorPosition
+      self.fix_cursor_position
       @return_data = ret
       return ret
     end
@@ -342,12 +342,8 @@ module RNDK
                          @toggle_size)
       end
 
-      # Box it if needed.
-      if box
-        draw_box @win
-      end
-
-      self.fixCursorPosition
+      draw_box @win if @box
+      fix_cursor_position
     end
 
     # This sets the background attribute of the widget.
@@ -356,14 +352,14 @@ module RNDK
       Ncurses.wbkgd(@scrollbar_win, attrib) unless @scrollbar_win.nil?
     end
 
-    def destroyInfo
+    def destroy_info
       @item = ''
     end
 
     # This function destroys the radio widget.
     def destroy
       self.clean_title
-      self.destroyInfo
+      self.destroy_info
 
       # Clean up the windows.
       RNDK.window_delete(@scrollbar_win)
@@ -510,7 +506,7 @@ module RNDK
           widest_item = [widest_item, new_len[j]].max
         end
         if status
-          self.destroyInfo
+          self.destroy_info
           @item = new_items
           @item_len = new_len
           @item_pos = new_pos

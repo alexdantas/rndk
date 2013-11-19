@@ -534,7 +534,6 @@ module RNDK
       @screen_col = 0
       @left_char = 0
 
-      # Refresh the entry field.
       Ncurses.wrefresh @field_win
     end
 

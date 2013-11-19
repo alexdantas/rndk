@@ -5,6 +5,8 @@ require 'rndk/label'
 require 'rndk/entry'
 require 'rndk/button'
 require 'rndk/template'
+require 'rndk/radio'
+require 'rndk/itemlist'
 
 class Layout < RNDK::Screen
 
@@ -12,12 +14,13 @@ class Layout < RNDK::Screen
     super
     RNDK::Color.init
 
+    # First we create the widgets, then we bind their actions
     y = 0
     @title = RNDK::Label.new(self,
                              :text => "</77>Sign Up",
                              :y => y,
                              :box => false)
-    y += 1
+    y += 2
 
     @name = RNDK::Entry.new(self,
                             :y => y,
@@ -62,17 +65,34 @@ class Layout < RNDK::Screen
                                :box => false)
     y += 2
 
+    items = ["Option 1",
+             "Option 2",
+             "Option 3",
+             "Option 4"]
     @radio = RNDK::Radio.new(self,
                              :y => y,
+                             :width => 33,
+                             :height => 4,
+                             :items => items,
+                             :box => false)
+    y += 6
 
+    @sex = RNDK::Itemlist.new(self,
+                              :y => y,
+                              :title => '',
+                              :label => "Sex      ",
+                              :items => ["Male", "Female", "Other"],
+                              :box => false)
+    y += 2
 
     @clear = RNDK::Button.new(self,
                               :y => y,
                               :label => "Clear")
 
-    @clear.bind_signal(:pressed) do
-      [@name, @user, @pass1, @pass2].each { |w| w.clean }
-    end
+    @save = RNDK::Button.new(self,
+                             :x => 33,
+                             :y => y,
+                             :label => "Save")
 
     @pass2.bind_signal(:after_leaving) do
       if not @pass2.empty?
@@ -83,10 +103,24 @@ class Layout < RNDK::Screen
       end
     end
 
-    @save = RNDK::Button.new(self,
-                             :x => 33,
-                             :y => y,
-                             :label => "Save")
+    @clear.bind_signal(:after_pressing) do
+      [@name, @user, @pass1, @pass2, @date].each { |w| w.clean }
+    end
+
+    @save.bind_signal(:before_pressing) do
+      keep_going = true
+      [@name, @user, @pass1, @pass2, @date].each do |w|
+        keep_going = false if w.empty?
+      end
+
+      keep_going
+    end
+
+    @save.bind_signal(:after_pressing) do
+      self.popup_label "HELL YEAH"
+      self.refresh
+    end
+
   end
 
   def run
@@ -104,5 +138,13 @@ begin
 
   layout.run
   layout.end
+
+# In case something goes wrong
+rescue Exception => e
+  RNDK::Screen.finish
+
+  puts e
+  puts e.inspect
+  puts e.backtrace
 end
 

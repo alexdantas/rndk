@@ -108,9 +108,9 @@ module RNDK
             xpos + @label_len + horizontal_adjust + @border_size)
       Ncurses.keypad(@field_win, true)
 
-      # Set up the info field.
+      # Set up the text field.
       @plate_len = plate.size
-      @info = ''
+      @text = ''
       # Copy the plate to the template
       @plate = plate.clone
 
@@ -123,7 +123,7 @@ module RNDK
       @box_width = box_width
       @plate_pos = 0
       @screen_pos = 0
-      @info_pos = 0
+      @text_pos = 0
       @min = 0
       @input_window = @win
       @accepts_focus = true
@@ -133,8 +133,8 @@ module RNDK
         change = false
         moveby = false
         amount = 0
-        mark = @info_pos
-        have = @info.size
+        mark = @text_pos
+        have = @text.size
 
         if input == Ncurses::KEY_LEFT
           if mark != 0
@@ -144,18 +144,18 @@ module RNDK
             failed = true
           end
         elsif input == Ncurses::KEY_RIGHT
-          if mark < @info.size
+          if mark < @text.size
             moveby = true
             amount = 1
           else
             failed = true
           end
         else
-          test = @info.clone
+          test = @text.clone
           if input == Ncurses::KEY_BACKSPACE
             if mark != 0
-              front = @info[0...mark-1] || ''
-              back = @info[mark..-1] || ''
+              front = @text[0...mark-1] || ''
+              back = @text[mark..-1] || ''
               test = front + back
               change = true
               amount = -1
@@ -163,9 +163,9 @@ module RNDK
               failed = true
             end
           elsif input == Ncurses::KEY_DC
-            if mark < @info.size
-              front = @info[0...mark] || ''
-              back = @info[mark+1..-1] || ''
+            if mark < @text.size
+              front = @text[0...mark] || ''
+              back = @text[mark+1..-1] || ''
               test = front + back
               change = true
               amount = 0
@@ -182,7 +182,7 @@ module RNDK
 
           if change
             if self.valid_template? test
-              @info = test
+              @text = test
               self.draw_field
             else
               failed = true
@@ -193,7 +193,7 @@ module RNDK
         if failed
           RNDK.beep
         elsif change || moveby
-          @info_pos += amount
+          @text_pos += amount
           @plate_pos += amount
           @screen_pos += amount
 
@@ -262,27 +262,27 @@ module RNDK
         else
           case input
           when RNDK::ERASE
-            if @info.size > 0
-              self.clean
+            if @text.size > 0
+              clean
               self.draw_field
             end
           when RNDK::CUT
-            if @info.size > 0
-              @@g_paste_buffer = @info.clone
-              self.clean
+            if @text.size > 0
+              @@g_paste_buffer = @text.clone
+              clean
               self.draw_field
             else
               RNDK.beep
             end
           when RNDK::COPY
-            if @info.size > 0
-              @@g_paste_buffer = @info.clone
+            if @text.size > 0
+              @@g_paste_buffer = @text.clone
             else
               RNDK.beep
             end
           when RNDK::PASTE
             if @@g_paste_buffer.size > 0
-              self.clean
+              clean
 
               # Start inserting each character one at a time.
               (0...@@g_paste_buffer.size).each do |x|
@@ -293,11 +293,11 @@ module RNDK
               RNDK.beep
             end
           when RNDK::KEY_TAB, RNDK::KEY_RETURN, Ncurses::KEY_ENTER
-            if @info.size < @min
+            if @text.size < @min
               RNDK.beep
             else
               self.set_exit_type(input)
-              ret = @info
+              ret = @text
               complete = true
             end
           when RNDK::KEY_ESC
@@ -357,17 +357,17 @@ module RNDK
       return true
     end
 
-    # Return a mixture of the plate-overlay and field-info
+    # Return a mixture of the plate-overlay and field-text
     def mix
       mixed_string = ''
       plate_pos = 0
-      info_pos = 0
+      text_pos = 0
 
-      if @info.size > 0
+      if @text.size > 0
         mixed_string = ''
-        while plate_pos < @plate_len && info_pos < @info.size
+        while plate_pos < @plate_len && text_pos < @text.size
           mixed_string << if RNDK::Template.isPlateChar(@plate[plate_pos])
-                          then info_pos += 1; @info[info_pos - 1]
+                          then text_pos += 1; @text[text_pos - 1]
                           else @plate[plate_pos]
                           end
           plate_pos += 1
@@ -377,14 +377,14 @@ module RNDK
       return mixed_string
     end
 
-    # Return the field_info from the mixed string.
-    def unmix(info)
+    # Return the field_text from the mixed string.
+    def unmix(text)
       pos = 0
       unmixed_string = ''
 
-      while pos < @info.size
+      while pos < @text.size
         if RNDK::Template.isPlateChar(@plate[pos])
-          unmixed_string << info[pos]
+          unmixed_string << text[pos]
         end
         pos += 1
       end
@@ -431,12 +431,12 @@ module RNDK
       end
 
       # Adjust the cursor.
-      if @info.size > 0
+      if @text.size > 0
         pos = 0
         (0...[@field_width, @plate.size].min).each do |x|
-          if RNDK::Template.isPlateChar(@plate[x]) && pos < @info.size
+          if RNDK::Template.isPlateChar(@plate[x]) && pos < @text.size
             field_color = @overlay[x] & RNDK::Color[:extract]
-            Ncurses.mvwaddch(@field_win, 0, x, @info[pos].ord | field_color)
+            Ncurses.mvwaddch(@field_win, 0, x, @text[pos].ord | field_color)
             pos += 1
           end
         end
@@ -467,7 +467,7 @@ module RNDK
 
     # Destroy this widget.
     def destroy
-      self.clean_title
+      clean_title
 
       # Delete the windows
       RNDK.window_delete(@field_win)
@@ -476,7 +476,7 @@ module RNDK
       RNDK.window_delete(@win)
 
       # Clean the key bindings.
-      self.clean_bindings
+      clean_bindings
 
       @screen.unregister self
     end
@@ -503,14 +503,14 @@ module RNDK
 
       # Just to be sure, let's make sure the new value isn't nil
       if new_value.nil?
-        self.clean
+        clean
         return
       end
 
       # Determine how many characters we need to copy.
       copychars = [@new_value.size, @field_width, @plate.size].min
 
-      @info = new_value[0...copychars]
+      @text = new_value[0...copychars]
 
       # Use the function which handles the input of the characters.
       (0...new_value.size).each do |x|
@@ -519,7 +519,7 @@ module RNDK
     end
 
     def getValue
-      return @info
+      return @text
     end
 
     # Set the minimum number of characters to enter into the widget.
@@ -533,12 +533,18 @@ module RNDK
       return @min
     end
 
-    # Erase the information in the template widget.
+    # Erase the textrmation in the template widget.
     def clean
-      @info = ''
+      @text = ''
       @screen_pos = 0
-      @info_pos = 0
+      @text_pos = 0
       @plaste_pos = 0
+
+      draw
+    end
+
+    def empty?
+      @text.empty?
     end
 
     # Set the callback function for the widget.
