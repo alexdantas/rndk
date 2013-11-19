@@ -763,7 +763,7 @@ module RNDK
 
       # Box it if it was asked for.
       if @box
-        Draw.drawObjBox(@win, self)
+        draw_box @win
         Ncurses.wrefresh @win
       end
 
@@ -900,7 +900,7 @@ module RNDK
 
       # Box it if we have to.
       if @box
-        Draw.drawObjBox(@win, self)
+        draw_box @win
         Ncurses.wrefresh @win
       end
 

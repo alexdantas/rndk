@@ -337,11 +337,11 @@ module RNDK
       self.set_box box
     end
 
-    # This function sets the information inside the alphaitems.
+    # This function sets the textrmation inside the alphaitems.
     def set_contents items
       return if not self.create_items items
 
-      # Set the information in the scrolling items.
+      # Set the textrmation in the scrolling items.
       @scroll_field.set(@items, @items_size, false,
           @scroll_field.highlight, @scroll_field.box)
 
@@ -429,14 +429,14 @@ module RNDK
       @scroll_field.set_bg_color(attrib)
     end
 
-    def destroyInfo
+    def destroyText
       @items = ''
       @items_size = 0
     end
 
     # This destroys the alpha items
     def destroy
-      self.destroyInfo
+      self.destroyText
 
       # Clean the key bindings.
       self.clean_bindings
@@ -461,7 +461,7 @@ module RNDK
       if items.size >= 0
         newitems = []
 
-        # Copy in the new information.
+        # Copy in the new textrmation.
         status = true
         (0...items.size).each do |x|
           newitems << items[x]
@@ -471,13 +471,13 @@ module RNDK
           end
         end
         if status
-          self.destroyInfo
+          self.destroyText
           @items_size = items.size
           @items = newitems
           @items.sort!
         end
       else
-        self.destroyInfo
+        self.destroyText
         status = true
       end
       status
@@ -528,13 +528,13 @@ module RNDK
       ret = 0
       alt_words = []
 
-      if entry.info.size == 0
+      if entry.text.size == 0
         RNDK.beep
         return true
       end
 
       # Look for a unique word match.
-      index = RNDK.search_list(self.items, self.items.size, entry.info)
+      index = RNDK.search_list(self.items, self.items.size, entry.text)
 
       # if the index is less than zero, return we didn't find a match
       if index < 0
@@ -550,8 +550,8 @@ module RNDK
       end
 
       # Ok, we found a match, is the next item similar?
-      len = [entry.info.size, self.items[index + 1].size].min
-      ret = self.items[index + 1][0...len] <=> entry.info
+      len = [entry.text.size, self.items[index + 1].size].min
+      ret = self.items[index + 1][0...len] <=> entry.text
       if ret == 0
         current_index = index
         match = 0
@@ -560,7 +560,7 @@ module RNDK
         # Start looking for alternate words
         # FIXME(original): bsearch would be more suitable.
         while (current_index < self.items.size) and
-            ((self.items[current_index][0...len] <=> entry.info) == 0)
+            ((self.items[current_index][0...len] <=> entry.text) == 0)
           alt_words << self.items[current_index]
           current_index += 1
         end
@@ -620,7 +620,7 @@ module RNDK
     def pre_process_entry_field(input)
       scrollp = self.scroll_field
       entry = self.entry_field
-      info_len = entry.info.size
+      text_len = entry.text.size
       result = 1
       empty = false
 
@@ -633,7 +633,7 @@ module RNDK
 
         index = 0
         curr_pos = entry.screen_col + entry.left_char
-        pattern = entry.info.clone
+        pattern = entry.text.clone
 
         if [Ncurses::KEY_BACKSPACE, Ncurses::KEY_DC].include? input
 

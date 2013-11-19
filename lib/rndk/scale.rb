@@ -405,7 +405,7 @@ module RNDK
     def draw
       Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       self.draw_title @win
 

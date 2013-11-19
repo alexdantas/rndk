@@ -4,7 +4,7 @@ module RNDK
   module Draw
 
     # This prints out a box around a window with attributes
-    def Draw.boxWindow(window, attr)
+    def Draw.window_box(window, attr)
       tlx = 0
       tly = 0
       brx = Ncurses.getmaxx(window) - 1
@@ -28,7 +28,7 @@ module RNDK
 
     # This draws a box with attributes and lets the user define each
     # element of the box
-    def Draw.attrbox(win, tlc, trc, blc, brc, horz, vert, attr)
+    def Draw.window_box_set(win, tlc, trc, blc, brc, horz, vert, attr)
       x1 = 0
       y1 = 0
       y2 = Ncurses.getmaxy(win) - 1
@@ -69,14 +69,6 @@ module RNDK
       if count != 0
         Ncurses.wrefresh win
       end
-    end
-
-    # Draw a box around the given window using the widget's defined
-    # line-drawing characters
-    def Draw.drawObjBox(win, widget)
-      Draw.attrbox(win,
-          widget.ULChar, widget.URChar, widget.LLChar, widget.LRChar,
-          widget.HZChar, widget.VTChar, widget.BXAttr)
     end
 
     # This draws a line on the given window. (odd angle lines not working yet)

@@ -266,7 +266,7 @@ module RNDK
       end
 
       # Box the widget if they asked.
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       # Draw in the message.
       (0...@message_rows).each do |x|

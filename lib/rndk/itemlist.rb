@@ -259,7 +259,7 @@ module RNDK
       end
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       Ncurses.wrefresh @win
 

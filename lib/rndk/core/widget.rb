@@ -564,7 +564,16 @@ module RNDK
         end
       end
 
-      return result
+      result
+    end
+
+    # Draw a box around the given window using the widget's defined
+    # line-drawing characters
+    def draw_box win
+
+      Draw.window_box_set(win,
+          self.ULChar, self.URChar, self.LLChar, self.LRChar,
+          self.HZChar, self.VTChar, self.BXAttr)
     end
 
   end

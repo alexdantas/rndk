@@ -212,7 +212,7 @@ module RNDK
       end
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       self.draw_label
       Ncurses.wrefresh @win
@@ -332,8 +332,9 @@ module RNDK
           # AGHGW
 
           if keep_going
-            self.run_signal_binding(:pressed)
-            self.set_exit_type(Ncurses::KEY_ENTER)
+            run_signal_binding(:pressed)
+            focus
+            set_exit_type(Ncurses::KEY_ENTER)
             ret = true
             complete = true
           end

@@ -327,7 +327,7 @@ module RNDK
       attrib = ' '.ord | RNDK::Color[:reverse]
 
       if box
-        Draw.drawObjBox(@win, self)
+        draw_box @win
       end
 
       # Draw in the vertical axis

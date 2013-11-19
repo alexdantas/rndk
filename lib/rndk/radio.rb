@@ -344,7 +344,7 @@ module RNDK
 
       # Box it if needed.
       if box
-        Draw.drawObjBox(@win, self)
+        draw_box @win
       end
 
       self.fixCursorPosition

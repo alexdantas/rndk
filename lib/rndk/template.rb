@@ -27,8 +27,8 @@ module RNDK
         shadow  = val if key == :shadow
       end
 
-      parent_width  = Ncurses.getmaxx(screen.window)
-      parent_height = Ncurses.getmaxy(screen.window)
+      parent_width  = Ncurses.getmaxx screen.window
+      parent_height = Ncurses.getmaxy screen.window
       box_width = 0
       box_height = if box then 3 else 1 end
       plate_len = 0
@@ -183,7 +183,7 @@ module RNDK
           if change
             if self.valid_template? test
               @info = test
-              self.drawField
+              self.draw_field
             else
               failed = true
             end
@@ -197,7 +197,7 @@ module RNDK
           @plate_pos += amount
           @screen_pos += amount
 
-          self.adjustCursor(amount)
+          self.adjust_cursor(amount)
         end
       end
 
@@ -248,7 +248,7 @@ module RNDK
       self.set_exit_type(0)
 
       # Move the cursor.
-      self.drawField
+      self.draw_field
 
       # Check if there is a pre-process function to be called.
       keep_going = self.run_signal_binding(:before_input, input)
@@ -264,13 +264,13 @@ module RNDK
           when RNDK::ERASE
             if @info.size > 0
               self.clean
-              self.drawField
+              self.draw_field
             end
           when RNDK::CUT
             if @info.size > 0
               @@g_paste_buffer = @info.clone
               self.clean
-              self.drawField
+              self.draw_field
             else
               RNDK.beep
             end
@@ -288,7 +288,7 @@ module RNDK
               (0...@@g_paste_buffer.size).each do |x|
                 @callbackfn.call(self, @@g_paste_buffer[x])
               end
-              self.drawField
+              self.draw_field
             else
               RNDK.beep
             end
@@ -400,26 +400,21 @@ module RNDK
     end
 
     # Draw the template widget.
-    def draw(box)
+    def draw
       # Do we need to draw the shadow.
       unless @shadow_win.nil?
         Draw.drawShadow(@shadow_win)
       end
 
-      # Box it if needed
-      if box
-        Draw.drawObjBox(@win, self)
-      end
-
+      draw_box @win if @box
       self.draw_title(@win)
-
       Ncurses.wrefresh @win
 
-      self.drawField
+      self.draw_field
     end
 
     # Draw the template field
-    def drawField
+    def draw_field
       field_color = 0
 
       # Draw in the label and the template widget.
@@ -447,13 +442,13 @@ module RNDK
         end
         Ncurses.wmove(@field_win, 0, @screen_pos)
       else
-        self.adjustCursor(1)
+        self.adjust_cursor(1)
       end
       Ncurses.wrefresh @field_win
     end
 
     # Adjust the cursor for the template
-    def adjustCursor(direction)
+    def adjust_cursor(direction)
       while @plate_pos < [@field_width, @plate.size].min &&
           !RNDK::Template.isPlateChar(@plate[@plate_pos])
         @plate_pos += direction

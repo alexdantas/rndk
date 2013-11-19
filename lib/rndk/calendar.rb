@@ -409,7 +409,7 @@ module RNDK
       Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
 
       # Box the widget if asked.
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       self.draw_title @win
 

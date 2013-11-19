@@ -721,7 +721,7 @@ module RNDK
         end
       end
 
-      Draw.drawObjBox(@win, self) if box
+      draw_box @win if @box
       Ncurses.wrefresh @win
     end
 

@@ -544,7 +544,7 @@ module RNDK
     def draw
       Draw.drawShadow @shadow_win unless @shadow_win.nil?
 
-      Draw.drawObjBox(@win, self) if @box
+      draw_box @win if @box
 
       self.draw_title @win
       Ncurses.wrefresh @win
@@ -697,6 +697,10 @@ module RNDK
     #       you shouldn't need this.
     def setCB(callback)
       @callbackfn = callback
+    end
+
+    def empty?
+      @text.empty?
     end
 
     protected
