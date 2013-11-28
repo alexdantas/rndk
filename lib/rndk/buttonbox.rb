@@ -2,37 +2,36 @@ require 'rndk'
 
 module RNDK
   class Buttonbox < Widget
-    attr_reader :current_button
 
     def initialize(screen, config={})
       super()
       @widget_type = :buttonbox
       @supported_signals += [:before_pressing, :pressed]
 
-      x            = 0
-      y            = 0
-      width        = 0
-      height       = 0
-      title        = "buttonbox"
-      buttons      = []
-      button_rows         = 0
-      button_cols         = 0
-      highlight    = RNDK::Color[:reverse]
-      box          = true
-      shadow       = false
+      x           = 0
+      y           = 0
+      width       = 0
+      height      = 0
+      title       = "buttonbox"
+      buttons     = []
+      button_rows = 1
+      button_cols = 1
+      highlight   = RNDK::Color[:reverse]
+      box         = true
+      shadow      = false
 
       config.each do |key, val|
-        x            = val if key == :x
-        y            = val if key == :y
-        width        = val if key == :width
-        height       = val if key == :height
-        title        = val if key == :title
-        button_rows         = val if key == :button_rows
-        button_cols         = val if key == :button_cols
-        buttons      = val if key == :buttons
-        highlight    = val if key == :highlight
-        box          = val if key == :box
-        shadow       = val if key == :shadow
+        x           = val if key == :x
+        y           = val if key == :y
+        width       = val if key == :width
+        height      = val if key == :height
+        title       = val if key == :title
+        button_rows = val if key == :button_rows
+        button_cols = val if key == :button_cols
+        buttons     = val if key == :buttons
+        highlight   = val if key == :highlight
+        box         = val if key == :box
+        shadow      = val if key == :shadow
       end
 
       button_count = buttons.size
@@ -149,7 +148,7 @@ module RNDK
     # This activates the widget.
     def activate(actions=[])
       # Draw the buttonbox box.
-      self.draw
+      draw
 
       if actions.nil? || actions.size == 0
         while true
@@ -251,12 +250,12 @@ module RNDK
       end
 
       unless complete
-        self.draw_buttons
+        draw_buttons
         self.set_exit_type(0)
       end
 
       @result_data = ret
-      return ret
+      ret
     end
 
     # This sets multiple attributes of the widget.
@@ -266,36 +265,25 @@ module RNDK
     end
 
     # This sets the highlight attribute for the buttonboxes
-    def set_highlight(highlight)
-      @highlight = highlight
+    def highlight= hilite
+      @highlight = hilite
     end
 
-    def getHighlight
-      return @highlight
+    def highlight
+      @highlight
     end
 
     # This sets th background attribute of the widget.
-    def set_bg_color(attrib)
+    def set_bg_color attrib
       Ncurses.wbkgd(@win, attrib)
     end
 
     # This draws the buttonbox box widget.
     def draw
-      # Is there a shadow?
-      unless @shadow_win.nil?
-        Draw.drawShadow(@shadow_win)
-      end
-
-      # Box the widget if they asked.
-      if box
-        draw_box @win
-      end
-
-      # Draw in the title if there is one.
-      self.draw_title @win
-
-      # Draw in the buttons.
-      self.draw_buttons
+      Draw.drawShadow(@shadow_win) unless @shadow_win.nil?
+      draw_box @win if @box
+      draw_title @win
+      draw_buttons
     end
 
     # This erases the buttonbox box from the screen.
@@ -318,13 +306,14 @@ module RNDK
       @screen.unregister self
     end
 
-    def setCurrentButton(button)
-      if button >= 0 && button < @button_count
-        @current_button = button
-      end
+    def current_button= button
+      @current_button = button if (0...@button_count).member? button
+
+      @current_button = 0 if button < 0
+      @current_button = @button_count-1 if button > @button_count-1
     end
 
-    def getCurrentButton
+    def current_button
       @current_button
     end
 
@@ -333,11 +322,11 @@ module RNDK
     end
 
     def focus
-      self.draw
+      draw
     end
 
     def unfocus
-      self.draw
+      draw
     end
 
     def position
@@ -387,6 +376,6 @@ module RNDK
       Ncurses.wrefresh @win
     end
 
-
   end
 end
+
