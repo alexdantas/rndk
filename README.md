@@ -126,3 +126,7 @@ take the time to visit any of the links below.
 * Contact: `eu @ alexdantas.net`
 * My homepage: http://www.alexdantas.net
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/alexdantas/rndk/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
