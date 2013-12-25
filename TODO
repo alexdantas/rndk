@@ -14,7 +14,10 @@ The main things we must do are:
   - medium: Explain stuff on modules and classes.
             Argument lists, config, signals, stuff.
 
-
+* Specific things
+  - Fix Ncurses::BACKSPACE problem.
+    Sometimes backspace don't work - that's a xterm issue, but
+    it may have a wordaround - check for (key.ord == 127) or (key == '\b')
 
 
 Now those items were forked from Tawny-Cdk's TODO List.

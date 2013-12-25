@@ -119,14 +119,12 @@ Step-by-step guide to contribute:
 
 ## Contact
 
-Hi, I'm Alexandre Dantas! Thanks for having interest in this project. Please
-take the time to visit any of the links below.
+Hi, I'm Alexandre Dantas! Thanks for having interest in this project.
+Please take the time to visit any of the links below.
 
 * `rndk` homepage: http://www.alexdantas.net/projects/rndk
 * Contact: `eu @ alexdantas.net`
 * My homepage: http://www.alexdantas.net
 
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/alexdantas/rndk/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/ddaa96fcc25f5fc79f8db4de7a9c0952 "githalytics.com")](http://githalytics.com/alexdantas/rndk)
 
